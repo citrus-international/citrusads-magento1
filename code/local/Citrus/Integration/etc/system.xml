@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<config>
+    <tabs>
+        <citrus translate="label" module="citrusintegration">
+            <label>Citrus Integration</label>
+            <sort_order>20</sort_order>
+        </citrus>
+    </tabs>
+    <sections>
+        <citrus translate="label" module="citrusintegration">
+            <label>General Setting</label>
+            <tab>citrus</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>40</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+
+            <groups>
+                <citrus_group translate="label" module="citrusintegration">
+                    <label>General Setting</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>1000</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+
+                    <fields>
+                        <enable translate="label">
+                            <label>Enable: </label>
+                            <comment>Source model provider Magento's default Yes/No values</comment>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </enable>
+                        <host translate="label">
+                            <label>Host: </label>
+                            <comment>Choose your host</comment>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>citrusintegration/system_config_source_host</source_model>
+                        </host>
+                        <team_id translate="label">
+                            <label>Team Id: </label>
+                            <comment>
+                                1. Navigate to staging.citrusad.com.
+                                2. Log in.
+                                3. Click Integration Settings in the drop-down menu that appears when you click your name in the upper-right-hand corner of the Citrus User Interface.
+                                4. Your team ID is displayed in the first field on the screen.
+                            </comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </team_id>
+                        <api_key translate="label">
+                            <label>Api Key: </label>
+                            <comment>
+                                1. Navigate to staging.citrusad.com.
+                                2. Click on Integration Settings in the drop-down menu that appears when you click your name in the upper-right-hand corner of the Citrus User Interface.
+                                3. Click Api Key.
+                                4. Click the green Show button.
+                                5. Click the green Copy button. This copies the API key to your clipboard.
+                            </comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </api_key>
+                        <catalog_name>
+                            <label>Catalog Name: </label>
+                            <comment>
+
+                            </comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </catalog_name>
+                    </fields>
+                </citrus_group>
+            </groups>
+        </citrus>
+    </sections>
+</config>
