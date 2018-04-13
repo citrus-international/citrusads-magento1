@@ -6,6 +6,29 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
      * @param $body array
      * @return array
      */
+    public function pushOrderRequest($body){
+        $handle = 'order';
+        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        $body = [
+            'orders' =>
+                [$body]
+        ];
+        return self::requestPostApi($handle,$headers, $body);
+    }
+
+    /**
+     * @param $orderId
+     * @return array|bool
+     */
+    public function deleteOrderRequest($orderId){
+        $handle = 'orders/'.$orderId;
+        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        return self::requestDeleteApi($handle,$headers);
+    }
+    /**
+     * @param $body array
+     * @return array
+     */
     public function pushCustomerRequest($body){
         $handle = 'customers';
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
@@ -15,9 +38,15 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         ];
         return self::requestPostApi($handle,$headers, $body);
     }
+
+    /**
+     * @param $customerId
+     * @return array|bool
+     */
     public function deleteCustomerRequest($customerId){
         $handle = 'customers/'.$customerId;
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        return self::requestDeleteApi($handle,$headers);
     }
     /**
      * @param null $body
