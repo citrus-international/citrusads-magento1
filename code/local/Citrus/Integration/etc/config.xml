@@ -6,6 +6,18 @@
             <version>1.0.0</version>
         </Citrus_Integration>
     </modules>
+    <crontab> 
+        <jobs>   
+            <citrus_cron_task>       
+                <schedule>         
+                    <cron_expr>*/5 * * * *</cron_expr>       
+                </schedule>     
+                <run>         
+                    <model>citrusintegration/cron::crontask</model>       
+                </run>
+            </citrus_cron_task>
+        </jobs>
+    </crontab>
     <global>
         <models>
             <citrusintegration>
@@ -50,20 +62,22 @@
         <events>
             <admin_system_config_changed_section_citrus>
                 <observers>
-                    <alphapayments>
+                    <citrusintegration>
                         <type>singleton</type>
                         <class>Citrus_Integration_Model_Observer</class>
                         <method>createCatalog</method>
-                    </alphapayments>
+                    </citrusintegration>
                 </observers>
-                <!--<observers>-->
-                    <!--<citrusintegration>-->
-                        <!--<type>singleton</type>-->
-                        <!--<class>yourmodule/observer</class>-->
-                        <!--<method>adminSystemConfigChangedSectionNameofyoursection</method>-->
-                    <!--</citrusintegration>-->
-                <!--</observers>-->
             </admin_system_config_changed_section_citrus>
+            <admin_system_config_changed_section_citrus_sync>
+                <observers>
+                    <citrusintegration>
+                        <type>singleton</type>
+                        <class>Citrus_Integration_Model_Observer</class>
+                        <method>pushProducts</method>
+                    </citrusintegration>
+                </observers>
+            </admin_system_config_changed_section_citrus_sync>
         </events>
     </global>
     <!--<global>-->
@@ -93,8 +107,11 @@
                                 <config>
                                     <children>
                                         <citrus>
-                                            <title>Store Hello World Module Section</title>
+                                            <title>Citrus General</title>
                                         </citrus>
+                                        <citrus_sync>
+                                            <title>Citrus Synchronization</title>
+                                        </citrus_sync>
                                     </children>
                                 </config>
                             </children>

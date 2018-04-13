@@ -7,4 +7,33 @@ class Citrus_Integration_Model_Catalog extends Mage_Core_Model_Abstract
         parent::_construct();
         $this->_init('citrusintegration/catalog');
     }
+
+    /**
+     * Retrive catalog_id by name
+     *
+     * @param   string $name
+     * @return  integer
+     */
+    public function getCatalogIdByName($name)
+    {
+        return $this->_getResource()->getCatalogIdByName($name);
+    }
+    /**
+     * Get catalog_id
+     *
+     * @return string|false
+     */
+    public function getCatalogId()
+    {
+        return $this->_getResource()->getCatalogId();
+    }
+    /**
+     * Retrieve resource instance wrapper
+     *
+     * @return Citrus_Integration_Model_Resource_Catalog
+     */
+    protected function _getResource()
+    {
+        return parent::_getResource();
+    }
 }
