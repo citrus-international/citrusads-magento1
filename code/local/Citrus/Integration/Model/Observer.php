@@ -103,7 +103,7 @@ class Citrus_Integration_Model_Observer
                                 $category = $catModel->load($categoryId);
                                 $data['categoryHierarchy'][] = $category->getName();
                             }
-                        $body = $data;
+                        $body[] = $data;
                     }
                     $response = $this->getRequestModel()->pushCatalogProductsRequest($body, $catalogId);
                     $this->handleResponse($response);
