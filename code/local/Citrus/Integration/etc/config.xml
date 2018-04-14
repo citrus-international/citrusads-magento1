@@ -31,6 +31,16 @@
                         <table>citrus_integration_catalog</table>
                     </catalog>
                 </entities>
+                <entities>
+                    <queue>
+                        <table>citrus_integration_queue</table>
+                    </queue>
+                </entities>
+                <entities>
+                    <log>
+                        <table>citrus_integration_log</table>
+                    </log>
+                </entities>
             </citrusintegration_mysql4>
         </models>
         <!--resource-->
