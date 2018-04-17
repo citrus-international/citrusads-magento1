@@ -7,7 +7,7 @@ class Citrus_Integration_Block_Adminhtml_Queue_Edit extends Mage_Adminhtml_Block
     public function __construct()
     {
         $this->_blockGroup = 'citrusintegration';
-        $this->_controller = 'adminhtml_queue';
+        $this->_controller = 'adminhtml_citrusintegration_queue';
 
         parent::__construct();
 

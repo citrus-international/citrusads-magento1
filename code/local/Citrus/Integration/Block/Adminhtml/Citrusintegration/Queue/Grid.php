@@ -32,7 +32,6 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Queue_Grid extends Ma
             array(
                 'header'=> $this->__('ID'),
                 'align' =>'right',
-                'width' => '50px',
                 'index' => 'id'
             )
         );
@@ -40,7 +39,6 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Queue_Grid extends Ma
             array(
                 'header'=> $this->__('Magento Entity'),
                 'align' =>'right',
-                'width' => '50px',
                 'index' => 'entity_id'
             )
         );
@@ -48,7 +46,6 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Queue_Grid extends Ma
             array(
                 'header'=> $this->__('Type'),
                 'align' =>'right',
-                'width' => '50px',
                 'index' => 'type'
             )
         );
@@ -67,5 +64,19 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Queue_Grid extends Ma
     {
         // This is where our row data will link to
         return $this->getUrl('*/*/edit', array('id' => $row->getId()));
+    }
+
+    protected function _prepareMassaction()
+    {
+        $this->setMassactionIdField('id');
+        $this->getMassactionBlock()->setFormFieldName('id');
+
+        $this->getMassactionBlock()->addItem('delete', array(
+            'label'    => Mage::helper('citrusintegration')->__('Delete'),
+            'url'      => $this->getUrl('*/*/massDelete'),
+            'confirm'  => Mage::helper('citrusintegration')->__('Are you sure?')
+        ));
+
+        return $this;
     }
 }
