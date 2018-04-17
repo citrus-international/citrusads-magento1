@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<config>
+    <menu>
+        <!--
+        This item will be created in the Admin menu under Sales
+        - If you want another section, reference the appropriate adminhtml.xml file in app/code/core/Mage/Modulename/etc
+        - For example, we found out this was 'sales' by referencing the config/menu node of app/code/core/Mage/Sales/etc/adminhtml.xml
+        -->
+        <citrus translate="title" module="citrusintegration">
+            <title>Citrus</title>
+            <sort_order>20</sort_order>
+            <!--<depends><module>Mage_Sales</module></depends>-->
+            <children>
+                <!-- Here, I like to use the namespacename_modulename_controllername naming convention -->
+                <citrusintegration_queue translate="title" module="citrusintegration">
+                    <!-- This is how the menu text will be displayed -->
+                    <title>Queue List</title>
+                    <!-- This is the URL of what we want the menu item to link to -->
+                    <action>adminhtml/citrusintegration_queue</action>
+                </citrusintegration_queue>
+            </children>
+        </citrus>
+        <!--<sales translate="title" module="sales">-->
+            <!--<title>Sales</title>-->
+            <!--<sort_order>20</sort_order>-->
+            <!--<depends><module>Mage_Sales</module></depends>-->
+            <!--<children>-->
+                <!--<order translate="title" module="sales">-->
+                    <!--<title>Orders</title>-->
+                    <!--<action>adminhtml/sales_order</action>-->
+                    <!--<sort_order>10</sort_order>-->
+                <!--</order>-->
+                <!---->
+            <!--</children>-->
+        <!--</sales>-->
+    </menu>
+
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <!-- Same as above, but instead of referencing the config/menu node, you reference the acl/resources node of adminhtml.xml -->
+                    <citrus>
+                        <children>
+                            <!-- Keep the same naming convention as above -->
+                            <citrus_queue>
+                                <!-- This is how the ACL text will be displayed on System > Permissions > Roles > Role > Role Resources -->
+                                <title>Queue</title>
+                            </citrus_queue>
+                        </children>
+                    </citrus>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

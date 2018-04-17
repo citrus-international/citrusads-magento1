@@ -18,6 +18,39 @@
             </citrus_cron_task>
         </jobs>
     </crontab>
+    <!--<admin>-->
+        <!--<routers>-->
+            <!--<adminhtml>-->
+                <!--<args>-->
+                    <!--<modules>-->
+                        <!--<Citrus_Integration after="Mage_Adminhtml">Citrus_Integration_Adminhtml</Citrus_Integration>-->
+                    <!--</modules>-->
+                <!--</args>-->
+            <!--</adminhtml>-->
+        <!--</routers>-->
+    <!--</admin>-->
+    <!--<admin>-->
+        <!--<routers>-->
+            <!--<citrusintegration>-->
+                <!--<use>admin</use>-->
+                <!--<args>-->
+                    <!--<module>Citrus_Integration</module>-->
+                    <!--<frontName>citrusintegration</frontName>-->
+                <!--</args>-->
+            <!--</citrusintegration>-->
+        <!--</routers>-->
+    <!--</admin>-->
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Citrus_Integration before="Mage_Adminhtml">Citrus_Integration_Adminhtml</Citrus_Integration>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
     <global>
         <models>
             <citrusintegration>
@@ -69,6 +102,11 @@
                 <class>Citrus_Integration_Helper</class>
             </citrusintegration>
         </helpers>
+        <blocks>
+            <citrusintegration>
+                <class>Citrus_Integration_Block</class>
+            </citrusintegration>
+        </blocks>
         <events>
             <admin_system_config_changed_section_citrus>
                 <observers>
@@ -105,6 +143,17 @@
     <!--</global>-->
 
     <adminhtml>
+        <layout>
+            <updates>
+                <citrusintegration>
+                    <!--
+                    We again keep a nice naming convention and make our module upgrade proof by placing it in a separate folder
+                    - Since we are in the adminhtml node, this will look for the XML file in the app/design/adminhtml/default/default root folder
+                    -->
+                    <file>citrus/integration/queue.xml</file>
+                </citrusintegration>
+            </updates>
+        </layout>
         <acl>
             <resources>
                 <all>

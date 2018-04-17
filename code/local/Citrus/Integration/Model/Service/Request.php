@@ -137,7 +137,6 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             $result['success'] = false;
             $result['message'] = $exception->getMessage();
         }
-
         return $result;
     }
     public function requestDeleteApi($handle, $headers = array(), $params = '')
@@ -166,7 +165,6 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             $result['success'] = false;
             $result['message'] = $exception->getMessage();
         }
-
         return $result;
     }
 }

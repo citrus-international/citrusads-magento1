@@ -189,6 +189,18 @@
                             <depends><sync_mode>1</sync_mode></depends>
                         </frequency>
                     </fields>
+                    <fields>
+                        <add translate="label">
+                            <label>Add all product to queue</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>citrusintegration/adminhtml_system_config_form_button</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <button_url>citrus/queue/product</button_url>
+                        </add>
+                    </fields>
                 </citrus_product>
                 <citrus_order>
                     <label>Order</label>
