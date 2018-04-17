@@ -9,6 +9,12 @@ class Citrus_Integration_Model_Observer
         return Mage::getModel('citrusintegration/service_request');
     }
     /**
+     * @return false|Citrus_Integration_Model_Queue
+     */
+    protected function getQueueModel(){
+        return Mage::getModel('citrusintegration/queue');
+    }
+    /**
      * @return false|Citrus_Integration_Helper_Data
      */
     protected function getHelper(){
@@ -54,6 +60,23 @@ class Citrus_Integration_Model_Observer
         }catch (Exception $e){
 
         }
+    }
+
+    public function pushProductToQueue($observer){
+        $product = $observer->getProduct();
+        if($product->hasDataChanges()){
+            $queueModel = $this->getQueueModel();
+            $queueCollection = $queueModel->getCollection()->addFieldToSelect('id')
+                ->addFieldToFilter('entity_id', ['eq' => $product->getId()])
+                ->getFirstItem();
+            if($queueCollection->getData()){
+                $queueModel->load($queueCollection->getId());
+                $queueModel->enqueue($product->getId(), $product->getResourceName());
+            }else {
+                $queueModel->enqueue($product->getId(), $product->getResourceName());
+            }
+        }
+
     }
     public function pushProducts(){
 

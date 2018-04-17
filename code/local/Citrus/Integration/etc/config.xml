@@ -18,28 +18,6 @@
             </citrus_cron_task>
         </jobs>
     </crontab>
-    <!--<admin>-->
-        <!--<routers>-->
-            <!--<adminhtml>-->
-                <!--<args>-->
-                    <!--<modules>-->
-                        <!--<Citrus_Integration after="Mage_Adminhtml">Citrus_Integration_Adminhtml</Citrus_Integration>-->
-                    <!--</modules>-->
-                <!--</args>-->
-            <!--</adminhtml>-->
-        <!--</routers>-->
-    <!--</admin>-->
-    <!--<admin>-->
-        <!--<routers>-->
-            <!--<citrusintegration>-->
-                <!--<use>admin</use>-->
-                <!--<args>-->
-                    <!--<module>Citrus_Integration</module>-->
-                    <!--<frontName>citrusintegration</frontName>-->
-                <!--</args>-->
-            <!--</citrusintegration>-->
-        <!--</routers>-->
-    <!--</admin>-->
     <admin>
         <routers>
             <adminhtml>
@@ -117,15 +95,24 @@
                     </citrusintegration>
                 </observers>
             </admin_system_config_changed_section_citrus>
-            <admin_system_config_changed_section_citrus_sync>
+            <catalog_product_save_after>
                 <observers>
                     <citrusintegration>
                         <type>singleton</type>
                         <class>Citrus_Integration_Model_Observer</class>
-                        <method>pushProducts</method>
+                        <method>pushProductToQueue</method>
                     </citrusintegration>
                 </observers>
-            </admin_system_config_changed_section_citrus_sync>
+            </catalog_product_save_after>
+            <!--<catalog_product_save_after>-->
+                <!--<observers>-->
+                    <!--<citrusintegration>-->
+                        <!--<type>singleton</type>-->
+                        <!--<class>Citrus_Integration_Model_Observer</class>-->
+                        <!--<method>detectProductChanges</method>-->
+                    <!--</citrusintegration>-->
+                <!--</observers>-->
+            <!--</catalog_product_save_after>-->
         </events>
     </global>
     <!--<global>-->
