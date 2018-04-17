@@ -25,6 +25,9 @@ design/frontend/base/default/template/*
 design/adminhtml/*
 !design/adminhtml/default
 design/adminhtml/default/default/*
+!design/adminhtml/default/default/layout
+design/adminhtml/default/default/layout/*
+!design/adminhtml/default/default/layout/citrus
 !design/adminhtml/default/default/template
 design/adminhtml/default/default/template/*
 !design/adminhtml/default/default/template/citrus

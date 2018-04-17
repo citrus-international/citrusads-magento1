@@ -1,0 +1,168 @@
+<?php
+/** @var $this Citrus_Integration_Block_Adminhtml_System_Config_Form_Button */
+?>
+<div class="actions button-container">
+    <?php
+    $x = Mage::getBlockSingleton('citrusintegration/adminhtml_queue');
+    $y =1;
+    ?>
+    <button class="button action-configure"
+            type="button"
+            data-role="<?php /* @escapeNotVerified */
+            echo $this->getId() ?>"
+            id="<?php /* @escapeNotVerified */
+            echo $this->getId() ?>">
+        <span><?php /* @escapeNotVerified */
+            echo $this->escapeHtml($this->getLabel()) ?></span>
+    </button>
+</div>
+<!--    <button id="myBtn">Open Modal</button>-->
+<div id="myModal" class="modal-popup" style="display: none">
+    <div class="modal-inner-wrap">
+        <header class="modal-header">
+            <h1 class="modal-title" id="modal-title" data-role="title"></h1>
+            <button class="action-close" id="closeBtn" type="button">
+                <span class="close">&times;</span>
+            </button>
+        </header>
+        <div class="modal-content" id="modal-content">
+        </div>
+        <footer class="modal-footer">
+            <button class="action-primary action-accept" type="button" data-role="action" id="acceptBtn"><span>OK</span>
+            </button>
+        </footer>
+    </div>
+</div>
+<style>
+    .modal-popup {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 999; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0, 0, 0); /* Fallback color */
+        background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    }
+
+    .modal-inner-wrap {
+        margin: 5rem auto;
+        max-width: 900px;
+        width: 75%;
+        background-color: #fff;
+        box-shadow: 0 0 12px 2px rgba(0, 0, 0, 0.35);
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        box-sizing: border-box;
+        height: auto;
+        left: 0;
+        position: absolute;
+        right: 0;
+        transition-duration: .2s;
+        -webkit-transition-property: -webkit-transform, visibility;
+        transition-property: transform, visibility;
+        transition-timing-function: ease;
+    }
+
+    .modal-popup .modal-header,
+    .modal-popup .modal-content,
+    .modal-popup .modal-footer {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .modal-popup .modal-header {
+        padding-bottom: 6px;
+        padding-top: 15px;
+    }
+
+    .modal-popup .modal-footer {
+        padding-top: 13px;
+        padding-bottom: 15px;
+        margin-top: auto;
+        text-align: right;
+    }
+
+    .modal-popup .action-close {
+        position: absolute;
+        right: 0;
+        top: 0;
+        margin: 10px 15px;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type="text/javascript">// src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js">
+    // $j=$(".modal-popup");
+    $.noConflict();
+    console.log($('citrus_sync_citrus_product_add'));
+    console.log(jQuery);
+    // $.ajax('aaa','aaa');
+    var buttonDataRole = document.getElementById("citrus_sync_citrus_product_add");
+    buttonDataRole.onclick = function () {
+        // xmlhttp.open("GET","yourmodule/ajax/index/someval/"+value,true);
+        jQuery.ajax({
+            type: "GET",
+            url: '<?php /* @escapeNotVerified */ echo $this->escapeUrl($this->getButtonUrl()) ?>',
+            data: [],
+            showLoader: true,
+            success: function (response) {
+                console.log(response);
+                showModal(
+                    response.message,
+                    '<?php /* @escapeNotVerified */ echo $this->escapeHtml($this->getLabel()) ?>'
+                );
+            },
+            error: function (response) {
+                console.log(response);
+                showModal(
+                    'Something went wrong with Ajax request, please refresh your browser',
+                    '<?php /* @escapeNotVerified */ echo $this->escapeHtml($this->getLabel()) ?>'
+                );
+            }
+        });
+    };
+
+    function showModal(content, title) {
+        var modal = document.getElementById('myModal');
+        var modal_header = document.getElementById('modal-title');
+        var modal_content = document.getElementById('modal-content');
+        var close = document.getElementById("closeBtn");
+        var accept = document.getElementById("acceptBtn");
+        modal_header.append(title);
+        modal_content.append(content);
+        modal.style.display = "block";
+        close.onclick = function () {
+            modal.style.display = "none";
+        };
+        accept.onclick = function () {
+            modal.style.display = "none";
+        };
+        window.onclick = function (event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+    }
+    //]]>
+</script>

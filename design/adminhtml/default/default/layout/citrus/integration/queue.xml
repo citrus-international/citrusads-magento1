@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<layout>
+    <!-- Here, we reference the XML node path of our route -->
+    <!--<adminhtml_citrus_integration_queue_index>-->
+        <!--<reference name="content">-->
+            <!--&lt;!&ndash; We also reference our block by namespacename_modulename/adminhtml_controllername, and name it uniquely &ndash;&gt;-->
+            <!--<block type="citrusintegration/adminhtml_queue" name="citrus_integration_queue" />-->
+        <!--</reference>-->
+    <!--</adminhtml_citrus_integration_queue_index>-->
+    <adminhtml_citrusintegration_queue_index>
+        <reference name="content">
+            <block type="citrusintegration/adminhtml_citrusintegration_queue" name="citrus.integration.queue.grid.container"></block>
+        </reference>
+    </adminhtml_citrusintegration_queue_index>
+
+    <adminhtml_citrusintegration_queue_grid>
+        <block type="citrusintegration/adminhtml_citrusintegration_queue_grid" name="citrus.integration.queue.grid" output="toHtml"></block>
+    </adminhtml_citrusintegration_queue_grid>
+</layout>

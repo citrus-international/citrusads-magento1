@@ -1,4 +1,5 @@
 <?php
+
 class Citrus_Integration_Block_Adminhtml_System_Config_Form_Button extends Mage_Adminhtml_Block_System_Config_Form_Field
 {
     protected $_buttonLabel = 'Sync now';
@@ -9,7 +10,7 @@ class Citrus_Integration_Block_Adminhtml_System_Config_Form_Button extends Mage_
     protected function _construct()
     {
         parent::_construct();
-        $this->setTemplate('citrusintegration/system/config/button.phtml');
+        $this->setTemplate('citrus/integration/system/config/button.phtml');
     }
 
     /**
@@ -53,9 +54,9 @@ class Citrus_Integration_Block_Adminhtml_System_Config_Form_Button extends Mage_
     {
         $button = $this->getLayout()->createBlock('adminhtml/widget_button')
             ->setData(array(
-                'id'        => 'citrus_button',
-                'label'     => $this->helper('adminhtml')->__('Check'),
-                'onclick'   => 'javascript:check(); return false;'
+                'id' => 'citrus_button',
+                'label' => $this->helper('adminhtml')->__('Check'),
+                'onclick' => 'javascript:check(); return false;'
             ));
 
         return $button->toHtml();
