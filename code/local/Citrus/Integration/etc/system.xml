@@ -99,52 +99,52 @@
             <show_in_store>1</show_in_store>
             <groups>
                 <!--Synchronization-->
-                <citrus_group translate="label" module="citrusintegration">
-                    <label>Synchronization Options</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>20</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
-                    <fields>
-                        <option translate="label">
-                            <label>Synchronization Options: </label>
-                            <comment>Setup Synchronization Options: Real time/ Cron Job</comment>
-                            <frontend_type>select</frontend_type>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <source_model>citrusintegration/system_config_source_option</source_model>
-                        </option>
-                    </fields>
-                    <fields>
-                        <frequency translate="label comment">
-                            <label>Frequency</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_cron_frequency</source_model>
-                            <backend_model>backup/config_backend_cron</backend_model>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <depends><option>1</option></depends>
-                        </frequency>
-                    </fields>
-                    <fields>
-                        <push_current_product translate="label comment">
-                            <label>Push all current products</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                <!--<citrus_group translate="label" module="citrusintegration">-->
+                    <!--<label>Synchronization Options</label>-->
+                    <!--<frontend_type>text</frontend_type>-->
+                    <!--<sort_order>20</sort_order>-->
+                    <!--<show_in_default>1</show_in_default>-->
+                    <!--<show_in_website>1</show_in_website>-->
+                    <!--<show_in_store>1</show_in_store>-->
+                    <!--<fields>-->
+                        <!--<option translate="label">-->
+                            <!--<label>Synchronization Options: </label>-->
+                            <!--<comment>Setup Synchronization Options: Real time/ Cron Job</comment>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<sort_order>10</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<source_model>citrusintegration/system_config_source_option</source_model>-->
+                        <!--</option>-->
+                    <!--</fields>-->
+                    <!--<fields>-->
+                        <!--<frequency translate="label comment">-->
+                            <!--<label>Frequency</label>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<source_model>adminhtml/system_config_source_cron_frequency</source_model>-->
                             <!--<backend_model>backup/config_backend_cron</backend_model>-->
-                            <sort_order>30</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <!--<sort_order>20</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
                             <!--<depends><option>1</option></depends>-->
-                        </push_current_product>
-                    </fields>
-                </citrus_group>
+                        <!--</frequency>-->
+                    <!--</fields>-->
+                    <!--<fields>-->
+                        <!--<push_current_product translate="label comment">-->
+                            <!--<label>Push all current products</label>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<source_model>adminhtml/system_config_source_yesno</source_model>-->
+                            <!--&lt;!&ndash;<backend_model>backup/config_backend_cron</backend_model>&ndash;&gt;-->
+                            <!--<sort_order>30</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--&lt;!&ndash;<depends><option>1</option></depends>&ndash;&gt;-->
+                        <!--</push_current_product>-->
+                    <!--</fields>-->
+                <!--</citrus_group>-->
                 <citrus_product>
                     <label>Product</label>
                     <frontend_type>text</frontend_type>
@@ -191,14 +191,14 @@
                     </fields>
                     <fields>
                         <add translate="label">
-                            <label>Add all product to queue</label>
+                            <label>Add all products to queue</label>
                             <frontend_type>button</frontend_type>
                             <frontend_model>citrusintegration/adminhtml_system_config_form_button</frontend_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <button_url>citrus/queue/product</button_url>
+                            <button_url>adminhtml/citrusintegration_queue/product</button_url>
                         </add>
                     </fields>
                 </citrus_product>
@@ -258,6 +258,19 @@
                             <depends><sync_mode>1</sync_mode></depends>
                         </frequency>
                     </fields>
+
+                    <fields>
+                        <add translate="label">
+                            <label>Add all orders to queue</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>citrusintegration/adminhtml_system_config_form_button</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <button_url>adminhtml/citrusintegration_queue/order</button_url>
+                        </add>
+                    </fields>
                 </citrus_order>
                 <citrus_customer>
                     <label>Customer</label>
@@ -301,6 +314,18 @@
                             <show_in_store>1</show_in_store>
                             <depends><sync_mode>1</sync_mode></depends>
                         </frequency>
+                    </fields>
+                    <fields>
+                        <add translate="label">
+                            <label>Add all customers to queue</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>citrusintegration/adminhtml_system_config_form_button</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <button_url>adminhtml/citrusintegration_queue/customer</button_url>
+                        </add>
                     </fields>
                 </citrus_customer>
             </groups>

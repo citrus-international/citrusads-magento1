@@ -28,37 +28,10 @@ class Citrus_Integration_Block_Adminhtml_System_Config_Form_Button extends Mage_
             [
                 'label' => $this->helper('adminhtml')->__($buttonLabel),
                 'id' => $element->getHtmlId(),
-                'button_url' => $this->getUrl($router)
+                'button_url' => Mage::helper('adminhtml')->getUrl($router, array('_secure' => true))//$this->getUrl($router)
             ]
         );
         $element->setComment('<strong style="color:red">Warning</strong>: Please save the configuration before syncing data');
         return $this->_toHtml();
-    }
-
-    /**
-     * Return ajax url for button
-     *
-     * @return string
-     */
-    public function getAjaxCheckUrl()
-    {
-        return Mage::helper('adminhtml')->getUrl('adminhtml/adminhtml_atwixtweaks/check');
-    }
-
-    /**
-     * Generate button html
-     *
-     * @return string
-     */
-    public function getButtonHtml()
-    {
-        $button = $this->getLayout()->createBlock('adminhtml/widget_button')
-            ->setData(array(
-                'id' => 'citrus_button',
-                'label' => $this->helper('adminhtml')->__('Check'),
-                'onclick' => 'javascript:check(); return false;'
-            ));
-
-        return $button->toHtml();
     }
 }

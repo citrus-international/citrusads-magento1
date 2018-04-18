@@ -1,11 +1,9 @@
 <?php
 /** @var $this Citrus_Integration_Block_Adminhtml_System_Config_Form_Button */
+//$x = $this->escapeUrl($this->getButtonUrl());
+//$y =1;
 ?>
 <div class="actions button-container">
-    <?php
-    $x = Mage::getBlockSingleton('citrusintegration/adminhtml_queue');
-    $y =1;
-    ?>
     <button class="button action-configure"
             type="button"
             data-role="<?php /* @escapeNotVerified */
@@ -16,7 +14,6 @@
             echo $this->escapeHtml($this->getLabel()) ?></span>
     </button>
 </div>
-<!--    <button id="myBtn">Open Modal</button>-->
 <div id="myModal" class="modal-popup" style="display: none">
     <div class="modal-inner-wrap">
         <header class="modal-header">
@@ -115,12 +112,9 @@
 <script type="text/javascript">// src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js">
     // $j=$(".modal-popup");
     $.noConflict();
-    console.log($('citrus_sync_citrus_product_add'));
-    console.log(jQuery);
-    // $.ajax('aaa','aaa');
-    var buttonDataRole = document.getElementById("citrus_sync_citrus_product_add");
+    var buttonDataRole = document.getElementById("<?php /* @escapeNotVerified */ echo $this->getId() ?>");
     buttonDataRole.onclick = function () {
-        // xmlhttp.open("GET","yourmodule/ajax/index/someval/"+value,true);
+        console.log('hihih');
         jQuery.ajax({
             type: "GET",
             url: '<?php /* @escapeNotVerified */ echo $this->escapeUrl($this->getButtonUrl()) ?>',
@@ -128,8 +122,10 @@
             showLoader: true,
             success: function (response) {
                 console.log(response);
+                var data = JSON.parse(response);
+                console.log(data.message);
                 showModal(
-                    response.message,
+                    data.message,
                     '<?php /* @escapeNotVerified */ echo $this->escapeHtml($this->getLabel()) ?>'
                 );
             },
@@ -149,8 +145,8 @@
         var modal_content = document.getElementById('modal-content');
         var close = document.getElementById("closeBtn");
         var accept = document.getElementById("acceptBtn");
-        modal_header.append(title);
-        modal_content.append(content);
+        jQuery(modal_header).html(title);
+        jQuery(modal_content).html(content);
         modal.style.display = "block";
         close.onclick = function () {
             modal.style.display = "none";
