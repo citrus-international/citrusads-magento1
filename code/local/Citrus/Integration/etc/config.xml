@@ -104,39 +104,13 @@
                     </citrusintegration>
                 </observers>
             </catalog_product_save_after>
-            <!--<catalog_product_save_after>-->
-                <!--<observers>-->
-                    <!--<citrusintegration>-->
-                        <!--<type>singleton</type>-->
-                        <!--<class>Citrus_Integration_Model_Observer</class>-->
-                        <!--<method>detectProductChanges</method>-->
-                    <!--</citrusintegration>-->
-                <!--</observers>-->
-            <!--</catalog_product_save_after>-->
         </events>
     </global>
-    <!--<global>-->
-        <!--<events>-->
-            <!--<admin_system_config_changed_section_nameofyoursection>-->
-                <!--<observers>-->
-                    <!--<yourmodule>-->
-                        <!--<type>singleton</type>-->
-                        <!--<class>yourmodule/observer</class>-->
-                        <!--<method>adminSystemConfigChangedSectionNameofyoursection</method>-->
-                    <!--</yourmodule>-->
-                <!--</observers>-->
-            <!--</admin_system_config_changed_section_nameofyoursection>-->
-        <!--</events>-->
-    <!--</global>-->
 
     <adminhtml>
         <layout>
             <updates>
                 <citrusintegration>
-                    <!--
-                    We again keep a nice naming convention and make our module upgrade proof by placing it in a separate folder
-                    - Since we are in the adminhtml node, this will look for the XML file in the app/design/adminhtml/default/default root folder
-                    -->
                     <file>citrus/integration/queue.xml</file>
                 </citrusintegration>
             </updates>

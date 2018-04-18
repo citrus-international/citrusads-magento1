@@ -3,12 +3,15 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Queue extends Mage_Ad
 {
     public function __construct()
     {
-        // The blockGroup must match the first half of how we call the block, and controller matches the second half
         $this->_controller = 'adminhtml_citrusintegration_queue';
         $this->_blockGroup = 'citrusintegration';
 
         $this->_headerText = Mage::helper('adminhtml')->__('Queue');
-
+        $this->_addButton('add_new', array(
+            'label'   => Mage::helper('catalog')->__('Sync now'),
+            'onclick' => "setLocation('{$this->getUrl('*/*/sync')}')",
+            'class'   => 'add'
+        ));
         parent::__construct();
         $this->_removeButton('add');
     }

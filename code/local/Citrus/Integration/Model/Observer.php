@@ -64,17 +64,26 @@ class Citrus_Integration_Model_Observer
 
     public function pushProductToQueue($observer){
         $product = $observer->getProduct();
-        if($product->hasDataChanges()){
-            $queueModel = $this->getQueueModel();
-            $queueCollection = $queueModel->getCollection()->addFieldToSelect('id')
-                ->addFieldToFilter('entity_id', ['eq' => $product->getId()])
-                ->getFirstItem();
-            if($queueCollection->getData()){
-                $queueModel->load($queueCollection->getId());
-                $queueModel->enqueue($product->getId(), $product->getResourceName());
-            }else {
-                $queueModel->enqueue($product->getId(), $product->getResourceName());
+        $realTime = $enable = Mage::getStoreConfig('citrus_sync/citrus_product/sync_mode', Mage::app()->getStore());
+        if($realTime){
+            if($product->hasDataChanges()){
+                $queueModel = $this->getQueueModel();
+                $queueCollection = $queueModel->getCollection()->addFieldToSelect('id')
+                    ->addFieldToFilter('entity_id', ['eq' => $product->getId()])
+                    ->getFirstItem();
+                if($queueCollection->getData()){
+                    $queueModel->load($queueCollection->getId());
+                    $queueModel->enqueue($product->getId(), $product->getResourceName());
+                }else {
+                    $queueModel->enqueue($product->getId(), $product->getResourceName());
+                }
             }
+        }
+        else{
+            $helper = $this->getHelper();
+            $body = $helper->getProductData($product);
+            $response = $this->getRequestModel()->pushCatalogProductsRequest($body);
+            $this->handleResponse($response);
         }
 
     }

@@ -4,11 +4,34 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
 {
     public function indexAction()
     {
-        // Let's call our initAction method which will set some basic params for each action
         $this->_title($this->__('Queue List'));
         $this->loadLayout();
         $this->_initLayoutMessages('customer/session');
         $this->renderLayout();
+    }
+    /**
+     * @return false|Citrus_Integration_Model_Service_Request
+     */
+    protected function getRequestModel(){
+        return Mage::getModel('citrusintegration/service_request');
+    }
+    /**
+     * @return false|Mage_Catalog_Model_Product
+     */
+    protected function getProductModel(){
+        return Mage::getModel('catalog/product');
+    }
+    /**
+     * @return false|Mage_Customer_Model_Customer
+     */
+    protected function getCustomerModel(){
+        return Mage::getModel("customer/customer");
+    }
+    /**
+     * @return false|Mage_Sales_Model_Order
+     */
+    protected function getOrderModel(){
+        return Mage::getModel('sales/order');
     }
     /**
      * @param $name string
@@ -42,7 +65,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         else {
             if ($enable) {
                 /** @var Mage_Catalog_Model_Product $productModel */
-                $productModel = Mage::getModel('catalog/product');
+                $productModel = $this->getProductModel();
                 $allCollections = $productModel->getCollection()
                     ->addAttributeToSelect('*')
                     ->addAttributeToFilter('type_id', ['in' => ['simple', 'virtual']])
@@ -82,7 +105,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         else {
             if ($enable) {
                 /** @var Mage_Catalog_Model_Product $productModel */
-                $orderModel = Mage::getModel('sales/order');
+                $orderModel = $this->getOrderModel();
                 if($status != ''){
                     $allCollections = $orderModel->getCollection()
                         ->addAttributeToFilter('status', array('eq' => $status))
@@ -117,7 +140,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         else {
             if ($enable) {
                 /** @var Mage_Catalog_Model_Product $productModel */
-                $customerModel = Mage::getModel("customer/customer");
+                $customerModel = $this->getCustomerModel();
                 $allCollections = $customerModel->getCollection()
                     ->addAttributeToSelect('*')
                     ->setPageSize(100);
@@ -149,68 +172,109 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             $queueModel->enqueue($item->getId(), $item->getResourceName());
         }
     }
-    public function newAction()
+    public function syncAction()
     {
-        // We just forward the new action to a blank edit form
-        $this->_forward('edit');
-    }
-
-    public function editAction()
-    {
-        $this->_initAction();
-
-        // Get id if available
-        $id = $this->getRequest()->getParam('id');
-        $model = Mage::getModel('citrusintegration/queue');
-
-        if ($id) {
-            // Load record
-            $model->load($id);
-            // Check if record is loaded
-            if (!$model->getId()) {
-                Mage::getSingleton('adminhtml/session')->addError($this->__('This baz no longer exists.'));
-                $this->_redirect('*/*/');
-
-                return;
-            }
-        }
-
-        $this->_title($model->getId() ? $model->getName() : $this->__('New Queue'));
-
-        $data = Mage::getSingleton('adminhtml/session')->getBazData(true);
-        if (!empty($data)) {
-            $model->setData($data);
-        }
-
-        Mage::register('citrusintegration', $model);
-
-        $this->_initAction()
-            ->_addBreadcrumb($id ? $this->__('Edit Baz') : $this->__('New Baz'), $id ? $this->__('Edit Baz') : $this->__('New Queue'))
-            ->_addContent($this->getLayout()->createBlock('citrusintegration/adminhtml_queue_edit')->setData('action', $this->getUrl('*/*/save')))
-            ->renderLayout();
-    }
-
-    public function saveAction()
-    {
-        if ($postData = $this->getRequest()->getPost()) {
-            $model = Mage::getSingleton('citrusintegration/queue');
-            $model->setData($postData);
-
+        $requestIds = $this->getRequest()->getParam('id');
+        $requestIds = [9];
+        if(!is_array($requestIds)) {
+            Mage::getSingleton('adminhtml/session')->addError(Mage::helper('adminhtml')->__('Please select request(s)'));
+        } else {
             try {
-                $model->save();
-
-                Mage::getSingleton('adminhtml/session')->addSuccess($this->__('The queue has been saved.'));
-                $this->_redirect('*/*/');
-
-                return;
-            } catch (Mage_Core_Exception $e) {
-                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                foreach ($requestIds as $requestId) {
+                    $requestData = Mage::getModel('citrusintegration/queue')->load($requestId);
+                    $this->handleData($requestData->getEntityId(), $requestData->getType());
+                }
+                Mage::getSingleton('adminhtml/session')->addSuccess(
+                    Mage::helper('adminhtml')->__(
+                        'Total of %d record(s) were successfully synced', count($requestIds)
+                    )
+                );
             } catch (Exception $e) {
-                Mage::getSingleton('adminhtml/session')->addError($this->__('An error occurred while saving this queue.'));
+                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
+        }
+        $this->_redirect('*/*/');
+    }
+    public function handleData($itemId, $type){
+        $itemModel = Mage::getModel($type);
+        $entity = $itemModel->load($itemId);
+        $helper = $this->getHelper();
+        switch ($type){
+            case 'catalog/product':
+                /** @var  $entity Mage_Catalog_Model_Product */
+                $body = $helper->getProductData($entity);
+                $response = $this->getRequestModel()->pushCatalogProductsRequest($body);
+                break;
+            case 'customer/customer':
+                /** @var  $entity Mage_Customer_Model_Customer */
+                $body = $helper->getCustomerData($entity);
+                $response = $this->getRequestModel()->pushCustomerRequest($body);
+                break;
+            case 'sales/order':
+                /** @var  $entity Mage_Sales_Model_Order */
+                $body = $helper->getOrderData($entity);
+                $response = $this->getRequestModel()->pushOrderRequest($body);
+                break;
+        }
+        $this->handleResponse($response);
+    }
+    protected function handleResponse($response){
+        $x = 1;
+    }
+    public function pushProducts(){
 
-            Mage::getSingleton('adminhtml/session')->setBazData($postData);
-            $this->_redirectReferer();
+        $enable = Mage::getStoreConfig('citrus_sync/citrus_group/push_current_product', Mage::app()->getStore());
+        $catalogId = $this->getCitrusCatalogId();
+        $teamId = $this->getHelper()->getTeamId();
+        if(!$catalogId || !$teamId){
+            $error = Mage::helper('adminhtml')->__('Please save your api key first!');
+            Mage::throwException($error);
+        }
+        else {
+            if ($enable) {
+                /** @var Mage_Catalog_Model_Product $productModel */
+                $productModel = Mage::getModel('catalog/product');
+                $allCollections = $productModel->getCollection()
+                    ->addAttributeToSelect('*')
+                    ->addAttributeToFilter('type_id', ['in' => ['simple', 'virtual']])
+                    ->addAttributeToFilter('status', 1)
+                    ->joinField(
+                        'qty',
+                        'cataloginventory/stock_item',
+                        'qty',
+                        'product_id=entity_id',
+                        '{{table}}.stock_id=1',
+                        'left'
+                    )
+                    ->setPageSize(100);
+                $numberOfPages = $allCollections->getLastPageNumber();
+                for ($i = 1; $i <= $numberOfPages; $i++) {
+                    $collections = $allCollections->setCurPage($i);
+                    $body = [];
+                    foreach ($collections as $collection) {
+                        $tags = $this->getProductTags($collection->getId());
+                        $data['catalogId'] = $catalogId;
+                        $data['teamId'] = $teamId;
+                        $data['gtin'] = $collection->getId();
+                        $data['name'] = $collection->getName();
+                        if ($collection->getImage() != 'no_selection')
+                            $data['images'] = [Mage::getModel('catalog/product_media_config')->getMediaUrl($collection->getImage())];
+                        $data['inventory'] = (int)$collection->getQty();
+                        $data['price'] = (int)$collection->getPrice();
+                        $data['tags'] = $tags;
+                        $categoryIds = $collection->getCategoryIds();
+                        $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
+                        if (is_array($categoryIds))
+                            foreach ($categoryIds as $categoryId) {
+                                $category = $catModel->load($categoryId);
+                                $data['categoryHierarchy'][] = $category->getName();
+                            }
+                        $body[] = $data;
+                    }
+                    $response = $this->getRequestModel()->pushCatalogProductsRequest($body, $catalogId);
+                    $this->handleResponse($response);
+                }
+            }
         }
     }
 
@@ -252,7 +316,6 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     protected function _initAction()
     {
         $this->loadLayout()
-            // Make the active menu match the menu config nodes (without 'children' inbetween)
             ->_setActiveMenu('citrus/citrus_queue')
             ->_title($this->__('Sales'))->_title($this->__('Queue'))
             ->_addBreadcrumb($this->__('Sales'), $this->__('Sales'))
