@@ -30,6 +30,22 @@ CREATE TABLE {$this->getTable('citrusintegration/log')} (
   `message` VARCHAR(255) NULL,
   PRIMARY KEY (`id`)    
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS {$this->getTable('citrusintegration/customer')};
+CREATE TABLE {$this->getTable('citrusintegration/customer')} (
+  `id` int(11) unsigned NOT NULL auto_increment,
+  `entity_id` VARCHAR(255) NOT NULL,
+  `citrus_id` VARCHAR(255) NULL,
+  PRIMARY KEY (`id`)    
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS {$this->getTable('citrusintegration/order')};
+CREATE TABLE {$this->getTable('citrusintegration/order')} (
+  `id` int(11) unsigned NOT NULL auto_increment,
+  `entity_id` VARCHAR(255) NOT NULL,
+  `citrus_id` VARCHAR(255) NULL,
+  PRIMARY KEY (`id`)    
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ");
 
 $installer->endSetup();

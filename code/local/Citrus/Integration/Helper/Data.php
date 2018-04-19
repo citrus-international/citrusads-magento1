@@ -40,13 +40,18 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      * @param $name string
      * @return false|string
      */
-    protected function getCitrusCatalogId($name = null){
+    public function getCitrusCatalogId($name = null){
         $model = Mage::getModel('citrusintegration/catalog');
         if($name)
             return $model->getCatalogIdByName($name);
         return $model->getCatalogId();
     }
-
+    /**
+     * @return false|Citrus_Integration_Model_Service_Request
+     */
+    public function getRequestModel(){
+        return Mage::getModel('citrusintegration/service_request');
+    }
     /**
      * @param $entity Mage_Sales_Model_Order
      * @return mixed
@@ -54,8 +59,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function getOrderData($entity){
         $teamId = $this->getTeamId();
         $data['teamId'] = $teamId;
-        $data['id'] = $entity->getId();
-        $data['customerId'] = $entity->getCustomerId();
+        $data['customerId'] = $this->getCustomerIdByCustomer($entity->getCustomer());
         $datetime = DateTime::createFromFormat("Y-m-d H:i:s", $entity->getCreatedAt());
         $data['orderDate'] = $datetime->format(\DateTime::RFC3339);
         $orderItems = $entity->getAllItems();
@@ -64,7 +68,70 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         }
         return $data;
     }
+    public function getCustomerIdByCustomer($customer){
+        /** @var Citrus_Integration_Model_Customer $model */
+        $model = Mage::getModel('citrusintegration/customer');
+        $customerId = $model->getCustomerIdByEntityId($customer->getId());
+        if($customerId){
+            return $customerId;
+        }
+        else{
+            $customerData = $this->getCustomerData($customer);
+            $response = $this->getRequestModel()->pushCustomerRequest([$customerData]);
+            $this->handleResponse($response, 'customer', $customer->getId());
+            return $this->getCustomerIdByCustomer($customer);
+        }
+    }
+    public function handleResponse($response,$type = null, $name = null){
+        if ($response['success']) {
+            if($type == 'catalog'){
+                $data = json_decode($response['message'], true);
+                foreach ($data['catalogs'] as $catalog){
+                    $catalogData['catalog_id'] = $catalog['id'];
+                    $catalogData['entity_id'] = $catalog['name'];
+                    $model = Mage::getModel('citrusintegration/catalog')->setData($catalogData);
+                    try {
+                        $model->save();
+                    } catch (Exception $e) {
 
+                    }
+                }
+            }
+            elseif($type == 'customer'){
+                $data = json_decode($response['message'], true);
+                foreach ($data['customers'] as $customer){
+                    $customerData['citrus_id'] = $customer['id'];
+                    $customerData['entity_id'] = $name;
+                    $model = Mage::getModel('citrusintegration/customer')->setData($customerData);
+                    try {
+                        $model->save();
+                    } catch (Exception $e) {
+
+                    }
+                }
+
+            }
+            elseif($type == 'order'){
+                $data = json_decode($response['message'], true);
+                foreach ($data['orders'] as $order){
+                    $orderData['citrus_id'] = $order['id'];
+                    $orderData['entity_id'] = $name;
+                    $model = Mage::getModel('citrusintegration/order')->setData($orderData);
+                    try {
+                        $model->save();
+                    } catch (Exception $e) {
+
+                    }
+                }
+            }
+        }
+        else {
+            $data = json_decode($response['message'], true);
+            $error = $data['message'] != '' ? $data['message'] : 'Something went wrong. Please try again in a few minutes';
+            $error = Mage::helper('adminhtml')->__($error);
+            Mage::throwException($error);
+        }
+    }
     /**
      * @param $item Mage_Sales_Model_Order_Item
      * @return array
@@ -84,7 +151,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function getCustomerData($entity){
         $teamId = $this->getTeamId();
         $data['teamId'] = $teamId;
-        $data['id'] = $entity->getId();
+//        $data['id'] = $entity->getId();
         $gender = $entity->getGender();
         if($gender == 1)
             $gender = 'Male';
@@ -127,7 +194,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             }
         return $data;
     }
-    protected function getProductTags($id){
+    public function getProductTags($id){
         $results = [];
         $model=Mage::getModel('tag/tag');
         $tags= $model->getResourceCollection()

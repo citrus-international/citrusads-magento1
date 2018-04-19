@@ -52,6 +52,16 @@
                         <table>citrus_integration_log</table>
                     </log>
                 </entities>
+                <entities>
+                    <customer>
+                        <table>citrus_integration_customer</table>
+                    </customer>
+                </entities>
+                <entities>
+                    <order>
+                        <table>citrus_integration_order</table>
+                    </order>
+                </entities>
             </citrusintegration_mysql4>
         </models>
         <!--resource-->

@@ -116,7 +116,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         $url = $this->getCitrusHelper()->getHost().$handle;
         $result = ['success' => true];
         $body = json_encode($params);
-        $body= '{"customers":[{"id": "string","teamId": "c45f5be4-4b1f-453b-9074-1f03655f276e","yearOfBirth": "1994","gender": "string","suburb": "string","postcode": "string"}]}';
+//        $body= '{"customers":[{"id": "string","teamId": "c45f5be4-4b1f-453b-9074-1f03655f276e","yearOfBirth": "1994","gender": "string","suburb": "string","postcode": "string"}]}';
         try {
             $curl = new Varien_Http_Adapter_Curl();
             $curl->write(Zend_Http_Client::POST, $url , '1.1', $headers, $body);
