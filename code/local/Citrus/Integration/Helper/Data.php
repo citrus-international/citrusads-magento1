@@ -88,7 +88,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                 $data = json_decode($response['message'], true);
                 foreach ($data['catalogs'] as $catalog){
                     $catalogData['catalog_id'] = $catalog['id'];
-                    $catalogData['entity_id'] = $catalog['name'];
+                    $catalogData['name'] = $catalog['name'];
                     $model = Mage::getModel('citrusintegration/catalog')->setData($catalogData);
                     try {
                         $model->save();
@@ -184,6 +184,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $data['images'] = [Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage())];
         $data['inventory'] = (int)$entity->getQty();
         $data['price'] = (int)$entity->getPrice();
+        $data['filters'] = [$entity->getName()];
         $data['tags'] = $tags;
         $categoryIds = $entity->getCategoryIds();
         $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());

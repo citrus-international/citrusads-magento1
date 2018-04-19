@@ -202,7 +202,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             case 'catalog/product':
                 /** @var  $entity Mage_Catalog_Model_Product */
                 $body = $helper->getProductData($entity);
-                $response = $this->getRequestModel()->pushCatalogProductsRequest([$body]);
+                $response = $this->getRequestModel()->pushCatalogProductsRequest($body);
                 break;
             case 'customer/customer':
                 /** @var  $entity Mage_Customer_Model_Customer */
