@@ -87,6 +87,50 @@ class Citrus_Integration_Model_Observer
         }
 
     }
+    public function pushOrderToQueue($observer){
+        $order = $observer->getOrder();
+        $customer = $order->getCustomer();
+        $realTimeOrder = $enable = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
+        $realTimeCustomer = $enable = Mage::getStoreConfig('citrus_sync/citrus_customer/sync_mode', Mage::app()->getStore());
+        if($realTimeCustomer){
+            $queueModel = $this->getQueueModel();
+            $queueCollection = $queueModel->getCollection()->addFieldToSelect('id')
+                ->addFieldToFilter('entity_id', ['eq' => $customer->getId()])
+                ->getFirstItem();
+            if($queueCollection->getData()){
+                $queueModel->load($queueCollection->getId());
+                $queueModel->enqueue($customer->getId(), $customer->getResourceName());
+            }else {
+                $queueModel->enqueue($customer->getId(), $customer->getResourceName());
+            }
+        }
+        else{
+            $helper = $this->getHelper();
+            $body = $helper->getCustomerData($customer);
+            $response = $this->getRequestModel()->pushCustomerRequest([$body]);
+            $this->handleResponse($response);
+        }
+        if($realTimeOrder){
+            $queueModel = $this->getQueueModel();
+            $queueCollection = $queueModel->getCollection()->addFieldToSelect('id')
+                ->addFieldToFilter('entity_id', ['eq' => $order->getId()])
+                ->getFirstItem();
+            if($queueCollection->getData()){
+                $queueModel->load($queueCollection->getId());
+                $queueModel->enqueue($order->getId(), $order->getResourceName());
+            }else {
+                $queueModel->enqueue($order->getId(), $order->getResourceName());
+            }
+        }
+        else{
+            $helper = $this->getHelper();
+            $body = $helper->getOrderData($order);
+            $response = $this->getRequestModel()->pushOrderRequest([$body]);
+            $this->handleResponse($response);
+        }
+
+
+    }
     public function pushProducts(){
 
         $enable = Mage::getStoreConfig('citrus_sync/citrus_group/push_current_product', Mage::app()->getStore());

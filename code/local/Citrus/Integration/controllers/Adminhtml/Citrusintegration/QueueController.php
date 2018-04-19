@@ -172,10 +172,9 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             $queueModel->enqueue($item->getId(), $item->getResourceName());
         }
     }
-    public function syncAction()
+    public function massSyncAction()
     {
         $requestIds = $this->getRequest()->getParam('id');
-        $requestIds = [9];
         if(!is_array($requestIds)) {
             Mage::getSingleton('adminhtml/session')->addError(Mage::helper('adminhtml')->__('Please select request(s)'));
         } else {
@@ -203,17 +202,17 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             case 'catalog/product':
                 /** @var  $entity Mage_Catalog_Model_Product */
                 $body = $helper->getProductData($entity);
-                $response = $this->getRequestModel()->pushCatalogProductsRequest($body);
+                $response = $this->getRequestModel()->pushCatalogProductsRequest([$body]);
                 break;
             case 'customer/customer':
                 /** @var  $entity Mage_Customer_Model_Customer */
                 $body = $helper->getCustomerData($entity);
-                $response = $this->getRequestModel()->pushCustomerRequest($body);
+                $response = $this->getRequestModel()->pushCustomerRequest([$body]);
                 break;
             case 'sales/order':
                 /** @var  $entity Mage_Sales_Model_Order */
                 $body = $helper->getOrderData($entity);
-                $response = $this->getRequestModel()->pushOrderRequest($body);
+                $response = $this->getRequestModel()->pushOrderRequest([$body]);
                 break;
         }
         $this->handleResponse($response);
@@ -317,9 +316,9 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     {
         $this->loadLayout()
             ->_setActiveMenu('citrus/citrus_queue')
-            ->_title($this->__('Sales'))->_title($this->__('Queue'))
-            ->_addBreadcrumb($this->__('Sales'), $this->__('Sales'))
-            ->_addBreadcrumb($this->__('Baz'), $this->__('Baz'));
+            ->_title($this->__('Citrus'))->_title($this->__('Queue'))
+            ->_addBreadcrumb($this->__('Citrus'), $this->__('Citrus'))
+            ->_addBreadcrumb($this->__('Queue'), $this->__('Queue'));
 
         return $this;
     }

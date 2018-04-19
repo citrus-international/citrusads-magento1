@@ -24,28 +24,28 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Queue_Grid extends Ma
         $this->setCollection($collection);
         return parent::_prepareCollection();
     }
-//
+
     protected function _prepareColumns()
     {
         // Add the columns that should appear in the grid
         $this->addColumn('id',
             array(
                 'header'=> $this->__('ID'),
-                'align' =>'right',
+                'align' =>'left',
                 'index' => 'id'
             )
         );
         $this->addColumn('entity_id',
             array(
                 'header'=> $this->__('Magento Entity'),
-                'align' =>'right',
+                'align' =>'left',
                 'index' => 'entity_id'
             )
         );
         $this->addColumn('type',
             array(
                 'header'=> $this->__('Type'),
-                'align' =>'right',
+                'align' =>'left',
                 'index' => 'type'
             )
         );
@@ -74,6 +74,12 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Queue_Grid extends Ma
         $this->getMassactionBlock()->addItem('delete', array(
             'label'    => Mage::helper('citrusintegration')->__('Delete'),
             'url'      => $this->getUrl('*/*/massDelete'),
+            'confirm'  => Mage::helper('citrusintegration')->__('Are you sure?')
+        ));
+
+        $this->getMassactionBlock()->addItem('sync', array(
+            'label'    => Mage::helper('citrusintegration')->__('Sync'),
+            'url'      => $this->getUrl('*/*/massSync'),
             'confirm'  => Mage::helper('citrusintegration')->__('Are you sure?')
         ));
 

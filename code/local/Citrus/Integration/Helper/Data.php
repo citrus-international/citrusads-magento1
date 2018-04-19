@@ -52,17 +52,16 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      * @return mixed
      */
     public function getOrderData($entity){
-        $teamId = $this->getHelper()->getTeamId();
+        $teamId = $this->getTeamId();
         $data['teamId'] = $teamId;
         $data['id'] = $entity->getId();
         $data['customerId'] = $entity->getCustomerId();
-        $data['orderDate'] = $entity->getCreatedAt();
+        $datetime = DateTime::createFromFormat("Y-m-d H:i:s", $entity->getCreatedAt());
+        $data['orderDate'] = $datetime->format(\DateTime::RFC3339);
         $orderItems = $entity->getAllItems();
         foreach ($orderItems as $orderItem){
             $data['orderItems'][] = $this->getOrderItemData($orderItem);
         }
-        $address = $entity->getDefaultBillingAddress();
-        $data['postcode'] = isset($address) ? $address->getPostcode() : '';
         return $data;
     }
 
@@ -83,7 +82,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      * @return mixed
      */
     public function getCustomerData($entity){
-        $teamId = $this->getHelper()->getTeamId();
+        $teamId = $this->getTeamId();
         $data['teamId'] = $teamId;
         $data['id'] = $entity->getId();
         $gender = $entity->getGender();
@@ -108,7 +107,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      */
     public function getProductData($entity){
         $catalogId = $this->getCitrusCatalogId();
-        $teamId = $this->getHelper()->getTeamId();
+        $teamId = $this->getTeamId();
         $tags = $this->getProductTags($entity->getId());
         $data['catalogId'] = $catalogId;
         $data['teamId'] = $teamId;

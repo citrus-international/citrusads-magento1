@@ -104,6 +104,15 @@
                     </citrusintegration>
                 </observers>
             </catalog_product_save_after>
+            <sales_order_place_after>
+                <observers>
+                    <citrusintegration>
+                        <type>singleton</type>
+                        <class>Citrus_Integration_Model_Observer</class>
+                        <method>pushOrderToQueue</method>
+                    </citrusintegration>
+                </observers>
+            </sales_order_place_after>
         </events>
     </global>
 
