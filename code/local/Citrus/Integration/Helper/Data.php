@@ -51,11 +51,20 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             return $model->getCatalogIdByName($name);
         return $model->getCatalogId();
     }
+    public function getCitrusCatalogName(){
+        return Mage::getStoreConfig('citrus/citrus_group/catalog_name', Mage::app()->getStore());
+    }
     /**
      * @return false|Citrus_Integration_Model_Service_Request
      */
     public function getRequestModel(){
         return Mage::getModel('citrusintegration/service_request');
+    }
+    /**
+     * @return false|Citrus_Integration_Model_Service_Response
+     */
+    public function getResponseModel(){
+        return Mage::getModel('citrusintegration/service_response');
     }
     /**
      * @param $entity Mage_Sales_Model_Order
@@ -92,6 +101,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             return $this->getCustomerIdByCustomer($customer);
         }
     }
+//    public function handleR
     public function handleResponse($response,$type = null, $name = null){
         if ($response['success']) {
             if($type == 'catalog'){

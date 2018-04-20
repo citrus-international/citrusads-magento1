@@ -11,27 +11,26 @@ class Citrus_Integration_Model_Service_Response extends Varien_Object
      */
     public function getCatalogProductsListResponse($catalogId, $gtin = null, $limit = null, $skip = null)
     {
-//        $handle = 'catalog-products?';
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
         $body['catalogId'] = $catalogId;
         if ($gtin) $body['gtin'] = $gtin;
         if ($limit) $body['limit'] = $limit;
         if ($skip) $body['skip'] = $skip;
-//        $handle = 'catalog-products?'.http_build_query($body);
         $handle = 'catalog-products/3898addf-69eb-4631-812b-f0b952145563/2';
         return self::requestGetApi($handle, $headers, $body);
     }
 
     /**
-     * @param null $name
      * @return array
      */
-    public function getCatalogResponse($name = null)
+    public function getCatalogListResponse()
     {
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
-//        $handle = 'catalogs?'.http_build_query(['name'=> 'Name3','teamId'=>$this->getCitrusHelper()->getTeamId()]);
-//        $handle = 'catalogs/'.http_build_query(['name'=> 'Name3','teamId'=>$this->getCitrusHelper()->getTeamId()]);
-        $handle = 'catalogs/3898addf-69eb-4631-812b-f0b952145563';//.http_build_query(['name'=> 'Name3','teamId'=>$this->getCitrusHelper()->getTeamId()]);
+        $teamId = $this->getCitrusHelper()->getTeamId();
+        $data = [
+            'teamId' => $teamId
+        ];
+        $handle = 'catalogs?'.http_build_query($data);
         return self::requestGetApi($handle, $headers);
     }
 

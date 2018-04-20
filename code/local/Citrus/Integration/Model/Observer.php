@@ -1,7 +1,6 @@
 <?php
 class Citrus_Integration_Model_Observer
 {
-
     /**
      * @return false|Citrus_Integration_Model_Queue
      */
@@ -21,18 +20,66 @@ class Citrus_Integration_Model_Observer
         return Mage::helper('citrusintegration/data');
     }
 
+    public function handleGetResponse($response, $type = null, $param = null){
+        $name = $this->getHelper()->getCitrusCatalogName();
+        $host = $this->getHelper()->getHost();
+        if ($response['success']) {
+            if($type == 'catalog'){
+                $data = json_decode($response['message'], true);
+                if(is_array($data['catalogs'])){
+                    $new = true;
+                    foreach ($data['catalogs'] as $catalog){
+                        /** @var Citrus_Integration_Model_Catalog $model */
+                        $model = Mage::getModel('citrusintegration/catalog');
+                        $id = $model->getIdByName($name);
+                        if(!$id){
+                            $catalogData = [
+                                'catalog_id' => $catalog['id'],
+                                'teamId' => $catalog['teamId'],
+                                'host' => $host,
+                                'name' => $catalog['name']
+                            ];
+                            $model->addData($catalogData);
+                            try {
+                                $model->save();
+                            } catch (Exception $e) {
+
+                            }
+                        }
+                        if($name == $catalog['name']){
+                            $new = false;
+                        }
+                    }
+                    if($new){
+                        $this->pushCatalog($name);
+                    }
+                }
+                else{
+                    $this->pushCatalog($name);
+                }
+            }
+        }
+        else {
+            $data = json_decode($response['message'], true);
+            $error = $data['message'] != '' ? $data['message'] : 'Something went wrong. Please try again in a few minutes';
+            $error = Mage::helper('adminhtml')->__($error);
+            Mage::throwException($error);
+        }
+    }
+    public function pushCatalog($name){
+        $requestModel = $this->getHelper()->getRequestModel();
+        $response = $requestModel->pushCatalogsRequest($name);
+        $this->getHelper()->handleResponse($response, 'catalog', $name);
+    }
     public function createCatalog($observer)
     {
         $enable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
         $catalogName = Mage::getStoreConfig('citrus/citrus_group/catalog_name', Mage::app()->getStore());
         if ($enable) {
-            $api = $this->getHelper()->getRequestModel();
-            /** @var Citrus_Integration_Model_Catalog $model */
-            $model = Mage::getModel('citrusintegration/catalog');
-            if($model->getCatalogId() == false) {
-                $response = $api->pushCatalogsRequest($catalogName);
-                $this->getHelper()->handleResponse($response, 'catalog', $catalogName);
-            }
+
+            $responseModel = $this->getHelper()->getResponseModel();
+            $response = $responseModel->getCatalogListResponse();
+            $this->handleGetResponse($response, 'catalog', $catalogName);
         }
     }
     public function createRootCategory($storeId, $name){
@@ -100,63 +147,6 @@ class Citrus_Integration_Model_Observer
             $queueModel->enqueue($entity_id, $item->getResourceName());
         }else {
             $queueModel->enqueue($entity_id, $item->getResourceName());
-        }
-    }
-    public function pushProducts(){
-
-        $enable = Mage::getStoreConfig('citrus_sync/citrus_group/push_current_product', Mage::app()->getStore());
-        $catalogId = $this->getHelper()->getCitrusCatalogId();
-        $teamId = $this->getHelper()->getTeamId();
-        if(!$catalogId || !$teamId){
-            $error = Mage::helper('adminhtml')->__('Please save your api key first!');
-            Mage::throwException($error);
-        }
-        else {
-            if ($enable) {
-                /** @var Mage_Catalog_Model_Product $productModel */
-                $productModel = Mage::getModel('catalog/product');
-                $allCollections = $productModel->getCollection()
-                    ->addAttributeToSelect('*')
-                    ->addAttributeToFilter('type_id', ['in' => ['simple', 'virtual']])
-                    ->addAttributeToFilter('status', 1)
-                    ->joinField(
-                        'qty',
-                        'cataloginventory/stock_item',
-                        'qty',
-                        'product_id=entity_id',
-                        '{{table}}.stock_id=1',
-                        'left'
-                    )
-                    ->setPageSize(100);
-                $numberOfPages = $allCollections->getLastPageNumber();
-                for ($i = 1; $i <= $numberOfPages; $i++) {
-                    $collections = $allCollections->setCurPage($i);
-                    $body = [];
-                    /** @var Mage_Catalog_Model_Product $collection */
-                    foreach ($collections as $collection) {
-                        $tags = $this->getHelper()->getProductTags($collection->getId());
-                        $data['catalogId'] = $catalogId;
-                        $data['teamId'] = $teamId;
-                        $data['gtin'] = $collection->getId();
-                        $data['name'] = $collection->getName();
-                        if ($collection->getImage() != 'no_selection')
-                            $data['images'] = [Mage::getModel('catalog/product_media_config')->getMediaUrl($collection->getImage())];
-                        $data['inventory'] = (int)$collection->getQty();
-                        $data['price'] = (int)$collection->getPrice();
-                        $data['tags'] = $tags;
-                        $categoryIds = $collection->getCategoryIds();
-                        $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
-                        if (is_array($categoryIds))
-                            foreach ($categoryIds as $categoryId) {
-                                $category = $catModel->load($categoryId);
-                                $data['categoryHierarchy'][] = $category->getName();
-                            }
-                        $body[] = $data;
-                    }
-                    $response = $this->getHelper()->getRequestModel()->pushCatalogProductsRequest($body);
-                    $this->getHelper()->handleResponse($response);
-                }
-            }
         }
     }
     protected function getConfigValue($type)
