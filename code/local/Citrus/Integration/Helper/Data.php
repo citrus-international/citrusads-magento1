@@ -18,6 +18,11 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         return Mage::getStoreConfig('citrus/citrus_group/team_id', Mage::app()->getStore());
     }
 
+    /** @return false|Citrus_Integration_Model_Sync */
+    public function getSyncModel(){
+        return Mage::getModel('citrusintegration/sync');
+    }
+
     public function getApiKey(){
         return Mage::getStoreConfig('citrus/citrus_group/api_key', Mage::app()->getStore());
     }
@@ -66,6 +71,11 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         foreach ($orderItems as $orderItem){
             $data['orderItems'][] = $this->getOrderItemData($orderItem);
         }
+        return $data;
+    }
+    public function getContextData($entity = null){
+        $teamId = $this->getTeamId();
+        $data['catalogId'] = $this->getCitrusCatalogId();
         return $data;
     }
     public function getCustomerIdByCustomer($customer){
@@ -151,7 +161,6 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function getCustomerData($entity){
         $teamId = $this->getTeamId();
         $data['teamId'] = $teamId;
-//        $data['id'] = $entity->getId();
         $gender = $entity->getGender();
         if($gender == 1)
             $gender = 'Male';
@@ -173,6 +182,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      * @return mixed
      */
     public function getProductData($entity){
+        $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($entity);
         $catalogId = $this->getCitrusCatalogId();
         $teamId = $this->getTeamId();
         $tags = $this->getProductTags($entity->getId());
@@ -182,7 +192,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $data['name'] = $entity->getName();
         if ($entity->getImage() != 'no_selection')
             $data['images'] = [Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage())];
-        $data['inventory'] = (int)$entity->getQty();
+        $data['inventory'] = (int)$stock->getQty();
         $data['price'] = (int)$entity->getPrice();
         $data['filters'] = [$entity->getName()];
         $data['tags'] = $tags;
@@ -208,5 +218,28 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $results[] = $tag->getName();
         }
         return $results;
+    }
+    public function handleData($itemId, $type){
+        $itemModel = Mage::getModel($type);
+        $entity = $itemModel->load($itemId);
+        $helper = $this->getHelper();
+        switch ($type){
+            case 'catalog/product':
+                /** @var  $entity Mage_Catalog_Model_Product */
+                $body = $helper->getProductData($entity);
+                $response = $this->getRequestModel()->pushCatalogProductsRequest($body);
+                break;
+            case 'customer/customer':
+                /** @var  $entity Mage_Customer_Model_Customer */
+                $body = $helper->getCustomerData($entity);
+                $response = $this->getRequestModel()->pushCustomerRequest([$body]);
+                break;
+            case 'sales/order':
+                /** @var  $entity Mage_Sales_Model_Order */
+                $body = $helper->getOrderData($entity);
+                $response = $this->getRequestModel()->pushOrderRequest([$body]);
+                break;
+        }
+        $this->handleResponse($response);
     }
 }

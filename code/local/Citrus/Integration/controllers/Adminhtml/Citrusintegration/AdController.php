@@ -1,0 +1,90 @@
+<?php
+
+class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_Adminhtml_Controller_Action
+{
+    public function indexAction()
+    {
+        $this->_title($this->__('Ads List'));
+        $this->loadLayout();
+        $this->_initLayoutMessages('customer/session');
+        $this->renderLayout();
+    }
+    public function getAction(){
+        $contextData = $this->getHelper()->getContextData();
+        $this->getRequestModel()->requestingAnAd($contextData);
+        $this->_redirect('*/*/');
+    }
+    /**
+     * @return false|Citrus_Integration_Model_Service_Request
+     */
+    protected function getRequestModel(){
+        return Mage::getModel('citrusintegration/service_request');
+    }
+    /**
+     * @return false|Mage_Catalog_Model_Product
+     */
+    protected function getProductModel(){
+        return Mage::getModel('catalog/product');
+    }
+    /**
+     * @return false|Mage_Customer_Model_Customer
+     */
+    protected function getCustomerModel(){
+        return Mage::getModel("customer/customer");
+    }
+    /**
+     * @return false|Mage_Sales_Model_Order
+     */
+    protected function getOrderModel(){
+        return Mage::getModel('sales/order');
+    }
+    /**
+     * @param $name string
+     * @return false|string
+     */
+    protected function getCitrusCatalogId($name = null){
+        $model = Mage::getModel('citrusintegration/catalog');
+        if($name)
+            return $model->getCatalogIdByName($name);
+        return $model->getCatalogId();
+    }
+    /**
+     * @return false|Citrus_Integration_Helper_Data
+     */
+    protected function getHelper(){
+        return Mage::helper('citrusintegration/data');
+    }
+    /**
+     * @return false|Citrus_Integration_Model_Queue
+     */
+    protected function getQueueModel(){
+        return Mage::getModel('citrusintegration/queue');
+    }
+    /**
+     * Initialize action
+     *
+     * Here, we set the breadcrumbs and the active menu
+     *
+     * @return Mage_Adminhtml_Controller_Action
+     */
+    protected function _initAction()
+    {
+        $this->loadLayout()
+            ->_setActiveMenu('citrus/citrus_ad')
+            ->_title($this->__('Citrus'))->_title($this->__('Queue'))
+            ->_addBreadcrumb($this->__('Citrus'), $this->__('Citrus'))
+            ->_addBreadcrumb($this->__('Queue'), $this->__('Queue'));
+
+        return $this;
+    }
+
+    /**
+     * Check currently called action by permissions for current user
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('citrus/citrus_ad');
+    }
+}

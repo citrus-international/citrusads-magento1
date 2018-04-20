@@ -10,10 +10,10 @@
         <jobs>   
             <citrus_cron_task>       
                 <schedule>         
-                    <cron_expr>*/5 * * * *</cron_expr>       
+                    <cron_expr>* * * * *</cron_expr>       
                 </schedule>     
                 <run>         
-                    <model>citrusintegration/cron::crontask</model>       
+                    <model>citrusintegration/observer::cronQueue</model>       
                 </run>
             </citrus_cron_task>
         </jobs>
@@ -66,6 +66,21 @@
                     <discount>
                         <table>citrus_integration_discount</table>
                     </discount>
+                </entities>
+                <entities>
+                    <banner>
+                        <table>citrus_integration_banner</table>
+                    </banner>
+                </entities>
+                <entities>
+                    <ad>
+                        <table>citrus_integration_ad</table>
+                    </ad>
+                </entities>
+                <entities>
+                    <relevant>
+                        <table>citrus_integration_relevant_product</table>
+                    </relevant>
                 </entities>
             </citrusintegration_mysql4>
         </models>

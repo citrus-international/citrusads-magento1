@@ -15,7 +15,7 @@ class Citrus_Integration_Model_Observer
         return Mage::getModel('citrusintegration/customer');
     }
     /**
-     * @return false|Citrus_Integration_Helper_Data
+     * @return Mage_Core_Helper_Abstract|Citrus_Integration_Helper_Data
      */
     protected function getHelper(){
         return Mage::helper('citrusintegration/data');
@@ -29,7 +29,6 @@ class Citrus_Integration_Model_Observer
             $api = $this->getHelper()->getRequestModel();
             /** @var Citrus_Integration_Model_Catalog $model */
             $model = Mage::getModel('citrusintegration/catalog');
-            //create one root category
             if($model->getCatalogId() == false) {
                 $response = $api->pushCatalogsRequest($catalogName);
                 $this->getHelper()->handleResponse($response, 'catalog', $catalogName);
@@ -59,17 +58,7 @@ class Citrus_Integration_Model_Observer
         $realTime = $enable = Mage::getStoreConfig('citrus_sync/citrus_product/sync_mode', Mage::app()->getStore());
         if($realTime){
             if($product->hasDataChanges()){
-                $queueModel = $this->getQueueModel();
-                $queueCollection = $queueModel->getCollection()->addFieldToSelect('id')
-                    ->addFieldToFilter('type', ['eq' => $product->getResourceName()])
-                    ->addFieldToFilter('entity_id', ['eq' => $product->getId()])
-                    ->getFirstItem();
-                if($queueCollection->getData()){
-                    $queueModel->load($queueCollection->getId());
-                    $queueModel->enqueue($product->getId(), $product->getResourceName());
-                }else {
-                    $queueModel->enqueue($product->getId(), $product->getResourceName());
-                }
+                $this->pushItemToQueue($product,$product->getId());
             }
         }
         else{
@@ -78,32 +67,40 @@ class Citrus_Integration_Model_Observer
             $response = $this->getHelper()->getRequestModel()->pushCatalogProductsRequest($body);
             $this->getHelper()->handleResponse($response);
         }
-
     }
     public function pushOrderToQueue($observer){
         /** @var Mage_Sales_Model_Order $order */
         $order = $observer->getOrder();
+        $customer = $order->getCustomer();
         $realTimeOrder = $enable = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
         if($realTimeOrder){
-            $queueModel = $this->getQueueModel();
-            $queueCollection = $queueModel->getCollection()->addFieldToSelect('id')
-                ->addFieldToFilter('type', ['eq'=> $order->getResourceName()])
-                ->addFieldToFilter('entity_id', ['eq' => $order->getIncrementId()])
-                ->getFirstItem();
-            if($queueCollection->getData()){
-                $queueModel->load($queueCollection->getId());
-                $queueModel->enqueue($order->getId(), $order->getResourceName());
-            }else {
-                $queueModel->enqueue($order->getId(), $order->getResourceName());
-            }
+            $this->pushItemToQueue($order, $order->getIncrementId());
+            $this->pushItemToQueue($customer, $customer->getId());
         }
         else{
             $body = $this->getHelper()->getOrderData($order);
             $response = $this->getHelper()->getRequestModel()->pushOrderRequest([$body]);
             $this->getHelper()->handleResponse($response, 'order', $order->getIncrementId());
         }
+    }
 
-
+    /**
+     * @param $item
+     * @param $entity_id
+     */
+    public function pushItemToQueue($item, $entity_id){
+        /** @var Citrus_Integration_Model_Queue $queueModel */
+        $queueModel = $this->getQueueModel();
+        $queueCollection = $queueModel->getCollection()->addFieldToSelect('id')
+            ->addFieldToFilter('type', ['eq'=> $item->getResourceName()])
+            ->addFieldToFilter('entity_id', ['eq' => $entity_id])
+            ->getFirstItem();
+        if($queueCollection->getData()){
+            $queueModel->load($queueCollection->getId());
+            $queueModel->enqueue($entity_id, $item->getResourceName());
+        }else {
+            $queueModel->enqueue($entity_id, $item->getResourceName());
+        }
     }
     public function pushProducts(){
 
@@ -161,5 +158,48 @@ class Citrus_Integration_Model_Observer
                 }
             }
         }
+    }
+    protected function getConfigValue($type)
+    {
+        $path = 'citrus_sync/'. $type .'/frequency';
+
+        return Mage::getStoreConfig($path, Mage::app()->getStore());
+    }
+    public function cronQueue(){
+        $productCron = Mage::getStoreConfig('citrus_sync/citrus_product/sync_mode', Mage::app()->getStore());
+        $orderCron = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
+        Mage::log('My log entry'.time());
+        if($productCron){
+            if ($time = $this->getConfigValue('citrus_product')) {
+                if ($this->calculateTime($time)) {
+                    $this->getHelper()->getSyncModel()->syncData('catalog/product');
+                }
+            }
+        }
+        if($orderCron){
+            if ($time = $this->getConfigValue('citrus_order')) {
+                if ($this->calculateTime($time)) {
+                    $this->getHelper()->getSyncModel()->syncData('customer/customer');
+                    $this->getHelper()->getSyncModel()->syncData('sales/order');
+                }
+            }
+        }
+    }
+    /**
+     * Calculate time
+     *
+     * @param $time
+     * @return bool
+     */
+    protected function calculateTime($time)
+    {
+        $minute = date('i');
+        $hour = date('h');
+        /** change minute 0 to minute 60th */
+        if ($minute == 0) {
+            $minute = 60;
+        }
+
+        return ($minute % $time == 0) || ($time == 120 && $hour % 2 == 0);
     }
 }

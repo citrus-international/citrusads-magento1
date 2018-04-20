@@ -181,7 +181,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             try {
                 foreach ($requestIds as $requestId) {
                     $requestData = Mage::getModel('citrusintegration/queue')->load($requestId);
-                    $this->handleData($requestData->getEntityId(), $requestData->getType());
+                    $this->getHelper()->handleData($requestData->getEntityId(), $requestData->getType());
                 }
                 Mage::getSingleton('adminhtml/session')->addSuccess(
                     Mage::helper('adminhtml')->__(
@@ -194,29 +194,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         }
         $this->_redirect('*/*/');
     }
-    public function handleData($itemId, $type){
-        $itemModel = Mage::getModel($type);
-        $entity = $itemModel->load($itemId);
-        $helper = $this->getHelper();
-        switch ($type){
-            case 'catalog/product':
-                /** @var  $entity Mage_Catalog_Model_Product */
-                $body = $helper->getProductData($entity);
-                $response = $this->getRequestModel()->pushCatalogProductsRequest($body);
-                break;
-            case 'customer/customer':
-                /** @var  $entity Mage_Customer_Model_Customer */
-                $body = $helper->getCustomerData($entity);
-                $response = $this->getRequestModel()->pushCustomerRequest([$body]);
-                break;
-            case 'sales/order':
-                /** @var  $entity Mage_Sales_Model_Order */
-                $body = $helper->getOrderData($entity);
-                $response = $this->getRequestModel()->pushOrderRequest([$body]);
-                break;
-        }
-        $this->handleResponse($response);
-    }
+
     protected function handleResponse($response){
         $x = 1;
     }
@@ -297,12 +275,6 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             }
         }
         $this->_redirect('*/*/');
-    }
-
-    public function messageAction()
-    {
-        $data = Mage::getModel('citrusintegration/queue')->load($this->getRequest()->getParam('id'));
-        echo $data->getContent();
     }
 
     /**

@@ -4,7 +4,6 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Queue_Grid extends Ma
     public function __construct()
     {
         parent::__construct();
-        // Set some defaults for our grid
         $this->setDefaultSort('id');
         $this->setId('citrus_integration_queue_grid');
         $this->setDefaultDir('asc');
@@ -13,13 +12,12 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Queue_Grid extends Ma
 
     protected function _getCollectionClass()
     {
-        // This is the model we are using for the grid
         return 'citrusintegration/queue_collection';
     }
 
     protected function _prepareCollection()
     {
-        // Get and set our collection for the grid
+        /** @var Varien_Data_Collection $collection */
         $collection = Mage::getResourceModel($this->_getCollectionClass());
         $this->setCollection($collection);
         return parent::_prepareCollection();
@@ -27,42 +25,44 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Queue_Grid extends Ma
 
     protected function _prepareColumns()
     {
-        // Add the columns that should appear in the grid
-        $this->addColumn('id',
-            array(
-                'header'=> $this->__('ID'),
-                'align' =>'left',
-                'index' => 'id'
-            )
-        );
-        $this->addColumn('entity_id',
-            array(
-                'header'=> $this->__('Magento Entity'),
-                'align' =>'left',
-                'index' => 'entity_id'
-            )
-        );
-        $this->addColumn('type',
-            array(
-                'header'=> $this->__('Type'),
-                'align' =>'left',
-                'index' => 'type'
-            )
-        );
+        try{
+            $this->addColumn('id',
+                array(
+                    'header'=> $this->__('ID'),
+                    'align' =>'left',
+                    'width' => '55px',
+                    'index' => 'id'
+                )
+            );
+            $this->addColumn('entity_id',
+                array(
+                    'header'=> $this->__('Magento Entity'),
+                    'align' =>'left',
+                    'index' => 'entity_id'
+                )
+            );
+            $this->addColumn('type',
+                array(
+                    'header'=> $this->__('Type'),
+                    'align' =>'left',
+                    'index' => 'type'
+                )
+            );
 
-        $this->addColumn('enqueue_time',
-            array(
-                'header'=> $this->__('Enqueue Time'),
-                'index' => 'enqueue_time'
-            )
-        );
+            $this->addColumn('enqueue_time',
+                array(
+                    'header'=> $this->__('Enqueue Time'),
+                    'index' => 'enqueue_time'
+                )
+            );
+        }catch (Exception $e){
 
+        }
         return parent::_prepareColumns();
     }
 
     public function getRowUrl($row)
     {
-        // This is where our row data will link to
         return $this->getUrl('*/*/edit', array('id' => $row->getId()));
     }
 
