@@ -33,16 +33,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     protected function getOrderModel(){
         return Mage::getModel('sales/order');
     }
-    /**
-     * @param $name string
-     * @return false|string
-     */
-    protected function getCitrusCatalogId($name = null){
-        $model = Mage::getModel('citrusintegration/catalog');
-        if($name)
-            return $model->getCatalogIdByName($name);
-        return $model->getCatalogId();
-    }
+
     /**
      * @return false|Citrus_Integration_Helper_Data
      */
@@ -57,7 +48,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     }
     public function productAction(){
         $enable = Mage::getStoreConfig('citrus_sync/citrus_product/enable', Mage::app()->getStore());
-        $catalogId = $this->getCitrusCatalogId();
+        $catalogId = $this->getHelper()->getCitrusCatalogId();
         $teamId = $this->getHelper()->getTeamId();
         if(!$catalogId || !$teamId){
             $message = Mage::helper('adminhtml')->__('Please save your api key first!');
@@ -196,7 +187,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     }
 
     protected function handleResponse($response){
-        $x = 1;
+
     }
     public function pushProducts(){
 

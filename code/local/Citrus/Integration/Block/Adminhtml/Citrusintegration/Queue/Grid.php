@@ -61,11 +61,6 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Queue_Grid extends Ma
         return parent::_prepareColumns();
     }
 
-    public function getRowUrl($row)
-    {
-        return $this->getUrl('*/*/edit', array('id' => $row->getId()));
-    }
-
     protected function _prepareMassaction()
     {
         $this->setMassactionIdField('id');

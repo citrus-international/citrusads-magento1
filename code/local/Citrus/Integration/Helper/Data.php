@@ -42,14 +42,13 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         }
     }
     /**
-     * @param $name string
      * @return false|string
      */
-    public function getCitrusCatalogId($name = null){
+    public function getCitrusCatalogId(){
+        /** @var Citrus_Integration_Model_Catalog $model */
         $model = Mage::getModel('citrusintegration/catalog');
-        if($name)
-            return $model->getCatalogIdByName($name);
-        return $model->getCatalogId();
+        $name = $this->getCitrusCatalogName();
+        return $model->getCatalogIdByName($name);
     }
     public function getCitrusCatalogName(){
         return Mage::getStoreConfig('citrus/citrus_group/catalog_name', Mage::app()->getStore());
@@ -82,9 +81,22 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         }
         return $data;
     }
-    public function getContextData($entity = null){
-        $teamId = $this->getTeamId();
-        $data['catalogId'] = $this->getCitrusCatalogId();
+    public function getContextData($context = null){
+        $data = [
+            'catalogId' => $this->getCitrusCatalogId(),
+            'pageType' => isset($context['pageType']) ? $context['pageType'] : 'Home',
+            'maxNumberOfAds' => (int)$context['maxNumberOfAds']
+        ];
+        if(isset($context['searchTerm']))
+            $data['searchTerm'] = $context['searchTerm'];
+        if(isset($context['productFilters'])){
+           $arrays = explode(',',$context['productFilters']);
+           foreach ($arrays as $array){
+               $data['productFilters'][] = [$array];
+           }
+        }
+        if(isset($context['customerId']))
+            $data['customerId'] = $context['customerId'];
         return $data;
     }
     public function getCustomerIdByCustomer($customer){
@@ -101,7 +113,6 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             return $this->getCustomerIdByCustomer($customer);
         }
     }
-//    public function handleR
     public function handleResponse($response,$type = null, $name = null){
         if ($response['success']) {
             if($type == 'catalog'){

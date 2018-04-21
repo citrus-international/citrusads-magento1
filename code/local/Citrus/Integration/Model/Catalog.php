@@ -29,15 +29,6 @@ class Citrus_Integration_Model_Catalog extends Mage_Core_Model_Abstract
         return $this->_getResource()->getIdByName($name);
     }
     /**
-     * Get catalog_id
-     *
-     * @return string|false
-     */
-    public function getCatalogId()
-    {
-        return $this->_getResource()->getCatalogId();
-    }
-    /**
      * Retrieve resource instance wrapper
      *
      * @return Citrus_Integration_Model_Resource_Catalog

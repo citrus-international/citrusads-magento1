@@ -52,7 +52,6 @@ CREATE TABLE {$this->getTable('citrusintegration/order')} (
 DROP TABLE IF EXISTS {$this->getTable('citrusintegration/discount')};
 CREATE TABLE {$this->getTable('citrusintegration/discount')} (
   `id` int(11) unsigned NOT NULL auto_increment,
-  `ad_id` VARCHAR(255) NOT NULL,
   `amount` VARCHAR(11) NULL,
   `minPrice` VARCHAR(11) NULL,
   `maxPerCustomer` INT(11) NULL,
