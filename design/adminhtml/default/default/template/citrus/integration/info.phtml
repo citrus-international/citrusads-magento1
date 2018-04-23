@@ -1,0 +1,160 @@
+<?php
+$data = $this->getAdData();
+?>
+<div class="content-header">
+    <h3 class="icon-head head-adminhtml-citrusintegration-ad">Ad Infomation</h3>
+    <p class="form-buttons">
+        <button title="Back" type="button" class="scalable back"
+                onclick="setLocation('<?php echo $this->getUrl('*/*/index') ?>')"
+                style="">Back</button>
+    </p>
+</div>
+<div class="box-left">
+    <!--Ad Information-->
+    <div class="entry-edit">
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-account"><?php echo Mage::helper('citrusintegration')->__('Ad # %s', $data->getAds()->getId()); ?></h4>
+        </div>
+        <div class="fieldset">
+            <table cellspacing="0" class="form-list">
+                <tr>
+                    <td class="label"><label><?php /* @escapeNotVerified */
+                            echo __('Ad Id in Citrus') ?></label></td>
+                    <td class="value"><strong><?php /* @escapeNotVerified */
+                            echo $data->getAds()->getCitrusId() ?></strong></td>
+                </tr>
+                <tr>
+                    <td class="label"><label><?php /* @escapeNotVerified */
+                            echo __('GTIN') ?></label></td>
+                    <td class="value"><strong><?php /* @escapeNotVerified */
+                            echo $data->getAds()->getGtin() ?></strong></td>
+                </tr>
+                <tr>
+                    <td class="label"><label><?php /* @escapeNotVerified */
+                            echo __('Expiry') ?></label></td>
+                    <td class="value"><strong><?php /* @escapeNotVerified */
+                            echo $data->getAds()->getExpiry() ?></strong></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="box-right">
+    <!--Ad Information-->
+    <div class="entry-edit">
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-account"><?php echo Mage::helper('citrusintegration')->__('Discount # %s', $data->getAds()->getDiscount()->getId()); ?></h4>
+        </div>
+        <div class="fieldset">
+            <table cellspacing="0" class="form-list">
+                <tr>
+                    <td class="label"><label><?php /* @escapeNotVerified */
+                            echo __('Amount') ?></label></td>
+                    <td class="value"><?php /* @escapeNotVerified */
+                        echo $data->getAds()->getDiscount()->getAmount() ? $data->getAds()->getDiscount()->getAmount() : 0; ?></strong></td>
+                </tr>
+                <tr>
+                    <td class="label"><?php /* @escapeNotVerified */
+                        echo __('Min Price') ?></label></td>
+                    <td class="value"><strong><?php /* @escapeNotVerified */
+                            echo $data->getAds()->getDiscount()->getData('minPrice') ? $data->getAds()->getDiscount()->getData('minPrice') : 0 ?></strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label"><label><?php /* @escapeNotVerified */
+                            echo __('Max Per Customer') ?></label></td>
+                    <td class="value"><strong><?php /* @escapeNotVerified */
+                            echo $data->getAds()->getDiscount()->getData('maxPerCustomer') ?></strong></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="clear"></div>
+<div class="box" style="padding: 0; border: none">
+    <!--Banner Information-->
+    <div class="entry-edit">
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-account"><?php echo Mage::helper('citrusintegration')->__('Banner') ?></h4>
+        </div>
+        <div class="fieldset">
+            <table cellspacing="0" style="width:100%; padding: 0">
+
+                <thead>
+                <tr
+                "class="headings">
+                <th><?php /* @escapeNotVerified */
+                    echo __('Slot Id') ?></th>
+                <th><?php /* @escapeNotVerified */
+                    echo __('Image Url') ?></th>
+                <th><?php /* @escapeNotVerified */
+                    echo __('Link Url') ?></th>
+                <th><?php /* @escapeNotVerified */
+                    echo __('Alt Text') ?></th>
+                <th><?php /* @escapeNotVerified */
+                    echo __('Expiry') ?></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php if (is_array($data->getBanners())): ?>
+                    <?php foreach ($data->getBanners() as $banner) : ?>
+                        <tr>
+                            <td><?php /* @escapeNotVerified */
+                                echo $banner->getData('slotId') ?></td>
+                            <td><?php /* @escapeNotVerified */
+                                echo $banner->getData('imageUrl') ?></td>
+                            <td><?php /* @escapeNotVerified */
+                                echo $banner->getData('linkUrl') ?></td>
+                            <td><?php /* @escapeNotVerified */
+                                echo $banner->getData('altText') ?></td>
+                            <td><?php /* @escapeNotVerified */
+                                echo $banner->getData('expiry') ?></td>
+
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="clear"></div>
+<div class="box" style="padding: 0; border: none">
+    <!--Relevant Information-->
+    <div class="entry-edit">
+        <div class="entry-edit-head">
+            <h4 class="icon-head head-account"><?php echo Mage::helper('citrusintegration')->__('Products') ?></h4>
+        </div>
+        <div class="fieldset">
+            <table cellspacing="0" style="width:100%;" id="lastOrdersGrid_table">
+                <col/>
+                <col/>
+                <col/>
+                <col/>
+                <col width="1"/>
+                <thead>
+                <tr
+                "class="headings">
+                <th><?php /* @escapeNotVerified */
+                    echo __('Ad Id in Citrus') ?></th>
+                <th><?php /* @escapeNotVerified */
+                    echo __('GTIN') ?></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php if (is_array($data->getRelevants())): ?>
+                    <?php foreach ($data->getRelevants() as $relevant) : ?>
+                        <tr>
+                            <td><?php /* @escapeNotVerified */
+                                echo $relevant->getCitrusId() ?></td>
+                            <td><?php /* @escapeNotVerified */
+                                echo $relevant->getGtin() ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

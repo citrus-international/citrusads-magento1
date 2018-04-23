@@ -64,7 +64,7 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Grid extends Mage_
 
     public function getRowUrl($row)
     {
-        return $this->getUrl('*/*/edit', array('id' => $row->getId()));
+        return $this->getUrl('*/*/info', array('id' => $row->getId()));
     }
 
 //    protected function _prepareMassaction()

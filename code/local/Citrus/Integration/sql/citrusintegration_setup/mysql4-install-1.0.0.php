@@ -61,12 +61,14 @@ CREATE TABLE {$this->getTable('citrusintegration/discount')} (
 DROP TABLE IF EXISTS {$this->getTable('citrusintegration/banner')};
 CREATE TABLE {$this->getTable('citrusintegration/banner')} (
   `id` int(11) unsigned NOT NULL auto_increment,
+  `ad_id` int(11) NULL,
   `citrus_id` VARCHAR(255) NOT NULL,
   `slotId` VARCHAR(255) NULL,
   `imageUrl` VARCHAR(255) NULL,
   `linkUrl` VARCHAR(255) NULL,
   `altText` VARCHAR(255) NULL,
   `expiry` VARCHAR(255) NULL,
+  `host` VARCHAR(255) NULL,
   PRIMARY KEY (`id`)    
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -77,15 +79,18 @@ CREATE TABLE {$this->getTable('citrusintegration/ad')} (
   `gtin` VARCHAR(255) NULL,
   `discount_id` int(11) NULL,
   `expiry` VARCHAR(255) NULL,
+  `host` VARCHAR(255) NULL,
   PRIMARY KEY (`id`)    
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS {$this->getTable('citrusintegration/relevant')};
 CREATE TABLE {$this->getTable('citrusintegration/relevant')} (
   `id` int(11) unsigned NOT NULL auto_increment,
+  `ad_id` int(11) NULL,
   `citrus_id` VARCHAR(255) NOT NULL,
   `gtin` VARCHAR(255) NULL,
   `entity_id` VARCHAR(255) NOT NULL,
+  `host` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`)    
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ");

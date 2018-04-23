@@ -278,7 +278,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     protected function _initAction()
     {
         $this->loadLayout()
-            ->_setActiveMenu('citrus/citrus_queue')
+            ->_setActiveMenu('citrus')
             ->_title($this->__('Citrus'))->_title($this->__('Queue'))
             ->_addBreadcrumb($this->__('Citrus'), $this->__('Citrus'))
             ->_addBreadcrumb($this->__('Queue'), $this->__('Queue'));

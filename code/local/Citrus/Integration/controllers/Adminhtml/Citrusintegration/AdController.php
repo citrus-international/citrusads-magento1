@@ -9,22 +9,27 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
         $this->_initLayoutMessages('customer/session');
         $this->renderLayout();
     }
-    public function editAction()
+    public function infoAction()
     {
         $this->_initAction();
 
         $id  = $this->getRequest()->getParam('id');
         $model = Mage::getModel('citrusintegration/ad');
+        $discountModel = Mage::getModel('citrusintegration/discount');
+        $bannerModel = Mage::getModel('citrusintegration/banner');
+        $relevantModel = Mage::getModel('citrusintegration/relevant');
 
         if ($id) {
             $model->load($id);
-
-            // Check if record is loaded
             if (!$model->getId()) {
-                Mage::getSingleton('adminhtml/session')->addError($this->__('This baz no longer exists.'));
+                Mage::getSingleton('adminhtml/session')->addError($this->__('This ad no longer exists.'));
                 $this->_redirect('*/*/');
-
                 return;
+            }
+            else{
+                $discountModel->load($model->getData('discount_id'));
+                $bannerModel->load($model->getData('banner_id'));
+                $relevantModel->load($model->getData('relevant_id'));
             }
         }
 
@@ -34,12 +39,14 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
         if (!empty($data)) {
             $model->setData($data);
         }
+        try{
+            Mage::register('citrus_ad', $model);
+        }catch (Exception $e){}
 
-        Mage::register('foo_bar', $model);
 
         $this->_initAction()
-            ->_addBreadcrumb($id ? $this->__('Edit Baz') : $this->__('New Baz'), $id ? $this->__('Edit Baz') : $this->__('New Baz'))
-            ->_addContent($this->getLayout()->createBlock('citrusintegration/adminhtml_citrusintegration_ad_edit')->setData('action', $this->getUrl('*/*/save')))
+//            ->_addBreadcrumb($id ? $this->__('Edit Baz') : $this->__('New Baz'), $id ? $this->__('Edit Baz') : $this->__('New Baz'))
+            ->_addContent($this->getLayout()->createBlock('citrusintegration/adminhtml_citrusintegration_ad_info'))
             ->renderLayout();
     }
     public function requestAction(){
@@ -50,8 +57,8 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
     public function sendAction(){
         $params = $this->getRequest()->getParams();
         $context = $this->getHelper()->getContextData($params);
-        $resonse = $this->getRequestModel()->requestingAnAd($context);
-        $this->handlePostResponse($resonse);
+        $response = $this->getRequestModel()->requestingAnAd($context);
+        $this->handlePostResponse($response);
         $this->_redirect('*/*/');
 
     }
@@ -61,6 +68,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
             $data = json_decode($response['message'], true);
             $adModel = $this->getAdModel();
             $discountModel = $this->getDiscountModel();
+            $host = $this->getHelper()->getHost();
             if($data['ads']){
                foreach ($data['ads'] as $ad){
 
@@ -79,6 +87,8 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                        ];
                        $adModel->addData($adData);
                        $discountModel->addData($discountData);
+                       $this->handleBanner($data['banners'] = isset($data['banners']) ? $data['banners'] : null, $id);
+                       $this->handleBanner($data['products'], $id);
                        try{
                            $discountModel->save();
                            $adModel->save();
@@ -98,14 +108,140 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                            'citrus_id' => $ad['id'],
                            'discount_id' => $discountModel->getId(),
                            'gtin' => $ad['gtin'],
-                           'expiry' => $ad['expiry']
+                           'expiry' => $ad['expiry'],
+                           'host' => $host
                        ];
                        $adModel->addData($adData);
                        try{
                            $adModel->save();
-                       }catch (Exception $e){}
+                       }catch (Exception $e){
+                           Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                       }
                    }
                }
+            }
+        }
+    }
+    public function handleBanner($banners, $adId){
+        /** @var Citrus_Integration_Model_Banner $model */
+        $model = Mage::getModel('citrusintegration/banner');
+        $host = $this->getHelper()->getHost();
+        if(!is_array($banners)){
+            $ids = $model->getIdByAdId(1);
+            if($ids){
+                foreach ($ids as $id){
+                    $model->load($id['id']);
+                    try{
+                        $model->delete();
+                    }catch (Exception $e) {
+                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                    }
+                }
+            }
+        }
+        else {
+            foreach ($banners as $banner){
+                $ids = $model->getIdByAdId($adId);
+                if($ids){
+                    foreach ($ids as $id){
+                        $model->load($id['id']);
+                        try{
+                            $model->delete();
+                        }catch (Exception $e) {
+                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                        }
+                    }
+                    $bannerData = [
+                        "id" => $banner['id'],
+                        "slotId" => $banner['slotId'],
+                        "imageUrl" => $banner['imageUrl'],
+                        "linkUrl" => $banner['linkUrl'],
+                        "altText" => $banner['altText'],
+                        "expiry" => $banner['expiry'],
+                        "ad_id" => $adId,
+                        "host" => $host
+                    ];
+                    $model->addData($bannerData);
+                    try{
+                        $model->save();
+                    }catch (Exception $e){
+                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                    }
+                }
+                else{
+                    $bannerData = [
+                        "id" => $banner['id'],
+                        "slotId" => $banner['slotId'],
+                        "imageUrl" => $banner['imageUrl'],
+                        "linkUrl" => $banner['linkUrl'],
+                        "altText" => $banner['altText'],
+                        "expiry" => $banner['expiry'],
+                        "ad_id" => $adId,
+                        "host" => $host
+                    ];
+                    $model->addData($bannerData);
+                    try{
+                        $model->save();
+                    }catch (Exception $e){
+                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                    }
+                }
+            }
+        }
+    }
+    public function handleRelevant($relevants, $adId){
+        /** @var Citrus_Integration_Model_Relevant $model */
+        $model = Mage::getModel('citrusintegration/relevant');
+        $host = $this->getHelper()->getHost();
+
+        if(!is_array($relevants)){
+            $ids = $model->getIdByAdId($adId);
+            if($ids){
+                foreach ($ids as $id){
+                    $model->load($id['id']);
+                    try{
+                        $model->delete();
+                    }catch (Exception $e) {
+                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                    }
+                }
+            }
+        }
+        else {
+            foreach ($relevants as $relevant){
+                $ids = $model->getIdByAdId($adId);
+                if($ids){
+                    foreach ($ids as $id){
+                        $model->load($id['id']);
+                        try{
+                            $model->delete();
+                        }catch (Exception $e) {
+                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                        }
+                    }
+                    $bannerData = [
+                        "id" => $relevant['id'],
+                        "gtin" => $relevant['gtin'],
+                        "ad_id" => $adId,
+                        "host" => $host
+                    ];
+                    $model->addData($bannerData);
+                    try{
+                        $model->save();
+                    }catch (Exception $e){}
+                }
+                else{
+                    $bannerData = [
+                        "id" => $relevant['id'],
+                        "gtin" => $relevant['gtin'],
+                        "ad_id" => $adId,
+                        "host" => $host
+                    ];
+                    $model->addData($bannerData);
+                    try{
+                        $model->save();
+                    }catch (Exception $e){}
+                }
             }
         }
     }

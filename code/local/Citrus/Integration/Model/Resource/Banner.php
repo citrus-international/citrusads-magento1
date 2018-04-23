@@ -1,23 +1,30 @@
 <?php
 
-class Citrus_Integration_Model_Resource_Ad extends Mage_Core_Model_Resource_Db_Abstract
+class Citrus_Integration_Model_Resource_Banner extends Mage_Core_Model_Resource_Db_Abstract
 {
     public function _construct()
     {
-        $this->_init('citrusintegration/ad', 'id');
+        $this->_init('citrusintegration/banner', 'id');
     }
-    public function getIdByCitrusId($citrusId){
+
+    /**
+     * Get catalog_id
+     * @param $adId string
+     * @return array
+     */
+    public function getIdByAdId($adId)
+    {
         $host = $this->getHelper()->getHost();
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
             ->from(self::getMainTable(), 'id')
-            ->where('citrus_id = :citrusId')
+            ->where('ad_id = :adId')
             ->where('host = :host');
         $bind = array(
-            ':citrusId' => (string)$citrusId,
+            ':adId' => (int)$adId,
             ':host' => (string)$host
         );
-        return $adapter->fetchOne($select, $bind);
+        return $adapter->fetchAll($select, $bind);
     }
     /**
      * @return Mage_Core_Helper_Abstract|Citrus_Integration_Helper_Data
