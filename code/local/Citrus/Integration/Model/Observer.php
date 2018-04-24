@@ -19,7 +19,21 @@ class Citrus_Integration_Model_Observer
     protected function getHelper(){
         return Mage::helper('citrusintegration/data');
     }
+    public function addDiscountToProduct($observer){
+//        $product = $observer->getProduct();
+//        /** @var Citrus_Integration_Model_Catalog $catalog */
+//        $catalog = Mage::getModel('citrusintegration/catalog')->getCollection();
+//        $discountModel = Mage::getModel('citrusintegration/discount')->getCollection();
+//        $relevantModel = Mage::getModel('citrusintegration/relevant');
+//        $host = $this->getHelper()->getHost();
+//        $relevantCollections = $relevantModel->getCollection();
+////        ->addFieldToSelect('gtin')
+////            ->addFieldToFilter('host',['eq' => $host]);
+//        foreach ($relevantCollections as $relevantCollection){
+//            $x =1;
+//        }
 
+    }
     public function handleGetResponse($response, $type = null, $param = null){
         $name = $this->getHelper()->getCitrusCatalogName();
         $host = $this->getHelper()->getHost();

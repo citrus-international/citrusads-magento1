@@ -6,7 +6,7 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad extends Mage_Admin
         $this->_controller = 'adminhtml_citrusintegration_ad';
         $this->_blockGroup = 'citrusintegration';
         $this->_addButton('add_new', array(
-            'label'   => Mage::helper('catalog')->__('Get Ads'),
+            'label'   => Mage::helper('citrusintegration')->__('Request Ads and Relevant product'),
             'onclick' => "setLocation('{$this->getUrl('*/*/request')}')",
             'class'   => 'add'
         ));

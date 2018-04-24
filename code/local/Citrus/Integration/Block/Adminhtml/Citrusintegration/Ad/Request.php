@@ -38,6 +38,10 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Request extends Ma
             'required'  => true,
             'name'      => 'maxNumberOfAds',
         ));
+        $bannerSlotIds = $fieldset->addField('bannerSlotIds', 'text', array(
+            'label'     => Mage::helper('citrusintegration')->__('Banner Slot Ids'),
+            'name'      => 'bannerSlotIds',
+        ));
         $submit = $fieldset->addField('submit', 'submit', array(
             'label' => Mage::helper('citrusintegration')->__('Send Request'),
             'value' => Mage::helper('citrusintegration')->__('Submit'),

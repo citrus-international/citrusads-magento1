@@ -35,14 +35,6 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Info extends Mage_
         $object = new Varien_Object();
         return $object->addData($adData);
     }
-    protected function getOtherField($type, $adId){
-        $func = 'get'.$type.'Model';
-        $ids = $this->$func()->getIdByAdId($adId);
-        $data = [];
-        foreach ($ids as $id){
-            $data[] = 1;
-        }
-    }
     /**
      * @return Citrus_Integration_Model_Banner|false
      */
@@ -63,8 +55,5 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Info extends Mage_
     protected function getRelevantModel(){
         return Mage::getModel('citrusintegration/relevant');
     }
-//    protected function getBannerModel(){
-//        return Mage::getModel('citrusintegration/banner');
-//    }
 
 }

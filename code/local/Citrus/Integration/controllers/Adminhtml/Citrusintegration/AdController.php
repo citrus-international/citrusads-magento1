@@ -45,7 +45,6 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
 
 
         $this->_initAction()
-//            ->_addBreadcrumb($id ? $this->__('Edit Baz') : $this->__('New Baz'), $id ? $this->__('Edit Baz') : $this->__('New Baz'))
             ->_addContent($this->getLayout()->createBlock('citrusintegration/adminhtml_citrusintegration_ad_info'))
             ->renderLayout();
     }
@@ -58,20 +57,21 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
         $params = $this->getRequest()->getParams();
         $context = $this->getHelper()->getContextData($params);
         $response = $this->getRequestModel()->requestingAnAd($context);
-        $this->handlePostResponse($response);
-        $this->_redirect('*/*/');
-
+        $return = $this->handlePostResponse($response);
+        if($return) {
+            $this->_redirect('*/*/');
+            Mage::getSingleton('adminhtml/session')->addSuccess('Your request is completed');
+        }
+        else $this->_redirect('*/*/request');
     }
     public function handlePostResponse($response){
         if($response['success']){
-
             $data = json_decode($response['message'], true);
             $adModel = $this->getAdModel();
             $discountModel = $this->getDiscountModel();
             $host = $this->getHelper()->getHost();
             if($data['ads']){
                foreach ($data['ads'] as $ad){
-
                    $id = $adModel->getIdByCitrusId($ad['id']);
                    if($id){
                        $adModel->load($id);
@@ -92,7 +92,10 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                        try{
                            $discountModel->save();
                            $adModel->save();
-                       }catch (Exception $e){}
+                       }catch (Exception $e){
+                           Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                           return false;
+                       }
                    }
                    else{
                        $discountData = [
@@ -103,7 +106,10 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                        $discountModel->addData($discountData);
                        try{
                            $discountModel->save();
-                       }catch (Exception $e){}
+                       }catch (Exception $e){
+                           Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                           return false;
+                       }
                        $adData = [
                            'citrus_id' => $ad['id'],
                            'discount_id' => $discountModel->getId(),
@@ -114,12 +120,22 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                        $adModel->addData($adData);
                        try{
                            $adModel->save();
+                           Mage::getSingleton('adminhtml/session')->addSuccess('Your request is completed');
                        }catch (Exception $e){
                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                           return false;
                        }
                    }
                }
             }
+            return true;
+        }
+        else{
+            $data = json_decode($response['message'], true);
+            $error = $data['message'] != '' ? $data['message'] : 'Something went wrong. Please try again in a few minutes';
+            $error = Mage::helper('adminhtml')->__($error);
+            Mage::getSingleton('adminhtml/session')->addError($error);
+            return false;
         }
     }
     public function handleBanner($banners, $adId){

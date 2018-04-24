@@ -89,6 +89,10 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         ];
         if(isset($context['searchTerm']))
             $data['searchTerm'] = $context['searchTerm'];
+        if(isset($context['bannerSlotIds'])){
+            $arrays = explode(',',$context['bannerSlotIds']);
+            $data['bannerSlotIds'] = $arrays;
+        }
         if(isset($context['productFilters'])){
            $arrays = explode(',',$context['productFilters']);
            foreach ($arrays as $array){
@@ -243,21 +247,20 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function handleData($itemId, $type){
         $itemModel = Mage::getModel($type);
         $entity = $itemModel->load($itemId);
-        $helper = $this->getHelper();
         switch ($type){
             case 'catalog/product':
                 /** @var  $entity Mage_Catalog_Model_Product */
-                $body = $helper->getProductData($entity);
+                $body = $this->getProductData($entity);
                 $response = $this->getRequestModel()->pushCatalogProductsRequest($body);
                 break;
             case 'customer/customer':
                 /** @var  $entity Mage_Customer_Model_Customer */
-                $body = $helper->getCustomerData($entity);
+                $body = $this->getCustomerData($entity);
                 $response = $this->getRequestModel()->pushCustomerRequest([$body]);
                 break;
             case 'sales/order':
                 /** @var  $entity Mage_Sales_Model_Order */
-                $body = $helper->getOrderData($entity);
+                $body = $this->getOrderData($entity);
                 $response = $this->getRequestModel()->pushOrderRequest([$body]);
                 break;
         }

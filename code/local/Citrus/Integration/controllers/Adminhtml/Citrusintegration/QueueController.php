@@ -170,9 +170,11 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             Mage::getSingleton('adminhtml/session')->addError(Mage::helper('adminhtml')->__('Please select request(s)'));
         } else {
             try {
+                $queueModel = Mage::getModel('citrusintegration/queue');
                 foreach ($requestIds as $requestId) {
-                    $requestData = Mage::getModel('citrusintegration/queue')->load($requestId);
+                    $requestData = $queueModel->load($requestId);
                     $this->getHelper()->handleData($requestData->getEntityId(), $requestData->getType());
+                    $queueModel->delete();
                 }
                 Mage::getSingleton('adminhtml/session')->addSuccess(
                     Mage::helper('adminhtml')->__(
