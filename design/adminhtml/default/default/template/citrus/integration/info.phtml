@@ -119,42 +119,43 @@ $data = $this->getAdData();
         </div>
     </div>
 </div>
-<div class="clear"></div>
-<div class="box" style="padding: 0; border: none">
-    <!--Relevant Information-->
-    <div class="entry-edit">
-        <div class="entry-edit-head">
-            <h4 class="icon-head head-account"><?php echo Mage::helper('citrusintegration')->__('Products') ?></h4>
-        </div>
-        <div class="fieldset">
-            <table cellspacing="0" style="width:100%;" id="lastOrdersGrid_table">
-                <col/>
-                <col/>
-                <col/>
-                <col/>
-                <col width="1"/>
-                <thead>
-                <tr
-                "class="headings">
-                <th><?php /* @escapeNotVerified */
-                    echo __('Ad Id in Citrus') ?></th>
-                <th><?php /* @escapeNotVerified */
-                    echo __('GTIN') ?></th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php if (is_array($data->getRelevants())): ?>
-                    <?php foreach ($data->getRelevants() as $relevant) : ?>
-                        <tr>
-                            <td><?php /* @escapeNotVerified */
-                                echo $relevant->getCitrusId() ?></td>
-                            <td><?php /* @escapeNotVerified */
-                                echo $relevant->getGtin() ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+<!--<div class="clear">-->
+
+<!--<div class="box" style="padding: 0; border: none">-->
+<!--    <!--Relevant Information-->
+<!--    <div class="entry-edit">-->
+<!--        <div class="entry-edit-head">-->
+<!--            <h4 class="icon-head head-account">--><?php //echo Mage::helper('citrusintegration')->__('Products') ?><!--</h4>-->
+<!--        </div>-->
+<!--        <div class="fieldset">-->
+<!--            <table cellspacing="0" style="width:100%;" id="lastOrdersGrid_table">-->
+<!--                <col/>-->
+<!--                <col/>-->
+<!--                <col/>-->
+<!--                <col/>-->
+<!--                <col width="1"/>-->
+<!--                <thead>-->
+<!--                <tr-->
+<!--                "class="headings">-->
+<!--                <th>--><?php ///* @escapeNotVerified */
+//                    echo __('Ad Id in Citrus') ?><!--</th>-->
+<!--                <th>--><?php ///* @escapeNotVerified */
+//                    echo __('GTIN') ?><!--</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                --><?php //if (is_array($data->getRelevants())): ?>
+<!--                    --><?php //foreach ($data->getRelevants() as $relevant) : ?>
+<!--                        <tr>-->
+<!--                            <td>--><?php ///* @escapeNotVerified */
+//                                echo $relevant->getCitrusId() ?><!--</td>-->
+<!--                            <td>--><?php ///* @escapeNotVerified */
+//                                echo $relevant->getGtin() ?><!--</td>-->
+<!--                        </tr>-->
+<!--                    --><?php //endforeach; ?>
+<!--                --><?php //endif; ?>
+<!--                </tbody>-->
+<!--            </table>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->

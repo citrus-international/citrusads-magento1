@@ -152,6 +152,24 @@
                     </citrusintegration>
                 </observers>
             </catalog_product_get_final_price>
+            <citrus_integration_ad_save_after>
+                <observers>
+                    <citrusintegration>
+                        <type>singleton</type>
+                        <class>Citrus_Integration_Model_Observer</class>
+                        <method>applyAfterSave</method>
+                    </citrusintegration>
+                </observers>
+            </citrus_integration_ad_save_after>
+            <catalog_product_collection_load_after>
+                <observers>
+                    <citrusintegration>
+                        <type>singleton</type>
+                        <class>Citrus_Integration_Model_Observer</class>
+                        <method>applyDiscountListProduct</method>
+                    </citrusintegration>
+                </observers>
+            </catalog_product_collection_load_after>
         </events>
     </global>
     <adminhtml>

@@ -22,15 +22,19 @@ class Citrus_Integration_Model_Observer
     public function addDiscountToProduct($observer){
         /** @var Mage_Catalog_Model_Product $product */
         $product = $observer->getProduct();
+        $this->applyDiscount($product);
+        return $this;
+    }
+    public function applyDiscount($product){
         $adModel = Mage::getModel('citrusintegration/ad');
         $discountModel = Mage::getModel('citrusintegration/discount');
         $host = $this->getHelper()->getHost();
         $datetime = new DateTime();
         $now = $datetime->format('Y-m-d\TH:i:s\Z');
         $adCollections = $adModel->getCollection()
-        ->addFieldToSelect('*')
-        ->addFieldToFilter('host',['eq' => $host])
-        ->addFieldToFilter('expiry', ['gteq' => $now]);
+            ->addFieldToSelect('*')
+            ->addFieldToFilter('host',['eq' => $host])
+            ->addFieldToFilter('expiry', ['gteq' => $now]);
         foreach ($adCollections as $adCollection){
             if($adCollection['gtin'] == $product->getId()){
                 $discount = $discountModel->load($adCollection->getDiscountId());
@@ -41,6 +45,12 @@ class Citrus_Integration_Model_Observer
                     $product->setFinalPrice($newPrice);
                 }
             }
+        }
+    }
+    public function applyDiscountListProduct($observer){
+        $collections = $observer->getCollection();
+        foreach ($collections as $collection){
+            $this->applyDiscount($collection);
         }
         return $this;
     }
