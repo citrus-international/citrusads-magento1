@@ -2,6 +2,13 @@
 
 class Citrus_Integration_Model_Ad extends Mage_Core_Model_Abstract
 {
+    /**
+     * Prefix of model events names
+     *
+     * @var string
+     */
+    protected $_eventPrefix = 'citrus_integration_ad';
+
     public function _construct()
     {
         parent::_construct();

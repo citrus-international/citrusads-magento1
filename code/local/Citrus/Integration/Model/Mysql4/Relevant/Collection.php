@@ -5,7 +5,7 @@ class Citrus_Integration_Model_Mysql4_Relevant_Collection
 {
     public function _construct()
     {
-        parent::__construct();
+//        parent::__construct();
         $this->_init('citrusintegration/relevant');
     }
 }

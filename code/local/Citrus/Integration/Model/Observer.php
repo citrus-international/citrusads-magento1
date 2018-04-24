@@ -20,19 +20,29 @@ class Citrus_Integration_Model_Observer
         return Mage::helper('citrusintegration/data');
     }
     public function addDiscountToProduct($observer){
-//        $product = $observer->getProduct();
-//        /** @var Citrus_Integration_Model_Catalog $catalog */
-//        $catalog = Mage::getModel('citrusintegration/catalog')->getCollection();
-//        $discountModel = Mage::getModel('citrusintegration/discount')->getCollection();
-//        $relevantModel = Mage::getModel('citrusintegration/relevant');
-//        $host = $this->getHelper()->getHost();
-//        $relevantCollections = $relevantModel->getCollection();
-////        ->addFieldToSelect('gtin')
-////            ->addFieldToFilter('host',['eq' => $host]);
-//        foreach ($relevantCollections as $relevantCollection){
-//            $x =1;
-//        }
-
+        /** @var Mage_Catalog_Model_Product $product */
+        $product = $observer->getProduct();
+        $adModel = Mage::getModel('citrusintegration/ad');
+        $discountModel = Mage::getModel('citrusintegration/discount');
+        $host = $this->getHelper()->getHost();
+        $datetime = new DateTime();
+        $now = $datetime->format('Y-m-d\TH:i:s\Z');
+        $adCollections = $adModel->getCollection()
+        ->addFieldToSelect('*')
+        ->addFieldToFilter('host',['eq' => $host])
+        ->addFieldToFilter('expiry', ['gteq' => $now]);
+        foreach ($adCollections as $adCollection){
+            if($adCollection['gtin'] == $product->getId()){
+                $discount = $discountModel->load($adCollection->getDiscountId());
+                if($product->getFinalPrice() <= $discount->getMinPrice()){
+                    continue;
+                }else{
+                    $newPrice = ($product->getFinalPrice() - (float)$discount->getAmount()) <= $discount->getMinPrice() ? $discount->getMinPrice() : $product->getFinalPrice() - (float)$discount->getAmount();
+                    $product->setFinalPrice($newPrice);
+                }
+            }
+        }
+        return $this;
     }
     public function handleGetResponse($response, $type = null, $param = null){
         $name = $this->getHelper()->getCitrusCatalogName();

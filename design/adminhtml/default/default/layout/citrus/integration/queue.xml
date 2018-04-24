@@ -19,9 +19,4 @@
     <adminhtml_citrusintegration_ad_grid>
         <block type="citrusintegration/adminhtml_citrusintegration_ad_grid" name="citrus.integration.ad.grid" output="toHtml"/>
     </adminhtml_citrusintegration_ad_grid>
-
-    <!--<adminhtml_citrusintegration_ad_request>-->
-        <!--<block type="citrusintegration/adminhtml_citrusintegration_ad_request" name="citrus.integration.request.grid" output="toHtml"/>-->
-        <!--&lt;!&ndash;<block type="core/template" output="toHtml" name="templateBlock" template="adminhello/hello.phtml">&ndash;&gt;-->
-    <!--</adminhtml_citrusintegration_ad_request>-->
 </layout>

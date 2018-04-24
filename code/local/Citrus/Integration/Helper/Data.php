@@ -120,10 +120,14 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function handleResponse($response,$type = null, $name = null){
         if ($response['success']) {
             if($type == 'catalog'){
+                $host = $this->getHost();
+                $teamId = $this->getTeamId();
                 $data = json_decode($response['message'], true);
                 foreach ($data['catalogs'] as $catalog){
                     $catalogData['catalog_id'] = $catalog['id'];
                     $catalogData['name'] = $catalog['name'];
+                    $catalogData['host'] = $host;
+                    $catalogData['teamId'] = $teamId;
                     $model = Mage::getModel('citrusintegration/catalog')->setData($catalogData);
                     try {
                         $model->save();

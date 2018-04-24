@@ -5,7 +5,8 @@ class Citrus_Integration_Model_Mysql4_Catalog_Collection
 {
     public function _construct()
     {
-        parent::__construct();
+        $x = 1;
+//        parent::__construct();
         $this->_init('citrusintegration/catalog');
     }
 }

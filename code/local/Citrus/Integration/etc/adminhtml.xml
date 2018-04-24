@@ -13,6 +13,10 @@
                     <title>Ads Request</title>
                     <action>adminhtml/citrusintegration_ad</action>
                 </citrusintegration_ads>
+                <!--<citrusintegration_log translate="title" module="citrusintegration">-->
+                    <!--<title>Log</title>-->
+                    <!--<action>adminhtml/citrusintegration_log</action>-->
+                <!--</citrusintegration_log>-->
             </children>
         </citrus>
     </menu>

@@ -154,19 +154,6 @@
             </catalog_product_get_final_price>
         </events>
     </global>
-    <!--<frontend>-->
-        <!--<events>-->
-            <!--<catalog_product_get_final_price>-->
-                <!--<observers>-->
-                    <!--<citrusintegration>-->
-                        <!--<type>singleton</type>-->
-                        <!--<class>Citrus_Integration_Model_Observer</class>-->
-                        <!--<method>addDiscountToProduct</method>-->
-                    <!--</citrusintegration>-->
-                <!--</observers>-->
-            <!--</catalog_product_get_final_price>-->
-        <!--</events>-->
-    <!--</frontend>-->
     <adminhtml>
         <layout>
             <updates>

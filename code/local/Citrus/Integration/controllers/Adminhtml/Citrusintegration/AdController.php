@@ -87,17 +87,19 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                        ];
                        $adModel->addData($adData);
                        $discountModel->addData($discountData);
-                       $this->handleBanner($data['banners'] = isset($data['banners']) ? $data['banners'] : null, $id);
-                       $this->handleBanner($data['products'], $id);
+
                        try{
                            $discountModel->save();
                            $adModel->save();
+//                           $this->handleBanner($data['banners'] = isset($data['banners']) ? $data['banners'] : null, $id);
+//                           $this->handleBanner($data['products'], $id);
                        }catch (Exception $e){
                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                            return false;
                        }
                    }
                    else{
+                       $discountModel->unsetData();
                        $discountData = [
                            'amount' => $ad['discount']['amount'],
                            'minPrice' => $ad['discount']['minPrice'],
@@ -110,6 +112,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                            return false;
                        }
+                       $adModel->unsetData();
                        $adData = [
                            'citrus_id' => $ad['id'],
                            'discount_id' => $discountModel->getId(),
@@ -120,7 +123,8 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                        $adModel->addData($adData);
                        try{
                            $adModel->save();
-                           Mage::getSingleton('adminhtml/session')->addSuccess('Your request is completed');
+//                           $this->handleBanner($data['banners'] = isset($data['banners']) ? $data['banners'] : null, $id);
+//                           $this->handleBanner($data['products'], $id);
                        }catch (Exception $e){
                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                            return false;
@@ -262,7 +266,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
         }
     }
     /**
-     * @return false|Citrus_Integration_Model_Ad
+     * @return false|Citrus_Integration_Model_Discount
      */
     protected function getDiscountModel(){
         return Mage::getModel('citrusintegration/discount');
