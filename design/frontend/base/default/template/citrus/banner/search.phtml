@@ -1,0 +1,15 @@
+<?php
+/** @var Citrus_Integration_Block_Banner $this */
+$banners = $this->getBanners('Search');
+if($banners): ?>
+    <div class="citrus-banner">
+        <?php
+        foreach ($banners as $banner):
+            $banner = $this->getCitrusHelper()->getBannerModel()->load($banner['id'])
+            ?>
+            <a href="<?= $banner->getData('linkUrl') ?>"><img src="<?= $banner->getData('imageUrl')?>" alt="<?= $banner->getData('altText')?>"></a>
+        <?php endforeach;?>
+    </div>
+<?php
+endif;
+?>

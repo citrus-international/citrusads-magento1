@@ -9,19 +9,38 @@ class Citrus_Integration_Model_Resource_Banner extends Mage_Core_Model_Resource_
 
     /**
      * Get catalog_id
-     * @param $adId string
-     * @return array
+     * @param $bannerId string
+     * @return string
      */
-    public function getIdByAdId($adId)
+    public function getIdByCitrusId($bannerId)
     {
         $host = $this->getHelper()->getHost();
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
             ->from(self::getMainTable(), 'id')
-            ->where('ad_id = :adId')
+            ->where('slotId = :slotId')
             ->where('host = :host');
         $bind = array(
-            ':adId' => (int)$adId,
+            ':slotId' => (int)$bannerId,
+            ':host' => (string)$host
+        );
+        return $adapter->fetchOne($select, $bind);
+    }
+
+    /**
+     * @param $pageType
+     * @return array
+     */
+    public function getBannerByPageType($pageType)
+    {
+        $host = $this->getHelper()->getHost();
+        $adapter = $this->_getReadAdapter();
+        $select = $adapter->select()
+            ->from(self::getMainTable(), 'id')
+            ->where('pageType = :pageType')
+            ->where('host = :host');
+        $bind = array(
+            ':pageType' => (string)$pageType,
             ':host' => (string)$host
         );
         return $adapter->fetchAll($select, $bind);

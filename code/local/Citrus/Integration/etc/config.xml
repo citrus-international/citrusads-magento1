@@ -170,6 +170,33 @@
                     </citrusintegration>
                 </observers>
             </catalog_product_collection_load_after>
+            <!--<catalogsearch_index_process_complete>-->
+                <!--<observers>-->
+                    <!--<citrusintegration>-->
+                        <!--<type>singleton</type>-->
+                        <!--<class>Citrus_Integration_Model_Observer</class>-->
+                        <!--<method>sendContextAfterSearch</method>-->
+                    <!--</citrusintegration>-->
+                <!--</observers>-->
+            <!--</catalogsearch_index_process_complete>-->
+            <!--<catalogsearch_searchable_attributes_load_after>-->
+                <!--<observers>-->
+                    <!--<citrusintegration>-->
+                        <!--<type>singleton</type>-->
+                        <!--<class>Citrus_Integration_Model_Observer</class>-->
+                        <!--<method>sendContextAfterSearch</method>-->
+                    <!--</citrusintegration>-->
+                <!--</observers>-->
+            <!--</catalogsearch_searchable_attributes_load_after>-->
+            <catalogsearch_query_save_after>
+                <observers>
+                    <citrusintegration>
+                        <type>singleton</type>
+                        <class>Citrus_Integration_Model_Observer</class>
+                        <method>sendContextAfterSearch</method>
+                    </citrusintegration>
+                </observers>
+            </catalogsearch_query_save_after>
         </events>
     </global>
     <adminhtml>
@@ -206,4 +233,13 @@
             </resources>
         </acl>
     </adminhtml>
+    <frontend>
+        <layout>
+            <updates>
+                <citrusintegration>
+                    <file>citrus.xml</file>
+                </citrusintegration>
+            </updates>
+        </layout>
+    </frontend>
 </config>

@@ -6,6 +6,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
     {
         $this->_title($this->__('Ads List'));
         $this->loadLayout();
+        $this->_initAction();
         $this->_initLayoutMessages('customer/session');
         $this->renderLayout();
     }
@@ -57,17 +58,18 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
         $params = $this->getRequest()->getParams();
         $context = $this->getHelper()->getContextData($params);
         $response = $this->getRequestModel()->requestingAnAd($context);
-        $return = $this->handlePostResponse($response);
+        $return = $this->handlePostResponse($response, $context['pageType']);
         if($return) {
             $this->_redirect('*/*/');
             Mage::getSingleton('adminhtml/session')->addSuccess('Your request is completed');
         }
         else $this->_redirect('*/*/request');
     }
-    public function handlePostResponse($response){
+    public function handlePostResponse($response, $pageType = null){
         if($response['success']){
             $data = json_decode($response['message'], true);
             $adModel = $this->getAdModel();
+            $bannerModel = $this->getBannerModel();
             $discountModel = $this->getDiscountModel();
             $host = $this->getHelper()->getHost();
             if($data['ads']){
@@ -91,8 +93,6 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                        try{
                            $discountModel->save();
                            $adModel->save();
-//                           $this->handleBanner($data['banners'] = isset($data['banners']) ? $data['banners'] : null, $id);
-//                           $this->handleBanner($data['products'], $id);
                        }catch (Exception $e){
                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                            return false;
@@ -131,6 +131,49 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                        }
                    }
                }
+            }
+            if($data['banners']){
+                foreach ($data['banners'] as $banner){
+                    $id = $bannerModel->getIdByCitrusId($banner['id']);
+                    if($id){
+                        $bannerModel->load($id);
+                        $bannerData = [
+                            'slotId' => $banner['slotId'],
+                            'imageUrl' => $banner['imageUrl'],
+                            'altText' => $banner['altText'],
+                            'linkUrl' => $banner['linkUrl'],
+                            'expiry' => $banner['expiry'],
+                            'pageType' => $pageType
+                        ];
+                        $bannerModel->addData($bannerData);
+                        try{
+                            $bannerModel->save();
+                        }catch (Exception $e){
+                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            return false;
+                        }
+                    }
+                    else{
+                        $bannerModel->unsetData();
+                        $bannerData = [
+                            'citrus_id' => $banner['id'],
+                            'slotId' => $banner['slotId'],
+                            'imageUrl' => $banner['imageUrl'],
+                            'altText' => $banner['altText'],
+                            'linkUrl' => $banner['linkUrl'],
+                            'expiry' => $banner['expiry'],
+                            'host' => $host,
+                            'pageType' => $pageType
+                        ];
+                        $bannerModel->addData($bannerData);
+                        try{
+                            $bannerModel->save();
+                        }catch (Exception $e){
+                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            return false;
+                        }
+                    }
+                }
             }
             return true;
         }
@@ -278,6 +321,12 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
         return Mage::getModel('citrusintegration/ad');
     }
     /**
+     * @return false|Citrus_Integration_Model_Banner
+     */
+    protected function getBannerModel(){
+        return Mage::getModel('citrusintegration/banner');
+    }
+    /**
      * @return false|Citrus_Integration_Model_Service_Request
      */
     protected function getRequestModel(){
@@ -324,9 +373,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
     {
         $this->loadLayout()
             ->_setActiveMenu('citrus')
-            ->_title($this->__('Citrus'))->_title($this->__('Queue'))
-            ->_addBreadcrumb($this->__('Citrus'), $this->__('Citrus'))
-            ->_addBreadcrumb($this->__('Queue'), $this->__('Queue'));
+            ->_title($this->__('Citrus'))->_title($this->__('Ads'));
 
         return $this;
     }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout version="0.1.0">
+    <cms_index_index>
+        <reference name="content">
+            <block type="citrusintegration/banner" name="citrus_banner_home" template="citrus/banner/home.phtml" before="-"/>
+        </reference>
+    </cms_index_index>
+    <catalog_category_default>
+        <reference name="content">
+            <block type="citrusintegration/banner" name="citrus_banner_category" template="citrus/banner/category.phtml" before="-"/>
+        </reference>
+    </catalog_category_default>
+    <catalogsearch_result_index>
+        <reference name="content">
+            <block type="citrusintegration/banner" name="citrus_banner_search" template="citrus/banner/search.phtml" before="-"/>
+        </reference>
+    </catalogsearch_result_index>
+</layout>

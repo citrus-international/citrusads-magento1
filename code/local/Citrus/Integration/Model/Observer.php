@@ -194,14 +194,14 @@ class Citrus_Integration_Model_Observer
         $orderCron = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
         Mage::log('My log entry'.time());
         if($productCron){
-            if ($time = $this->getConfigValue('citrus_product')) {
+            if ($time = $this->getConfigValue('citrus_sync/citrus_product/frequency')) {
                 if ($this->calculateTime($time)) {
                     $this->getHelper()->getSyncModel()->syncData('catalog/product');
                 }
             }
         }
         if($orderCron){
-            if ($time = $this->getConfigValue('citrus_order')) {
+            if ($time = $this->getConfigValue('citrus_sync/citrus_order/frequency')) {
                 if ($this->calculateTime($time)) {
                     $this->getHelper()->getSyncModel()->syncData('customer/customer');
                     $this->getHelper()->getSyncModel()->syncData('sales/order');
@@ -225,5 +225,17 @@ class Citrus_Integration_Model_Observer
         }
 
         return ($minute % $time == 0) || ($time == 120 && $hour % 2 == 0);
+    }
+    public function sendContextAfterSearch($observer){
+        /** @var Mage_CatalogSearch_Model_Query $queryModel */
+        $queryModel = $observer->getCatalogsearchQuery();
+        $searchTerm = $queryModel->getQueryText();
+        $context = [
+            'pageType' => 'Search',
+            'searchTerm' => $searchTerm
+        ];
+        $context = $this->getHelper()->getContextData($context);
+        $response = $this->getHelper()->getRequestModel()->requestingAnAd($context);
+        $return = $this->getHelper()->handlePostResponse($response);
     }
 }

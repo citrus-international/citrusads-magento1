@@ -29,7 +29,7 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Request extends Ma
         $productFilter = $fieldset->addField('productFilter', 'text', array(
             'label'     => Mage::helper('citrusintegration')->__('Product Filters'),
             'class'     => 'required-entry',
-            'required'  => true,
+//            'required'  => true,
             'name'      => 'productFilters',
         ));
         $maxNumberOfAds = $fieldset->addField('maxNumberOfAds', 'text', array(
@@ -55,11 +55,11 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Request extends Ma
             ->addFieldMap($pageType->getHtmlId(), $pageType->getName())
             ->addFieldMap($searchTerm->getHtmlId(), $searchTerm->getName())
             ->addFieldMap($productFilter->getHtmlId(), $productFilter->getName())
-            ->addFieldDependence(
-                $productFilter->getName(),
-                $pageType->getName(),
-                'Category'
-            )
+//            ->addFieldDependence(
+//                $productFilter->getName(),
+//                $pageType->getName(),
+//                'Category'
+//            )
             ->addFieldDependence(
                 $searchTerm->getName(),
                 $pageType->getName(),

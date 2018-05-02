@@ -26,7 +26,10 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function getApiKey(){
         return Mage::getStoreConfig('citrus/citrus_group/api_key', Mage::app()->getStore());
     }
-
+    /** @return false|Citrus_Integration_Model_Banner */
+    public function getBannerModel(){
+        return Mage::getModel('citrusintegration/banner');
+    }
     public function getHost(){
         $host = Mage::getStoreConfig('citrus/citrus_group/host', Mage::app()->getStore());
         switch ($host){
@@ -269,5 +272,83 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                 break;
         }
         $this->handleResponse($response);
+    }
+    public function handlePostResponse($response){
+        if($response['success']){
+            $data = json_decode($response['message'], true);
+            $adModel = $this->getAdModel();
+            $discountModel = $this->getDiscountModel();
+            $host = $this->getHelper()->getHost();
+            if($data['ads']){
+                foreach ($data['ads'] as $ad){
+                    $id = $adModel->getIdByCitrusId($ad['id']);
+                    if($id){
+                        $adModel->load($id);
+                        $discountModel->load($adModel->getDiscountId());
+                        $adData = [
+                            'gtin' => $ad['gtin'],
+                            'expiry' => $ad['expiry']
+                        ];
+                        $discountData = [
+                            'amount' => $ad['discount']['amount'],
+                            'minPrice' => $ad['discount']['minPrice'],
+                            'maxPerCustomer' => $ad['discount']['maxPerCustomer'],
+                        ];
+                        $adModel->addData($adData);
+                        $discountModel->addData($discountData);
+
+                        try{
+                            $discountModel->save();
+                            $adModel->save();
+//                           $this->handleBanner($data['banners'] = isset($data['banners']) ? $data['banners'] : null, $id);
+//                           $this->handleBanner($data['products'], $id);
+                        }catch (Exception $e){
+                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            return false;
+                        }
+                    }
+                    else{
+                        $discountModel->unsetData();
+                        $discountData = [
+                            'amount' => $ad['discount']['amount'],
+                            'minPrice' => $ad['discount']['minPrice'],
+                            'maxPerCustomer' => $ad['discount']['maxPerCustomer'],
+                        ];
+                        $discountModel->addData($discountData);
+                        try{
+                            $discountModel->save();
+                        }catch (Exception $e){
+                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            return false;
+                        }
+                        $adModel->unsetData();
+                        $adData = [
+                            'citrus_id' => $ad['id'],
+                            'discount_id' => $discountModel->getId(),
+                            'gtin' => $ad['gtin'],
+                            'expiry' => $ad['expiry'],
+                            'host' => $host
+                        ];
+                        $adModel->addData($adData);
+                        try{
+                            $adModel->save();
+//                           $this->handleBanner($data['banners'] = isset($data['banners']) ? $data['banners'] : null, $id);
+//                           $this->handleBanner($data['products'], $id);
+                        }catch (Exception $e){
+                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        else{
+            $data = json_decode($response['message'], true);
+            $error = $data['message'] != '' ? $data['message'] : 'Something went wrong. Please try again in a few minutes';
+            $error = Mage::helper('adminhtml')->__($error);
+            Mage::getSingleton('adminhtml/session')->addError($error);
+            return false;
+        }
     }
 }

@@ -61,8 +61,8 @@ CREATE TABLE {$this->getTable('citrusintegration/discount')} (
 DROP TABLE IF EXISTS {$this->getTable('citrusintegration/banner')};
 CREATE TABLE {$this->getTable('citrusintegration/banner')} (
   `id` int(11) unsigned NOT NULL auto_increment,
-  `ad_id` int(11) NULL,
   `citrus_id` VARCHAR(255) NOT NULL,
+  `pageType` VARCHAR(255) NOT NULL,
   `slotId` VARCHAR(255) NULL,
   `imageUrl` VARCHAR(255) NULL,
   `linkUrl` VARCHAR(255) NULL,

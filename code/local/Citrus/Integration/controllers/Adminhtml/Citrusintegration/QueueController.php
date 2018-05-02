@@ -6,6 +6,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     {
         $this->_title($this->__('Queue List'));
         $this->loadLayout();
+        $this->_initAction();
         $this->_initLayoutMessages('customer/session');
         $this->renderLayout();
     }
@@ -281,9 +282,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     {
         $this->loadLayout()
             ->_setActiveMenu('citrus')
-            ->_title($this->__('Citrus'))->_title($this->__('Queue'))
-            ->_addBreadcrumb($this->__('Citrus'), $this->__('Citrus'))
-            ->_addBreadcrumb($this->__('Queue'), $this->__('Queue'));
+            ->_title($this->__('Citrus'))->_title($this->__('Queue'));
 
         return $this;
     }
