@@ -1,36 +1,62 @@
+app
+dev
+downloader
+errors
+includes
+js
+lib
+media
+shell
+skin
+var
 .htaccess
+.htaccess.sample
+api.php
+cron.php
+cron.sh
+favicon.ico
+get.php
+index.php
+index.php.sample
+install.php
+LICENSE.txt
+LICENSE_AFL.txt
+mage
+php.ini.sample
+RELEASE_NOTES.txt
+LICENSE.html
 Mage.php
 bootstrap.php
 
-code/*
-!code/local
-code/local/*
-!code/local/Citrus
+app/code/*
+!app/code/local
+app/code/local/*
+!app/code/local/Citrus
 
-design/*
-!design/frontend
-design/frontend/*
-!design/frontend/base
-design/frontend/base/default/*
+app/design/*
+!app/design/frontend
+app/design/frontend/*
+!app/design/frontend/base
+app/design/frontend/base/default/*
 
-!design/frontend/base/default/layout
-design/frontend/base/default/layout/*
-!design/frontend/base/default/layout/citrus.xml
+!app/design/frontend/base/default/layout
+app/design/frontend/base/default/layout/*
+!app/design/frontend/base/default/layout/citrus.xml
 
-!design/frontend/base/default/template
-design/frontend/base/default/template/*
-!design/frontend/base/default/template/citrus
+!app/design/frontend/base/default/template
+app/design/frontend/base/default/template/*
+!app/design/frontend/base/default/template/citrus
 
-!design/adminhtml
-design/adminhtml/*
-!design/adminhtml/default
-design/adminhtml/default/default/*
-!design/adminhtml/default/default/layout
-design/adminhtml/default/default/layout/*
-!design/adminhtml/default/default/layout/citrus
-!design/adminhtml/default/default/template
-design/adminhtml/default/default/template/*
-!design/adminhtml/default/default/template/citrus
+!app/design/adminhtml
+app/design/adminhtml/*
+!app/design/adminhtml/default
+app/design/adminhtml/default/default/*
+!app/design/adminhtml/default/default/layout
+app/design/adminhtml/default/default/layout/*
+!app/design/adminhtml/default/default/layout/citrus
+!app/design/adminhtml/default/default/template
+app/design/adminhtml/default/default/template/*
+!app/design/adminhtml/default/default/template/citrus
 
 
 etc/*
