@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<widgets>
+    <add_post type="citrusintegration/widget" translate="name description" module="citrusintegration">
+        <name>Citrus Banner Widget</name>
+        <description type="desc">Add Banner To Page</description>
+        <parameters>
+            <page_type>
+                <label>Banner Page Type</label>
+                <visible>1</visible>
+                <required>1</required>
+                <type>select</type>
+                <value>Home</value>
+                <values>
+                    <default translate="label">
+                        <value>Home</value>
+                        <label>Home</label>
+                    </default>
+                    <category translate="label">
+                        <value>Category</value>
+                        <label>Category</label>
+                    </category>
+                    <search translate="label">
+                        <value>Search</value>
+                        <label>Search</label>
+                    </search>
+                </values>
+            </page_type>
+            <height>
+                <label>Height</label>
+                <visible>1</visible>
+                <required>0</required>
+                <type>text</type>
+            </height>
+            <width>
+                <label>Width</label>
+                <visible>1</visible>
+                <required>0</required>
+                <type>text</type>
+            </width>
+        </parameters>
+    </add_post>
+</widgets>

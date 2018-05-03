@@ -7,13 +7,13 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad extends Mage_Admin
         $this->_blockGroup = 'citrusintegration';
         $this->_addButton('add_new', array(
             'label'   => Mage::helper('citrusintegration')->__('Request Ads and Relevant product'),
-            'onclick' => "setLocation('{$this->getUrl('*/*/request')}')",
+            'onclick' => "setLocation('{$this->getUrl('*/*/request/banner/0')}')",
             'class'   => 'add'
         ));
         $this->_addButton('banner_list', array(
             'label'   => Mage::helper('citrusintegration')->__('Banners List'),
             'onclick' => "setLocation('{$this->getUrl('*/citrusintegration_banner/index')}')",
-            'class'   => 'add'
+            'class'   => 'go'
         ));
         $this->_headerText = Mage::helper('adminhtml')->__('Ads List');
         parent::__construct();

@@ -14,15 +14,19 @@ class Citrus_Integration_Model_Resource_Banner extends Mage_Core_Model_Resource_
      */
     public function getIdByCitrusId($bannerId)
     {
+        $datetime = new DateTime();
+        $now = $datetime->format('Y-m-d\TH:i:s\Z');
         $host = $this->getHelper()->getHost();
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
             ->from(self::getMainTable(), 'id')
             ->where('slotId = :slotId')
-            ->where('host = :host');
+            ->where('host = :host')
+            ->where('expiry >= :expiry' );
         $bind = array(
             ':slotId' => (int)$bannerId,
-            ':host' => (string)$host
+            ':host' => (string)$host,
+            ':expiry' => $now
         );
         return $adapter->fetchOne($select, $bind);
     }
@@ -33,15 +37,19 @@ class Citrus_Integration_Model_Resource_Banner extends Mage_Core_Model_Resource_
      */
     public function getBannerByPageType($pageType)
     {
+        $datetime = new DateTime();
+        $now = $datetime->format('Y-m-d\TH:i:s\Z');
         $host = $this->getHelper()->getHost();
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
             ->from(self::getMainTable(), 'id')
             ->where('pageType = :pageType')
-            ->where('host = :host');
+            ->where('host = :host')
+            ->where('expiry >= :expiry' );
         $bind = array(
             ':pageType' => (string)$pageType,
-            ':host' => (string)$host
+            ':host' => (string)$host,
+            ':expiry' => $now
         );
         return $adapter->fetchAll($select, $bind);
     }

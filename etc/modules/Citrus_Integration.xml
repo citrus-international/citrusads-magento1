@@ -30,7 +30,9 @@
         <Citrus_Integration>
             <active>true</active>
             <codePool>local</codePool>
-            <depends />
+            <depends>
+                <Mage_Cms />
+            </depends>
         </Citrus_Integration>
     </modules>
 </config>

@@ -9,6 +9,7 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Request extends Ma
             'action' => $this->getUrl('*/*/send'),
             'method' => 'post',
         ));
+        $is_banner = Mage::registry('is_banner');
         $fieldset = $form->addFieldset('citrusintegration_form', array('legend'=>Mage::helper('citrusintegration')->__('Context')));
 
         $pageType = $fieldset->addField('pageType', 'select', array(
@@ -38,6 +39,11 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Request extends Ma
             'required'  => true,
             'name'      => 'maxNumberOfAds',
         ));
+        $fieldset->addField('is_banner', 'hidden', array(
+            'label'     => Mage::helper('citrusintegration')->__('Is Banner'),
+            'name'      => 'is_banner',
+            'value'     => $is_banner
+        ));
         $bannerSlotIds = $fieldset->addField('bannerSlotIds', 'text', array(
             'label'     => Mage::helper('citrusintegration')->__('Banner Slot Ids'),
             'name'      => 'bannerSlotIds',
@@ -49,6 +55,7 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Request extends Ma
             'class' => 'form-button',
             'onclick' => "setLocation('{$this->getUrl('*/*/send')}')",
         ));
+
 
         $this->setForm($form);
         $this->setChild('form_after', $this->getLayout()->createBlock('adminhtml/widget_form_element_dependence')

@@ -1,0 +1,15 @@
+<?php
+$banners = $this->getBanners($this->getPageType());
+if($banners): ?>
+    <div class="citrus-banner">
+        <?php
+        foreach ($banners as $banner):
+            $banner = $this->getCitrusHelper()->getBannerModel()->load($banner['id'])
+            ?>
+            <a href="<?= $banner->getData('linkUrl') ?>"><img src="<?= $banner->getData('imageUrl')?>" alt="<?= $banner->getData('altText')?>"
+                height="<?= $this->getHeight()?>" width="<?= $this->getWidth()?>"></a>
+        <?php endforeach;?>
+    </div>
+<?php
+endif;
+?>

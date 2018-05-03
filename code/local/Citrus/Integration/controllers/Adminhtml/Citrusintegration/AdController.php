@@ -34,7 +34,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
             }
         }
 
-        $this->_title($model->getId() ? $model->getName() : $this->__('New Baz'));
+        $this->_title($model->getId() ? $model->getName() : $this->__('New Ad'));
 
         $data = Mage::getSingleton('adminhtml/session')->getBazData(true);
         if (!empty($data)) {
@@ -51,6 +51,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
     }
     public function requestAction(){
         $this->loadLayout();
+        Mage::register('is_banner',$this->getRequest()->getParam('banner'), true);
         $this->_addContent($this->getLayout()->createBlock('citrusintegration/adminhtml_citrusintegration_ad_request'));
         $this->renderLayout();
     }
@@ -60,10 +61,14 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
         $response = $this->getRequestModel()->requestingAnAd($context);
         $return = $this->handlePostResponse($response, $context['pageType']);
         if($return) {
-            $this->_redirect('*/*/');
             Mage::getSingleton('adminhtml/session')->addSuccess('Your request is completed');
+            if($this->getRequest()->getParam('is_banner'))
+                $this->_redirect('*/citrusintegration_banner/index');
+            else $this->_redirect('*/*/index');
         }
-        else $this->_redirect('*/*/request');
+        else{
+            $this->_redirect('*/*/request');
+        }
     }
     public function handlePostResponse($response, $pageType = null){
         if($response['success']){
@@ -123,8 +128,6 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                        $adModel->addData($adData);
                        try{
                            $adModel->save();
-//                           $this->handleBanner($data['banners'] = isset($data['banners']) ? $data['banners'] : null, $id);
-//                           $this->handleBanner($data['products'], $id);
                        }catch (Exception $e){
                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                            return false;
@@ -175,6 +178,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                     }
                 }
             }
+//            Mage::getSingleton('adminhtml/session')->addSuccess('Your request is completed');
             return true;
         }
         else{

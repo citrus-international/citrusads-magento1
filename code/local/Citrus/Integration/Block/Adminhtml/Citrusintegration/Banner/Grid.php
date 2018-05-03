@@ -48,11 +48,19 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Banner_Grid extends M
                     'index' => 'slotId'
                 )
             );
+            $this->addColumn('pageType',
+                array(
+                    'header'=> $this->__('Page Type'),
+                    'align' =>'left',
+                    'index' => 'pageType'
+                )
+            );
 
             $this->addColumn('imageUrl',
                 array(
                     'header'=> $this->__('Image Url'),
-                    'index' => 'imageUrl'
+                    'index' => 'imageUrl',
+                    'renderer' => 'Citrus_Integration_Block_Adminhtml_Template_Grid_Renderer_Image'
                 )
             );
             $this->addColumn('linkUrl',
@@ -76,7 +84,8 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Banner_Grid extends M
             $this->addColumn('host',
                 array(
                     'header'=> $this->__('Host'),
-                    'index' => 'host'
+                    'index' => 'host',
+                    'renderer' => 'Citrus_Integration_Block_Adminhtml_Template_Grid_Renderer_Host'
                 )
             );
         }catch (Exception $e){
