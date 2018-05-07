@@ -59,7 +59,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
         $params = $this->getRequest()->getParams();
         $context = $this->getHelper()->getContextData($params);
         $response = $this->getRequestModel()->requestingAnAd($context);
-        $return = $this->handlePostResponse($response, $context['pageType']);
+        $return = $this->getHelper()->handleAdsResponse($response, $context['pageType']);
         if($return) {
             Mage::getSingleton('adminhtml/session')->addSuccess('Your request is completed');
             if($this->getRequest()->getParam('is_banner'))
@@ -70,192 +70,192 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
             $this->_redirect('*/*/request');
         }
     }
-    public function handlePostResponse($response, $pageType = null){
-        if($response['success']){
-            $data = json_decode($response['message'], true);
-            $adModel = $this->getAdModel();
-            $bannerModel = $this->getBannerModel();
-            $discountModel = $this->getDiscountModel();
-            $host = $this->getHelper()->getHost();
-            if($data['ads']){
-               foreach ($data['ads'] as $ad){
-                   $id = $adModel->getIdByCitrusId($ad['id']);
-                   if($id){
-                       $adModel->load($id);
-                       $discountModel->load($adModel->getDiscountId());
-                       $adData = [
-                           'gtin' => $ad['gtin'],
-                           'expiry' => $ad['expiry']
-                       ];
-                       $discountData = [
-                            'amount' => $ad['discount']['amount'],
-                            'minPrice' => $ad['discount']['minPrice'],
-                            'maxPerCustomer' => $ad['discount']['maxPerCustomer'],
-                       ];
-                       $adModel->addData($adData);
-                       $discountModel->addData($discountData);
-
-                       try{
-                           $discountModel->save();
-                           $adModel->save();
-                       }catch (Exception $e){
-                           Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                           return false;
-                       }
-                   }
-                   else{
-                       $discountModel->unsetData();
-                       $discountData = [
-                           'amount' => $ad['discount']['amount'],
-                           'minPrice' => $ad['discount']['minPrice'],
-                           'maxPerCustomer' => $ad['discount']['maxPerCustomer'],
-                       ];
-                       $discountModel->addData($discountData);
-                       try{
-                           $discountModel->save();
-                       }catch (Exception $e){
-                           Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                           return false;
-                       }
-                       $adModel->unsetData();
-                       $adData = [
-                           'citrus_id' => $ad['id'],
-                           'discount_id' => $discountModel->getId(),
-                           'gtin' => $ad['gtin'],
-                           'expiry' => $ad['expiry'],
-                           'host' => $host
-                       ];
-                       $adModel->addData($adData);
-                       try{
-                           $adModel->save();
-                       }catch (Exception $e){
-                           Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                           return false;
-                       }
-                   }
-               }
-            }
-            if($data['banners']){
-                foreach ($data['banners'] as $banner){
-                    $id = $bannerModel->getIdByCitrusId($banner['id']);
-                    if($id){
-                        $bannerModel->load($id);
-                        $bannerData = [
-                            'slotId' => $banner['slotId'],
-                            'imageUrl' => $banner['imageUrl'],
-                            'altText' => $banner['altText'],
-                            'linkUrl' => $banner['linkUrl'],
-                            'expiry' => $banner['expiry'],
-                            'pageType' => $pageType
-                        ];
-                        $bannerModel->addData($bannerData);
-                        try{
-                            $bannerModel->save();
-                        }catch (Exception $e){
-                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                            return false;
-                        }
-                    }
-                    else{
-                        $bannerModel->unsetData();
-                        $bannerData = [
-                            'citrus_id' => $banner['id'],
-                            'slotId' => $banner['slotId'],
-                            'imageUrl' => $banner['imageUrl'],
-                            'altText' => $banner['altText'],
-                            'linkUrl' => $banner['linkUrl'],
-                            'expiry' => $banner['expiry'],
-                            'host' => $host,
-                            'pageType' => $pageType
-                        ];
-                        $bannerModel->addData($bannerData);
-                        try{
-                            $bannerModel->save();
-                        }catch (Exception $e){
-                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                            return false;
-                        }
-                    }
-                }
-            }
-//            Mage::getSingleton('adminhtml/session')->addSuccess('Your request is completed');
-            return true;
-        }
-        else{
-            $data = json_decode($response['message'], true);
-            $error = $data['message'] != '' ? $data['message'] : 'Something went wrong. Please try again in a few minutes';
-            $error = Mage::helper('adminhtml')->__($error);
-            Mage::getSingleton('adminhtml/session')->addError($error);
-            return false;
-        }
-    }
-    public function handleBanner($banners, $adId){
-        /** @var Citrus_Integration_Model_Banner $model */
-        $model = Mage::getModel('citrusintegration/banner');
-        $host = $this->getHelper()->getHost();
-        if(!is_array($banners)){
-            $ids = $model->getIdByAdId(1);
-            if($ids){
-                foreach ($ids as $id){
-                    $model->load($id['id']);
-                    try{
-                        $model->delete();
-                    }catch (Exception $e) {
-                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                    }
-                }
-            }
-        }
-        else {
-            foreach ($banners as $banner){
-                $ids = $model->getIdByAdId($adId);
-                if($ids){
-                    foreach ($ids as $id){
-                        $model->load($id['id']);
-                        try{
-                            $model->delete();
-                        }catch (Exception $e) {
-                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                        }
-                    }
-                    $bannerData = [
-                        "id" => $banner['id'],
-                        "slotId" => $banner['slotId'],
-                        "imageUrl" => $banner['imageUrl'],
-                        "linkUrl" => $banner['linkUrl'],
-                        "altText" => $banner['altText'],
-                        "expiry" => $banner['expiry'],
-                        "ad_id" => $adId,
-                        "host" => $host
-                    ];
-                    $model->addData($bannerData);
-                    try{
-                        $model->save();
-                    }catch (Exception $e){
-                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                    }
-                }
-                else{
-                    $bannerData = [
-                        "id" => $banner['id'],
-                        "slotId" => $banner['slotId'],
-                        "imageUrl" => $banner['imageUrl'],
-                        "linkUrl" => $banner['linkUrl'],
-                        "altText" => $banner['altText'],
-                        "expiry" => $banner['expiry'],
-                        "ad_id" => $adId,
-                        "host" => $host
-                    ];
-                    $model->addData($bannerData);
-                    try{
-                        $model->save();
-                    }catch (Exception $e){
-                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                    }
-                }
-            }
-        }
-    }
+//    public function handlePostResponse($response, $pageType = null){
+//        if($response['success']){
+//            $data = json_decode($response['message'], true);
+//            $adModel = $this->getAdModel();
+//            $bannerModel = $this->getBannerModel();
+//            $discountModel = $this->getDiscountModel();
+//            $host = $this->getHelper()->getHost();
+//            if($data['ads']){
+//               foreach ($data['ads'] as $ad){
+//                   $id = $adModel->getIdByCitrusId($ad['id']);
+//                   if($id){
+//                       $adModel->load($id);
+//                       $discountModel->load($adModel->getDiscountId());
+//                       $adData = [
+//                           'gtin' => $ad['gtin'],
+//                           'expiry' => $ad['expiry']
+//                       ];
+//                       $discountData = [
+//                            'amount' => $ad['discount']['amount'],
+//                            'minPrice' => $ad['discount']['minPrice'],
+//                            'maxPerCustomer' => $ad['discount']['maxPerCustomer'],
+//                       ];
+//                       $adModel->addData($adData);
+//                       $discountModel->addData($discountData);
+//
+//                       try{
+//                           $discountModel->save();
+//                           $adModel->save();
+//                       }catch (Exception $e){
+//                           Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+//                           return false;
+//                       }
+//                   }
+//                   else{
+//                       $discountModel->unsetData();
+//                       $discountData = [
+//                           'amount' => $ad['discount']['amount'],
+//                           'minPrice' => $ad['discount']['minPrice'],
+//                           'maxPerCustomer' => $ad['discount']['maxPerCustomer'],
+//                       ];
+//                       $discountModel->addData($discountData);
+//                       try{
+//                           $discountModel->save();
+//                       }catch (Exception $e){
+//                           Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+//                           return false;
+//                       }
+//                       $adModel->unsetData();
+//                       $adData = [
+//                           'citrus_id' => $ad['id'],
+//                           'discount_id' => $discountModel->getId(),
+//                           'gtin' => $ad['gtin'],
+//                           'expiry' => $ad['expiry'],
+//                           'host' => $host
+//                       ];
+//                       $adModel->addData($adData);
+//                       try{
+//                           $adModel->save();
+//                       }catch (Exception $e){
+//                           Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+//                           return false;
+//                       }
+//                   }
+//               }
+//            }
+//            if($data['banners']){
+//                foreach ($data['banners'] as $banner){
+//                    $id = $bannerModel->getIdByCitrusId($banner['id']);
+//                    if($id){
+//                        $bannerModel->load($id);
+//                        $bannerData = [
+//                            'slotId' => $banner['slotId'],
+//                            'imageUrl' => $banner['imageUrl'],
+//                            'altText' => $banner['altText'],
+//                            'linkUrl' => $banner['linkUrl'],
+//                            'expiry' => $banner['expiry'],
+//                            'pageType' => $pageType
+//                        ];
+//                        $bannerModel->addData($bannerData);
+//                        try{
+//                            $bannerModel->save();
+//                        }catch (Exception $e){
+//                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+//                            return false;
+//                        }
+//                    }
+//                    else{
+//                        $bannerModel->unsetData();
+//                        $bannerData = [
+//                            'citrus_id' => $banner['id'],
+//                            'slotId' => $banner['slotId'],
+//                            'imageUrl' => $banner['imageUrl'],
+//                            'altText' => $banner['altText'],
+//                            'linkUrl' => $banner['linkUrl'],
+//                            'expiry' => $banner['expiry'],
+//                            'host' => $host,
+//                            'pageType' => $pageType
+//                        ];
+//                        $bannerModel->addData($bannerData);
+//                        try{
+//                            $bannerModel->save();
+//                        }catch (Exception $e){
+//                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+//                            return false;
+//                        }
+//                    }
+//                }
+//            }
+////            Mage::getSingleton('adminhtml/session')->addSuccess('Your request is completed');
+//            return true;
+//        }
+//        else{
+//            $data = json_decode($response['message'], true);
+//            $error = $data['message'] != '' ? $data['message'] : 'Something went wrong. Please try again in a few minutes';
+//            $error = Mage::helper('adminhtml')->__($error);
+//            Mage::getSingleton('adminhtml/session')->addError($error);
+//            return false;
+//        }
+//    }
+//    public function handleBanner($banners, $adId){
+//        /** @var Citrus_Integration_Model_Banner $model */
+//        $model = Mage::getModel('citrusintegration/banner');
+//        $host = $this->getHelper()->getHost();
+//        if(!is_array($banners)){
+//            $ids = $model->getIdByAdId(1);
+//            if($ids){
+//                foreach ($ids as $id){
+//                    $model->load($id['id']);
+//                    try{
+//                        $model->delete();
+//                    }catch (Exception $e) {
+//                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+//                    }
+//                }
+//            }
+//        }
+//        else {
+//            foreach ($banners as $banner){
+//                $ids = $model->getIdByAdId($adId);
+//                if($ids){
+//                    foreach ($ids as $id){
+//                        $model->load($id['id']);
+//                        try{
+//                            $model->delete();
+//                        }catch (Exception $e) {
+//                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+//                        }
+//                    }
+//                    $bannerData = [
+//                        "id" => $banner['id'],
+//                        "slotId" => $banner['slotId'],
+//                        "imageUrl" => $banner['imageUrl'],
+//                        "linkUrl" => $banner['linkUrl'],
+//                        "altText" => $banner['altText'],
+//                        "expiry" => $banner['expiry'],
+//                        "ad_id" => $adId,
+//                        "host" => $host
+//                    ];
+//                    $model->addData($bannerData);
+//                    try{
+//                        $model->save();
+//                    }catch (Exception $e){
+//                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+//                    }
+//                }
+//                else{
+//                    $bannerData = [
+//                        "id" => $banner['id'],
+//                        "slotId" => $banner['slotId'],
+//                        "imageUrl" => $banner['imageUrl'],
+//                        "linkUrl" => $banner['linkUrl'],
+//                        "altText" => $banner['altText'],
+//                        "expiry" => $banner['expiry'],
+//                        "ad_id" => $adId,
+//                        "host" => $host
+//                    ];
+//                    $model->addData($bannerData);
+//                    try{
+//                        $model->save();
+//                    }catch (Exception $e){
+//                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+//                    }
+//                }
+//            }
+//        }
+//    }
     public function handleRelevant($relevants, $adId){
         /** @var Citrus_Integration_Model_Relevant $model */
         $model = Mage::getModel('citrusintegration/relevant');

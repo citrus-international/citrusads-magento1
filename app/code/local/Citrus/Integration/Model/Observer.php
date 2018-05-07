@@ -230,12 +230,20 @@ class Citrus_Integration_Model_Observer
         /** @var Mage_CatalogSearch_Model_Query $queryModel */
         $queryModel = $observer->getCatalogsearchQuery();
         $searchTerm = $queryModel->getQueryText();
+
         $context = [
             'pageType' => 'Search',
-            'searchTerm' => $searchTerm
+            'searchTerm' => $searchTerm,
+            'maxNumberOfAds' => $this->getHelper()::MAX_NUMBER_OF_ADS
         ];
+        $banners = Mage::getStoreConfig('citrus/citrus_banner/slot_ids', Mage::app()->getStore());
+        if($banners) {
+//            $bannerSlotIds = explode(',',$banners);
+            $context['bannerSlotIds'] = $banners;
+        }
         $context = $this->getHelper()->getContextData($context);
         $response = $this->getHelper()->getRequestModel()->requestingAnAd($context);
-        $return = $this->getHelper()->handlePostResponse($response);
+        $return = $this->getHelper()->handleAdsResponse($response, 'Search');
+//        $return = $this->getHelper()->handlePostResponse($response);
     }
 }
