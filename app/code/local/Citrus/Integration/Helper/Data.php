@@ -185,7 +185,6 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $data['totalOrderItemPriceAfterDiscounts'] = (float)$item->getRowTotal();
         return $data;
     }
-
     /**
      * @param $entity Mage_Customer_Model_Customer
      * @return mixed
@@ -211,7 +210,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     }
     /**
      * @param $entity Mage_Catalog_Model_Product
-     * @return mixed
+     * @return array
      */
     public function getProductData($entity){
         $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($entity);
@@ -226,7 +225,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $data['images'] = [Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage())];
         $data['inventory'] = (int)$stock->getQty();
         $data['price'] = (int)$entity->getPrice();
-        $data['filters'] = [$entity->getName()];
+        $data['filters'] = $this->getProductFilter($entity);
         $data['tags'] = $tags;
         $categoryIds = $entity->getCategoryIds();
         $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
@@ -236,6 +235,21 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                 $data['categoryHierarchy'][] = $category->getName();
             }
         return $data;
+    }
+    /**
+     * @param $product Mage_Catalog_Model_Product
+     * @return array
+     */
+    public function getProductFilter($product){
+        $categories = $product->getCategoryIds();
+        $cats = [];
+        if(is_array($categories)) {
+            foreach ($categories as $category_id) {
+                $_cat = Mage::getModel('catalog/category')->load($category_id);
+                $cats[] = $_cat->getName();
+            }
+        }
+        return array_merge([$product->getName()],$cats);
     }
     public function getProductTags($id){
         $results = [];
@@ -300,8 +314,6 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         try{
                             $discountModel->save();
                             $adModel->save();
-//                           $this->handleBanner($data['banners'] = isset($data['banners']) ? $data['banners'] : null, $id);
-//                           $this->handleBanner($data['products'], $id);
                         }catch (Exception $e){
                             Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                             return false;

@@ -33,10 +33,10 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Request extends Ma
 //            'required'  => true,
             'name'      => 'productFilters',
         ));
-        $maxNumberOfAds = $fieldset->addField('maxNumberOfAds', 'text', array(
+        $maxNumberOfAds = $fieldset->addField('maxNumberOfAds', 'hidden', array(
             'label'     => Mage::helper('citrusintegration')->__('Max Number Of Ads'),
             'class'     => 'required-entry',
-            'required'  => true,
+            'value'  => 3,
             'name'      => 'maxNumberOfAds',
         ));
         $fieldset->addField('is_banner', 'hidden', array(
