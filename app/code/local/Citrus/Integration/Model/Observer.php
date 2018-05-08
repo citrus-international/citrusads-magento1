@@ -238,12 +238,10 @@ class Citrus_Integration_Model_Observer
         ];
         $banners = Mage::getStoreConfig('citrus/citrus_banner/slot_ids', Mage::app()->getStore());
         if($banners) {
-//            $bannerSlotIds = explode(',',$banners);
             $context['bannerSlotIds'] = $banners;
         }
         $context = $this->getHelper()->getContextData($context);
         $response = $this->getHelper()->getRequestModel()->requestingAnAd($context);
         $return = $this->getHelper()->handleAdsResponse($response, 'Search');
-//        $return = $this->getHelper()->handlePostResponse($response);
     }
 }

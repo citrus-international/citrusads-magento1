@@ -111,10 +111,10 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $data['bannerSlotIds'] = $arrays;
         }
         if(isset($context['productFilters'])){
-           $arrays = explode(',',$context['productFilters']);
-           foreach ($arrays as $array){
-               $data['productFilters'][] = [$array];
-           }
+            $arrays = explode(',',$context['productFilters']);
+            foreach ($arrays as $array){
+                $data['productFilters'][] = [$array];
+            }
         }
         if(isset($context['customerId']))
             $data['customerId'] = $context['customerId'];
@@ -243,6 +243,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     }
                 }
             }
+//            Mage::getSingleton('adminhtml/session')->addSuccess('Your request is completed');
             return true;
         }
         else{
@@ -256,7 +257,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function handleBanner($banners, $adId){
         /** @var Citrus_Integration_Model_Banner $model */
         $model = Mage::getModel('citrusintegration/banner');
-        $host = $this->getHost();
+        $host = $this->getHelper()->getHost();
         if(!is_array($banners)){
             $ids = $model->getIdByAdId(1);
             if($ids){
@@ -545,6 +546,8 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         $adModel->addData($adData);
                         try{
                             $adModel->save();
+//                           $this->handleBanner($data['banners'] = isset($data['banners']) ? $data['banners'] : null, $id);
+//                           $this->handleBanner($data['products'], $id);
                         }catch (Exception $e){
                             Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                             return false;
