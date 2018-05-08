@@ -1,6 +1,13 @@
 <?xml version="1.0"?>
 <layout version="0.1.0">
     <default>
+        <reference name="content">
+            <block name="content_top" type="core/text_list" before="-" translate="label">
+                <label>Main Content Top</label>
+            </block>
+        </reference>
+    </default>
+    <default>
         <reference name="before_body_end">
             <block type="core/template" name="citrus-header" template="citrus/sdk.phtml" />
         </reference>
