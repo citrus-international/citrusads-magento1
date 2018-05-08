@@ -234,7 +234,7 @@ class Citrus_Integration_Model_Observer
         $context = [
             'pageType' => 'Search',
             'searchTerm' => $searchTerm,
-            'maxNumberOfAds' => $this->getHelper()::MAX_NUMBER_OF_ADS
+            'maxNumberOfAds' => Citrus_Integration_Helper_Data::MAX_NUMBER_OF_ADS
         ];
         $banners = Mage::getStoreConfig('citrus/citrus_banner/slot_ids', Mage::app()->getStore());
         if($banners) {
