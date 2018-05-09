@@ -95,17 +95,56 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-                        <slot_ids>
-                            <label>Banner SlotIds: </label>
+                        <search_slot_ids>
+                            <label>Search Banner SlotIds: </label>
                             <comment>
                                 Banner SlotId in Search Page
+                            </comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </search_slot_ids>
+                    </fields>
+                    <fields>
+                        <search_limit>
+                            <label>Max Number Search Banner: </label>
+                            <comment>
+                                Max Banners per Search Page
+                            </comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </search_limit>
+                    </fields>
+                    <fields>
+                        <category_slot_ids>
+                            <label>Category Banner SlotIds: </label>
+                            <comment>
+                                Banner SlotId in Category Page
+                            </comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </category_slot_ids>
+                    </fields>
+                    <fields>
+                        <category_limit>
+                            <label>Max Number Category Banner: </label>
+                            <comment>
+                                Max Banners per Category Page
                             </comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                        </slot_ids>
+                        </category_limit>
                     </fields>
                 </citrus_banner>
             </groups>

@@ -19,6 +19,32 @@ class Citrus_Integration_Model_Observer
     protected function getHelper(){
         return Mage::helper('citrusintegration/data');
     }
+
+    public function sendContextAfterCategory($observer){
+        /** @var Mage_Catalog_Model_Category $category */
+        $category = $observer->getCategory();
+        $productFilters = '';
+        $parentCategories = $category->getParentCategories();
+        if(is_array($parentCategories)){
+            foreach ($parentCategories as $parentCategory){
+                $productFilters = $productFilters.','.$parentCategory->getName();
+            }
+            $productFilters = trim($productFilters.','.'filter1',',');
+        }
+        if($category->getLevel() != '1'){
+            $context = [
+                'pageType' => 'Category',
+                'productFilters' => $productFilters
+            ];
+            $banners = Mage::getStoreConfig('citrus/citrus_banner/category_slot_ids', Mage::app()->getStore());
+            if($banners) {
+                $context['bannerSlotIds'] = $banners;
+            }
+            $context = $this->getHelper()->getContextData($context);
+            $response = $this->getHelper()->getRequestModel()->requestingAnAd($context);
+            $return = $this->getHelper()->handleAdsResponse($response, 'Category');
+        }
+    }
     public function addDiscountToProduct($observer){
         /** @var Mage_Catalog_Model_Product $product */
         $product = $observer->getProduct();
@@ -236,7 +262,7 @@ class Citrus_Integration_Model_Observer
             'searchTerm' => $searchTerm,
             'maxNumberOfAds' => Citrus_Integration_Helper_Data::MAX_NUMBER_OF_ADS
         ];
-        $banners = Mage::getStoreConfig('citrus/citrus_banner/slot_ids', Mage::app()->getStore());
+        $banners = Mage::getStoreConfig('citrus/citrus_banner/search_slot_ids', Mage::app()->getStore());
         if($banners) {
             $context['bannerSlotIds'] = $banners;
         }

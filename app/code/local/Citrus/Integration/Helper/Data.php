@@ -27,7 +27,9 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function getApiKey(){
         return Mage::getStoreConfig('citrus/citrus_group/api_key', Mage::app()->getStore());
     }
-    /** @return false|Citrus_Integration_Model_Banner */
+    /**
+     * @return false|Citrus_Integration_Model_Banner
+     */
     public function getBannerModel(){
         return Mage::getModel('citrusintegration/banner');
     }
@@ -102,7 +104,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $data = [
             'catalogId' => $this->getCitrusCatalogId(),
             'pageType' => isset($context['pageType']) ? $context['pageType'] : 'Home',
-            'maxNumberOfAds' => (int)$context['maxNumberOfAds']
+            'maxNumberOfAds' => self::MAX_NUMBER_OF_ADS
         ];
         if(isset($context['searchTerm']))
             $data['searchTerm'] = $context['searchTerm'];

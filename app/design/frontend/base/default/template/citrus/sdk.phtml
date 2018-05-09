@@ -1,1 +1,31 @@
+<?php
+$host = Mage::getStoreConfig('citrus/citrus_group/host', Mage::app()->getStore());
+if($host == 1) $hostUrl = trim(Citrus_Integration_Model_Service_Authentication::CITRUS_AU_SERVER, '/');
+elseif($host == 2) $hostUrl = trim(Citrus_Integration_Model_Service_Authentication::CITRUS_US_SERVER, '/');
+else $hostUrl = trim(Citrus_Integration_Model_Service_Authentication::CITRUS_STAGING_SERVER, '/');
+?>
 <script type="text/javascript" src="https://assets.citrusad.net/citrusjs/0.1.0/citrus.js"></script>
+<script type="text/javascript">
+    var citrusAd = CitrusAd.init(
+        '<?= $hostUrl ?>',
+        /*
+          Above address determines which environment clicks and impressions are being reported to.
+          - Staging: https://staging-integration.citrusad.com/v1
+          - Production AU: https://au-integration.citrusad.com/v1
+          - Production US: https://us-integration.citrusad.com/v1
+        */
+        {
+            disableTracking: false // Optional: defaults to true.
+        }
+    );
+    citrusAd.reportClick('adId').then(function (result) {
+        console.log(result);
+    }).catch(function (error) {
+        console.log(error);
+    });
+    citrusAd.reportImpression('adId').then(function (result) {
+        console.log(result);
+    }).catch(function (error) {
+        console.log(error);
+    })
+</script>

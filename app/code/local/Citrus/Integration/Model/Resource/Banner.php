@@ -38,6 +38,7 @@ class Citrus_Integration_Model_Resource_Banner extends Mage_Core_Model_Resource_
     public function getBannerByPageType($pageType)
     {
         $datetime = new DateTime();
+        $limit = Mage::getStoreConfig('citrus/citrus_banner/'.strtolower($pageType).'_limit', Mage::app()->getStore());
         $now = $datetime->format('Y-m-d\TH:i:s\Z');
         $host = $this->getHelper()->getHost();
         $adapter = $this->_getReadAdapter();
@@ -46,6 +47,7 @@ class Citrus_Integration_Model_Resource_Banner extends Mage_Core_Model_Resource_
             ->where('pageType = :pageType')
             ->where('host = :host')
             ->where('expiry >= :expiry' );
+        if($limit) $select = $select->limit((int)$limit);
         $bind = array(
             ':pageType' => (string)$pageType,
             ':host' => (string)$host,
