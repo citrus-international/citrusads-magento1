@@ -26,7 +26,6 @@ class Citrus_Integration_Model_Resource_Ad extends Mage_Core_Model_Resource_Db_A
     public function getAds()
     {
         $datetime = new DateTime();
-//        $limit = Mage::getStoreConfig('citrus/citrus_banner/'.strtolower($pageType).'_limit', Mage::app()->getStore());
         $now = $datetime->format('Y-m-d\TH:i:s\Z');
         $host = $this->getHelper()->getHost();
         $adapter = $this->_getReadAdapter();

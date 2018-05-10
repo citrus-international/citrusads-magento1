@@ -29,8 +29,7 @@ class Citrus_Integration_Model_Observer
             foreach ($parentCategories as $parentCategory){
                 $productFilters = $productFilters.','.$parentCategory->getName();
             }
-            $productFilters = trim($productFilters.','.'filter1',',');
-            $productFilters = trim($productFilters.','.'test4',',');
+            $productFilters = trim($productFilters,',');
         }
         if($category->getLevel() != '1'){
             $context = [
