@@ -30,6 +30,7 @@ class Citrus_Integration_Model_Observer
                 $productFilters = $productFilters.','.$parentCategory->getName();
             }
             $productFilters = trim($productFilters.','.'filter1',',');
+            $productFilters = trim($productFilters.','.'test4',',');
         }
         if($category->getLevel() != '1'){
             $context = [

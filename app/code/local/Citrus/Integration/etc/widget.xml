@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <widgets>
-    <add_post type="citrusintegration/widget" translate="name description" module="citrusintegration">
+    <add_banner type="citrusintegration/widget_banner" translate="name description" module="citrusintegration">
         <name>Citrus Banner Widget</name>
         <description type="desc">Add Banner To Page</description>
         <parameters>
@@ -38,5 +38,41 @@
                 <type>text</type>
             </width>
         </parameters>
-    </add_post>
+    </add_banner>
+    <add_ads type="citrusintegration/widget_ads" translate="name description" module="citrusintegration">
+        <name>Citrus Ads Widget</name>
+        <description type="desc">Add Ads To Page</description>
+        <parameters>
+            <max_number_ads>
+                <label>Max Number Ads</label>
+                <visible>1</visible>
+                <type>text</type>
+            </max_number_ads>
+            <column_count>
+                <label>Number Of Columns</label>
+                <visible>1</visible>
+                <type>text</type>
+                <comment>
+                    Product amount per row
+                </comment>
+            </column_count>
+            <template>
+                <required>1</required>
+                <visible>1</visible>
+                <label>Template</label>
+                <type>select</type>
+                <value>citrus/widget/content/new_grid.phtml</value>
+                <values>
+                    <default translate="label">
+                        <value>citrus/widget/content/new_grid.phtml</value>
+                        <label>Products Grid Template</label>
+                    </default>
+                    <list translate="label">
+                        <value>citrus/widget/content/content/new_list.phtml</value>
+                        <label>Products List Template</label>
+                    </list>
+                </values>
+            </template>
+        </parameters>
+    </add_ads>
 </widgets>
