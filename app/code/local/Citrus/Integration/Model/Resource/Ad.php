@@ -19,20 +19,34 @@ class Citrus_Integration_Model_Resource_Ad extends Mage_Core_Model_Resource_Db_A
         );
         return $adapter->fetchOne($select, $bind);
     }
+    public function getCitrusIdByGtin($gtin){
+        $host = $this->getHelper()->getHost();
+        $adapter = $this->_getReadAdapter();
+        $select = $adapter->select()
+            ->from(self::getMainTable(), 'citrus_id')
+            ->where('gtin = :gtin')
+            ->where('host = :host');
+        $bind = array(
+            ':gtin' => (string)$gtin,
+            ':host' => (string)$host
+        );
+        return $adapter->fetchOne($select, $bind);
+    }
     /**
-     * @param $pageType
+     * @param $limit
      * @return array
      */
-    public function getAds()
+    public function getAds($limit)
     {
         $datetime = new DateTime();
         $now = $datetime->format('Y-m-d\TH:i:s\Z');
         $host = $this->getHelper()->getHost();
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
-            ->from(self::getMainTable(), 'gtin')
+            ->from(self::getMainTable(), '*')
             ->where('host = :host')
-            ->where('expiry >= :expiry' );
+            ->where('expiry >= :expiry' )->order(['id DESC'] )
+            ->limit($limit);
         $bind = array(
             ':host' => (string)$host,
             ':expiry' => $now

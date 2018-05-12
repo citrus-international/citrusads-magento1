@@ -34,8 +34,10 @@
         <?php $_columnCount = $this->getColumnCount(); ?>
         <?php $i=0; ?>
         <ul class="products-grid products-grid--max-<?php echo $_columnCount; ?>-col-widget">
-            <?php foreach ($_products->getItems() as $_product): ?>
-                <li class="item<?php if(($i-1)%$_columnCount==0): ?> first<?php elseif($i%$_columnCount==0): ?> last<?php endif; ?>">
+            <?php foreach ($_products->getItems() as $_product):
+                $citrus_id = Mage::getModel('citrusintegration/ad')->getCitrusIdByGtin($_product->getEntityId())
+                ?>
+                <li class="item<?php if(($i-1)%$_columnCount==0): ?> first<?php elseif($i%$_columnCount==0): ?> last<?php endif; ?> citrus-ads" data-id="<?= $citrus_id ?>">
                     <?php $_imgSize = 210; ?>
                     <?php // The image size is locked at 210 for this for display purposes. CSS has it at 75% which should equate to 278px?>
                     <a href="<?php echo $_product->getProductUrl() ?>" title="<?php echo $this->stripTags($_product->getName(), null, true) ?>" class="product-image">

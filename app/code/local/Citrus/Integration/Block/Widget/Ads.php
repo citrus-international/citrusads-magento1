@@ -18,7 +18,7 @@ class Citrus_Integration_Block_Widget_Ads extends Mage_Catalog_Block_Product_New
     }
     public function _getProductCollection(){
         $limit = $this->getMaxNumberAds();
-        $adCollections = Mage::getResourceModel('citrusintegration/ad')->getAds();
+        $adCollections = Mage::getResourceModel('citrusintegration/ad')->getAds($limit);
         /** @var $collection Mage_Catalog_Model_Resource_Product_Collection */
 
         $productIds = [];
