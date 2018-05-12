@@ -67,6 +67,19 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         return self::requestPostApi($handle,$headers, $body);
     }
     /**
+     * @param null $body
+     * @return array
+     */
+    public function pushProductsRequest($body = null){
+        $handle = 'products';
+        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        $body = [
+            'products' =>
+                [$body]
+        ];
+        return self::requestPostApi($handle,$headers, $body);
+    }
+    /**
      * @param null $name
      * @return array
      */

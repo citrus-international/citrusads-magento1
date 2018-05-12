@@ -41,6 +41,13 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Grid extends Mage_
                     'index' => 'citrus_id'
                 )
             );
+            $this->addColumn('gtin',
+                array(
+                    'header' => $this->__('GTIN'),
+                    'align' => 'left',
+                    'index' => 'gtin'
+                )
+            );
             $this->addColumn('discount_id',
                 array(
                     'header' => $this->__('Discount Id'),

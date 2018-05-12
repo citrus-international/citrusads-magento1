@@ -16,7 +16,7 @@ class Citrus_Integration_Model_Observer
     /**
      * @return Mage_Core_Helper_Abstract|Citrus_Integration_Helper_Data
      */
-    protected function getHelper(){
+    public static function getCitrusHelper(){
         return Mage::helper('citrusintegration/data');
     }
 
@@ -40,9 +40,9 @@ class Citrus_Integration_Model_Observer
             if($banners) {
                 $context['bannerSlotIds'] = $banners;
             }
-            $context = $this->getHelper()->getContextData($context);
-            $response = $this->getHelper()->getRequestModel()->requestingAnAd($context);
-            $return = $this->getHelper()->handleAdsResponse($response, 'Category');
+            $context = $this->getCitrusHelper()->getContextData($context);
+            $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
+            $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Category');
         }
     }
     public function addDiscountToProduct($observer){
@@ -54,7 +54,7 @@ class Citrus_Integration_Model_Observer
     public function applyDiscount($product){
         $adModel = Mage::getModel('citrusintegration/ad');
         $discountModel = Mage::getModel('citrusintegration/discount');
-        $host = $this->getHelper()->getHost();
+        $host = $this->getCitrusHelper()->getHost();
         $datetime = new DateTime();
         $now = $datetime->format('Y-m-d\TH:i:s\Z');
         $adCollections = $adModel->getCollection()
@@ -81,8 +81,8 @@ class Citrus_Integration_Model_Observer
         return $this;
     }
     public function handleGetResponse($response, $type = null, $param = null){
-        $name = $this->getHelper()->getCitrusCatalogName();
-        $host = $this->getHelper()->getHost();
+        $name = $this->getCitrusHelper()->getCitrusCatalogName();
+        $host = $this->getCitrusHelper()->getHost();
         if ($response['success']) {
             if($type == 'catalog'){
                 $data = json_decode($response['message'], true);
@@ -127,9 +127,9 @@ class Citrus_Integration_Model_Observer
         }
     }
     public function pushCatalog($name){
-        $requestModel = $this->getHelper()->getRequestModel();
+        $requestModel = $this->getCitrusHelper()->getRequestModel();
         $response = $requestModel->pushCatalogsRequest($name);
-        $this->getHelper()->handleResponse($response, 'catalog', $name);
+        $this->getCitrusHelper()->handleResponse($response, 'catalog', $name);
     }
     public function createCatalog($observer)
     {
@@ -137,7 +137,7 @@ class Citrus_Integration_Model_Observer
         $catalogName = Mage::getStoreConfig('citrus/citrus_group/catalog_name', Mage::app()->getStore());
         if ($enable) {
 
-            $responseModel = $this->getHelper()->getResponseModel();
+            $responseModel = $this->getCitrusHelper()->getResponseModel();
             $response = $responseModel->getCatalogListResponse();
             $this->handleGetResponse($response, 'catalog', $catalogName);
         }
@@ -169,11 +169,18 @@ class Citrus_Integration_Model_Observer
             }
         }
         else{
-            $helper = $this->getHelper();
-            $body = $helper->getProductData($product);
-            $response = $this->getHelper()->getRequestModel()->pushCatalogProductsRequest($body);
-            $this->getHelper()->handleResponse($response);
+            $helper = $this->getCitrusHelper();
+            $body = $helper->getCatalogProductData($product);
+            $response = $this->getCitrusHelper()->getRequestModel()->pushCatalogProductsRequest($body);
+            $this->getCitrusHelper()->handleResponse($response);
+            $this->pushCatalogProductAfter($product);
         }
+    }
+    public function pushCatalogProductAfter($entity){
+        $helper = $this->getCitrusHelper();
+        $body = $helper->getProductData($entity);
+        $response = $this->getCitrusHelper()->getRequestModel()->pushProductsRequest($body);
+        $this->getCitrusHelper()->handleResponse($response);
     }
     public function pushOrderToQueue($observer){
         /** @var Mage_Sales_Model_Order $order */
@@ -185,9 +192,9 @@ class Citrus_Integration_Model_Observer
             $this->pushItemToQueue($customer, $customer->getId());
         }
         else{
-            $body = $this->getHelper()->getOrderData($order);
-            $response = $this->getHelper()->getRequestModel()->pushOrderRequest([$body]);
-            $this->getHelper()->handleResponse($response, 'order', $order->getIncrementId());
+            $body = $this->getCitrusHelper()->getOrderData($order);
+            $response = $this->getCitrusHelper()->getRequestModel()->pushOrderRequest([$body]);
+            $this->getCitrusHelper()->handleResponse($response, 'order', $order->getIncrementId());
         }
     }
 
@@ -222,15 +229,15 @@ class Citrus_Integration_Model_Observer
         if($productCron){
             if ($time = $this->getConfigValue('citrus_sync/citrus_product/frequency')) {
                 if ($this->calculateTime($time)) {
-                    $this->getHelper()->getSyncModel()->syncData('catalog/product');
+                    $this->getCitrusHelper()->getSyncModel()->syncData('catalog/product');
                 }
             }
         }
         if($orderCron){
             if ($time = $this->getConfigValue('citrus_sync/citrus_order/frequency')) {
                 if ($this->calculateTime($time)) {
-                    $this->getHelper()->getSyncModel()->syncData('customer/customer');
-                    $this->getHelper()->getSyncModel()->syncData('sales/order');
+                    $this->getCitrusHelper()->getSyncModel()->syncData('customer/customer');
+                    $this->getCitrusHelper()->getSyncModel()->syncData('sales/order');
                 }
             }
         }
@@ -266,8 +273,8 @@ class Citrus_Integration_Model_Observer
         if($banners) {
             $context['bannerSlotIds'] = $banners;
         }
-        $context = $this->getHelper()->getContextData($context);
-        $response = $this->getHelper()->getRequestModel()->requestingAnAd($context);
-        $return = $this->getHelper()->handleAdsResponse($response, 'Search');
+        $context = $this->getCitrusHelper()->getContextData($context);
+        $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
+        $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Search');
     }
 }

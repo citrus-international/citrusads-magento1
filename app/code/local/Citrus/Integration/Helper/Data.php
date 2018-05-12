@@ -114,9 +114,9 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         }
         if(isset($context['productFilters'])){
             $arrays = explode(',',$context['productFilters']);
-            foreach ($arrays as $array){
-                $data['productFilters'][] = [$array];
-            }
+//            foreach ($arrays as $array){
+                $data['productFilters'] = [$arrays];
+//            }
         }
         if(isset($context['customerId']))
             $data['customerId'] = $context['customerId'];
@@ -412,11 +412,27 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $data['postcode'] = isset($address) ? $address->getPostcode() : '';
         return $data;
     }
+    public function getProductData($entity){
+        $data['gtin'] = $entity->getId();
+        $data['name'] = $entity->getName();
+        if ($entity->getImage() != 'no_selection')
+            $data['images'] = [Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage())];
+        if($entity->getSize())
+            $data['size'] = $entity->getSize();
+        $categoryIds = $entity->getCategoryIds();
+        $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
+        if (is_array($categoryIds))
+            foreach ($categoryIds as $categoryId) {
+                $category = $catModel->load($categoryId);
+                $data['categoryHierarchy'][] = $category->getName();
+            }
+        return $data;
+    }
     /**
      * @param $entity Mage_Catalog_Model_Product
      * @return array
      */
-    public function getProductData($entity){
+    public function getCatalogProductData($entity){
         $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($entity);
         $catalogId = $this->getCitrusCatalogId();
         $teamId = $this->getTeamId();
@@ -475,7 +491,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         switch ($type){
             case 'catalog/product':
                 /** @var  $entity Mage_Catalog_Model_Product */
-                $body = $this->getProductData($entity);
+                $body = $this->getCatalogProductData($entity);
                 $response = $this->getRequestModel()->pushCatalogProductsRequest($body);
                 break;
             case 'customer/customer':
@@ -487,6 +503,11 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                 /** @var  $entity Mage_Sales_Model_Order */
                 $body = $this->getOrderData($entity);
                 $response = $this->getRequestModel()->pushOrderRequest([$body]);
+                break;
+            case 'products':
+                /** @var  $entity Mage_Catalog_Model_Product */
+                $body = $this->getProductData($entity);
+                $response = $this->getRequestModel()->pushProductsRequest($body);
                 break;
         }
         $this->handleResponse($response);

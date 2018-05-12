@@ -26,9 +26,7 @@ class Citrus_Integration_Block_Widget_Ads extends Mage_Catalog_Block_Product_New
             $productIds[] = $adCollection['gtin'];
         }
         $collection = Mage::getResourceModel('catalog/product_collection');
-        $collection->setVisibility(Mage::getSingleton('catalog/product_visibility')->getVisibleInCatalogIds());
         $collection = $this->_addProductAttributesAndPrices($collection)
-            ->addStoreFilter()
             ->addAttributeToFilter('entity_id', array('in' => $productIds))
             ->setPageSize($limit);
         return $collection;
