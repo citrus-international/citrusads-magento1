@@ -188,6 +188,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         $adData = [
                             'citrus_id' => $ad['id'],
                             'discount_id' => $discountModel->getId(),
+                            'pageType' => $pageType,
                             'gtin' => $ad['gtin'],
                             'expiry' => $ad['expiry'],
                             'host' => $host

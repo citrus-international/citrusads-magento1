@@ -34,9 +34,10 @@ class Citrus_Integration_Model_Resource_Ad extends Mage_Core_Model_Resource_Db_A
     }
     /**
      * @param $limit
+     * @param $pageType
      * @return array
      */
-    public function getAds($limit)
+    public function getAds($limit, $pageType)
     {
         $datetime = new DateTime();
         $now = $datetime->format('Y-m-d\TH:i:s\Z');
@@ -45,10 +46,12 @@ class Citrus_Integration_Model_Resource_Ad extends Mage_Core_Model_Resource_Db_A
         $select = $adapter->select()
             ->from(self::getMainTable(), '*')
             ->where('host = :host')
+            ->where('pageType = :pageType')
             ->where('expiry >= :expiry' )->order(['id DESC'] )
             ->limit($limit);
         $bind = array(
             ':host' => (string)$host,
+            ':pageType' => (string)$pageType,
             ':expiry' => $now
         );
         return $adapter->fetchAll($select, $bind);

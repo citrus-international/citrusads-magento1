@@ -16,9 +16,13 @@ class Citrus_Integration_Block_Widget_Ads extends Mage_Catalog_Block_Product_New
     public function getColumnCount(){
         return (int)$this->getData('column_count') > 0 ? (int)$this->getData('column_count') : $this->_defaultColumnCount;
     }
+    public function getPageType(){
+        return $this->getData('page_type');
+    }
     public function _getProductCollection(){
         $limit = $this->getMaxNumberAds();
-        $adCollections = Mage::getResourceModel('citrusintegration/ad')->getAds($limit);
+        $pageType = $this->getPageType();
+        $adCollections = Mage::getResourceModel('citrusintegration/ad')->getAds($limit, $pageType);
         /** @var $collection Mage_Catalog_Model_Resource_Product_Collection */
 
         $productIds = [];

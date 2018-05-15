@@ -43,6 +43,27 @@
         <name>Citrus Ads Widget</name>
         <description type="desc">Add Ads To Page</description>
         <parameters>
+            <page_type>
+                <label>Ads Page Type</label>
+                <visible>1</visible>
+                <required>1</required>
+                <type>select</type>
+                <value>Home</value>
+                <values>
+                    <default translate="label">
+                        <value>Home</value>
+                        <label>Home</label>
+                    </default>
+                    <category translate="label">
+                        <value>Category</value>
+                        <label>Category</label>
+                    </category>
+                    <search translate="label">
+                        <value>Search</value>
+                        <label>Search</label>
+                    </search>
+                </values>
+            </page_type>
             <max_number_ads>
                 <label>Max Number Ads</label>
                 <visible>1</visible>
