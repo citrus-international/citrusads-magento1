@@ -29,7 +29,27 @@
             </adminhtml>
         </routers>
     </admin>
+    <!---->
+    <!--<frontend>-->
+        <!--<routers>-->
+            <!--<catalog>-->
+                <!--<args>-->
+                    <!--<modules>-->
+                        <!--<Citrus_Integration before="Mage_Catalog">Citrus_Integration</Citrus_Integration>-->
+                    <!--</modules>-->
+                <!--</args>-->
+            <!--</catalog>-->
+        <!--</routers>-->
+    <!--</frontend>-->
+    <!---->
     <global>
+        <blocks>
+            <catalog>
+                <rewrite>
+                    <product_list>Citrus_Integration_Block_Product_List</product_list>
+                </rewrite>
+            </catalog>
+        </blocks>
         <models>
             <citrusintegration>
                 <class>Citrus_Integration_Model</class>

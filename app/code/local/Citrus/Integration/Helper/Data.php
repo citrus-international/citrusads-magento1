@@ -144,6 +144,8 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $bannerModel = $this->getBannerModel();
             $discountModel = $this->getDiscountModel();
             $host = $this->getHost();
+            $adsRegistry = [];
+            $bannerRegistry = [];
             if($data['ads']){
                 foreach ($data['ads'] as $ad){
                     $id = $adModel->getIdByCitrusId($ad['id']);
@@ -165,6 +167,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         try{
                             $discountModel->save();
                             $adModel->save();
+                            $adsRegistry[] = $adModel->getId();
                         }catch (Exception $e){
                             Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                             return false;
@@ -196,6 +199,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         $adModel->addData($adData);
                         try{
                             $adModel->save();
+                            $adsRegistry[] = $adModel->getId();
                         }catch (Exception $e){
                             Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                             return false;
@@ -219,6 +223,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         $bannerModel->addData($bannerData);
                         try{
                             $bannerModel->save();
+                            $bannerRegistry[] = $bannerModel->getId();
                         }catch (Exception $e){
                             Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                             return false;
@@ -239,6 +244,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         $bannerModel->addData($bannerData);
                         try{
                             $bannerModel->save();
+                            $bannerRegistry[] = $bannerModel->getId();
                         }catch (Exception $e){
                             Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                             return false;
@@ -247,7 +253,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                 }
             }
 //            Mage::getSingleton('adminhtml/session')->addSuccess('Your request is completed');
-            return true;
+            return ['ads'=>$adsRegistry,'banners'=>$bannerRegistry];
         }
         else{
             $data = json_decode($response['message'], true);

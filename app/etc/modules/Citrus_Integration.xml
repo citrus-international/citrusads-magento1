@@ -32,6 +32,8 @@
             <codePool>local</codePool>
             <depends>
                 <Mage_Cms />
+                <Mage_Catalog />
+                <Mage_CatalogSearch />
             </depends>
         </Citrus_Integration>
     </modules>

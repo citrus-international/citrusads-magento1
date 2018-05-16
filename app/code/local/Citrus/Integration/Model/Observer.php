@@ -43,6 +43,8 @@ class Citrus_Integration_Model_Observer
             $context = $this->getCitrusHelper()->getContextData($context);
             $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
             $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Category');
+            Mage::register('categoryAdResponse', $return);
+            $x = 1;
         }
     }
     public function addDiscountToProduct($observer){
