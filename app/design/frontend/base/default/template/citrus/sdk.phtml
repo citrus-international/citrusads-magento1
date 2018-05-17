@@ -16,7 +16,7 @@ else $hostUrl = trim(Citrus_Integration_Model_Service_Authentication::CITRUS_STA
     ci.on('click', function () {
         var adId = jQuery(this).attr('data-id');
         citrusAd.reportClick(adId).then(function (result) {
-            // console.log(result);
+            console.log(result);
         }).catch(function (error) {
             console.log(error);
         });
@@ -25,7 +25,7 @@ else $hostUrl = trim(Citrus_Integration_Model_Service_Authentication::CITRUS_STA
     ci.each(function () {
         var adId = jQuery(this).attr('data-id');
         citrusAd.reportImpression(adId).then(function (result) {
-            // console.log(result);
+            console.log(result);
         }).catch(function (error) {
             console.log(error);
         })

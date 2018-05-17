@@ -44,8 +44,28 @@ class Citrus_Integration_Model_Observer
             $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
             $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Category');
             Mage::register('categoryAdResponse', $return);
-            $x = 1;
+            Mage::log('My log entry'.time());
         }
+    }
+    public function sendContextAfterSearch($observer){
+        /** @var Mage_CatalogSearch_Model_Query $queryModel */
+        $queryModel = $observer->getCatalogsearchQuery();
+        $searchTerm = $queryModel->getQueryText();
+
+        $context = [
+            'pageType' => 'Search',
+            'searchTerm' => $searchTerm,
+            'maxNumberOfAds' => Citrus_Integration_Helper_Data::MAX_NUMBER_OF_ADS
+        ];
+        $banners = Mage::getStoreConfig('citrus/citrus_banner/search_slot_ids', Mage::app()->getStore());
+        if($banners) {
+            $context['bannerSlotIds'] = $banners;
+        }
+        $context = $this->getCitrusHelper()->getContextData($context);
+        $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
+        $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Search');
+        Mage::register('searchAdResponse', $return);
+        Mage::log('My log entry'.time());
     }
     public function addDiscountToProduct($observer){
         /** @var Mage_Catalog_Model_Product $product */
@@ -260,23 +280,5 @@ class Citrus_Integration_Model_Observer
         }
 
         return ($minute % $time == 0) || ($time == 120 && $hour % 2 == 0);
-    }
-    public function sendContextAfterSearch($observer){
-        /** @var Mage_CatalogSearch_Model_Query $queryModel */
-        $queryModel = $observer->getCatalogsearchQuery();
-        $searchTerm = $queryModel->getQueryText();
-
-        $context = [
-            'pageType' => 'Search',
-            'searchTerm' => $searchTerm,
-            'maxNumberOfAds' => Citrus_Integration_Helper_Data::MAX_NUMBER_OF_ADS
-        ];
-        $banners = Mage::getStoreConfig('citrus/citrus_banner/search_slot_ids', Mage::app()->getStore());
-        if($banners) {
-            $context['bannerSlotIds'] = $banners;
-        }
-        $context = $this->getCitrusHelper()->getContextData($context);
-        $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
-        $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Search');
     }
 }

@@ -24,19 +24,21 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
         $adProductIds = [];
         $collections->getItems();
         foreach ($categoryAdResponse['ads'] as $response){
-            $id = Mage::getModel(Citrus_Integration_Model_Ad::class)->load($response)->getGtin();
+            $adModel = Mage::getModel(Citrus_Integration_Model_Ad::class)->load($response);
+            $id = $adModel->getGtin();
             $product = Mage::getModel(Mage_Catalog_Model_Product::class)->load($id);
-
+            $citrus_ad_id = $adModel->getCitrusId();
             $collections->removeItemByKey($id);
             $collections->addItem($product);
-            $adProductIds[] = $id;
+            $adProductIds[$citrus_ad_id] = $id;
         }
         $items = $collections->getItems();
         foreach ($items as $key => $collection){
             if(in_array($key, $adProductIds)){
-                $collection->addData(['ad_index' => 'a']);
+                $collection->addData(['ad_index' => '0']);
+                $collection->addData(['citrus_ad_id' => array_search($key, $adProductIds)]);
             }else
-                $collection->addData(['ad_index' => 'b']);
+                $collection->addData(['ad_index' => '1']);
         }
         usort($items,array('Citrus_Integration_Block_Product_List','sortByIndex'));
         foreach ($items as $key => $item) {
