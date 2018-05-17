@@ -3,7 +3,7 @@
 <config>
     <modules>
         <Citrus_Integration>
-            <version>1.0.2</version>
+            <version>1.0.3</version>
         </Citrus_Integration>
     </modules>
     <crontab> 
@@ -30,17 +30,28 @@
         </routers>
     </admin>
     <!---->
-    <!--<frontend>-->
-        <!--<routers>-->
-            <!--<catalog>-->
-                <!--<args>-->
-                    <!--<modules>-->
-                        <!--<Citrus_Integration before="Mage_Catalog">Citrus_Integration</Citrus_Integration>-->
-                    <!--</modules>-->
-                <!--</args>-->
-            <!--</catalog>-->
-        <!--</routers>-->
-    <!--</frontend>-->
+    <frontend>
+        <events>
+            <catalogsearch_query_load_after>
+                <observers>
+                    <citrusintegration>
+                        <type>singleton</type>
+                        <class>Citrus_Integration_Model_Observer</class>
+                        <method>sendContextAfterSearch</method>
+                    </citrusintegration>
+                </observers>
+            </catalogsearch_query_load_after>
+            <catalog_category_load_after>
+                <observers>
+                    <citrusintegration>
+                        <type>singleton</type>
+                        <class>Citrus_Integration_Model_Observer</class>
+                        <method>sendContextAfterCategory</method>
+                    </citrusintegration>
+                </observers>
+            </catalog_category_load_after>
+        </events>
+    </frontend>
     <!---->
     <global>
         <blocks>
@@ -101,6 +112,11 @@
                     <relevant>
                         <table>citrus_integration_relevant_product</table>
                     </relevant>
+                </entities>
+                <entities>
+                    <slotid>
+                        <table>citrus_integration_slotid</table>
+                    </slotid>
                 </entities>
             </citrusintegration_mysql4>
         </models>
@@ -208,24 +224,7 @@
                     <!--</citrusintegration>-->
                 <!--</observers>-->
             <!--</catalogsearch_searchable_attributes_load_after>-->
-            <catalogsearch_query_save_after>
-                <observers>
-                    <citrusintegration>
-                        <type>singleton</type>
-                        <class>Citrus_Integration_Model_Observer</class>
-                        <method>sendContextAfterSearch</method>
-                    </citrusintegration>
-                </observers>
-            </catalogsearch_query_save_after>
-            <catalog_category_load_after>
-                <observers>
-                    <citrusintegration>
-                        <type>singleton</type>
-                        <class>Citrus_Integration_Model_Observer</class>
-                        <method>sendContextAfterCategory</method>
-                    </citrusintegration>
-                </observers>
-            </catalog_category_load_after>
+
         </events>
     </global>
     <adminhtml>

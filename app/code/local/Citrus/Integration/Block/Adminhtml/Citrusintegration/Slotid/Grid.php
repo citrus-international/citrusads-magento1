@@ -1,18 +1,18 @@
 <?php
-class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Grid extends Mage_Adminhtml_Block_Widget_Grid
+class Citrus_Integration_Block_Adminhtml_Citrusintegration_Slotid_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
     public function __construct()
     {
         parent::__construct();
         $this->setDefaultSort('id');
-        $this->setId('citrus_integration_ad_grid');
+        $this->setId('citrus_integration_slotid_grid');
         $this->setDefaultDir('asc');
         $this->setSaveParametersInSession(true);
     }
 
     protected function _getCollectionClass()
     {
-        return 'citrusintegration/ad_collection';
+        return 'citrusintegration/slotid_collection';
     }
 
     protected function _prepareCollection()
@@ -34,32 +34,27 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Grid extends Mage_
                     'index' => 'id'
                 )
             );
-            $this->addColumn('citrus_id',
+            $this->addColumn('page_type',
                 array(
-                    'header' => $this->__('Citrus Id'),
+                    'header' => $this->__('Page Type'),
                     'align' => 'left',
-                    'index' => 'citrus_id'
+                    'index' => 'page_type',
+                    'renderer' => 'Citrus_Integration_Block_Adminhtml_Template_Grid_Renderer_PageType'
                 )
             );
-            $this->addColumn('gtin',
+            $this->addColumn('page_id',
                 array(
-                    'header' => $this->__('GTIN'),
+                    'header' => $this->__('Page Id'),
                     'align' => 'left',
-                    'index' => 'gtin'
-                )
-            );
-            $this->addColumn('discount_id',
-                array(
-                    'header' => $this->__('Discount Id'),
-                    'align' => 'left',
-                    'index' => 'discount_id'
+                    'index' => 'page_id',
+                    'renderer' => 'Citrus_Integration_Block_Adminhtml_Template_Grid_Renderer_PageId'
                 )
             );
 
-            $this->addColumn('expiry',
+            $this->addColumn('slot_id',
                 array(
-                    'header' => $this->__('Expiry'),
-                    'index' => 'expiry'
+                    'header' => $this->__('Slot Id'),
+                    'index' => 'slot_id'
                 )
             );
         }catch (Exception $e){
@@ -71,7 +66,7 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Grid extends Mage_
 
     public function getRowUrl($row)
     {
-        return $this->getUrl('*/*/info', array('id' => $row->getId()));
+        return $this->getUrl('*/*/edit', array('id' => $row->getId()));
     }
 
 }

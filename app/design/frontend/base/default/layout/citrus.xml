@@ -23,4 +23,9 @@
             <action method="setTemplate"><template>citrus/catalog/product/list.phtml</template></action>
         </reference>
     </catalog_category_layered>
+    <catalogsearch_result_index translate="label">
+        <reference name="search_result_list">
+            <action method="setTemplate"><template>citrus/catalog/product/list.phtml</template></action>
+        </reference>
+    </catalogsearch_result_index>
 </layout>

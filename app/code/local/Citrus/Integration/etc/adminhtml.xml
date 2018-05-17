@@ -17,10 +17,10 @@
                     <title>Banners List</title>
                     <action>adminhtml/citrusintegration_banner</action>
                 </citrusintegration_banner>
-                <!--<citrusintegration_log translate="title" module="citrusintegration">-->
-                    <!--<title>Log</title>-->
-                    <!--<action>adminhtml/citrusintegration_log</action>-->
-                <!--</citrusintegration_log>-->
+                <citrusintegration_slotid translate="title" module="citrusintegration">
+                    <title>SlotId</title>
+                    <action>adminhtml/citrusintegration_slotid</action>
+                </citrusintegration_slotid>
             </children>
         </citrus>
     </menu>

@@ -36,7 +36,7 @@ class Citrus_Integration_Model_Observer
                 'pageType' => 'Category',
                 'productFilters' => $productFilters
             ];
-            $banners = Mage::getStoreConfig('citrus/citrus_banner/category_slot_ids', Mage::app()->getStore());
+            $banners = $this->getSlotIdByPageType($category->getEntityId(), Citrus_Integration_Helper_Data::CITRUS_PAGE_TYPE_CATEGORY);
             if($banners) {
                 $context['bannerSlotIds'] = $banners;
             }
@@ -57,15 +57,33 @@ class Citrus_Integration_Model_Observer
             'searchTerm' => $searchTerm,
             'maxNumberOfAds' => Citrus_Integration_Helper_Data::MAX_NUMBER_OF_ADS
         ];
-        $banners = Mage::getStoreConfig('citrus/citrus_banner/search_slot_ids', Mage::app()->getStore());
+        $banners = $this->getSlotIdByPageType('search', Citrus_Integration_Helper_Data::CITRUS_PAGE_TYPE_SEARCH);
         if($banners) {
             $context['bannerSlotIds'] = $banners;
         }
         $context = $this->getCitrusHelper()->getContextData($context);
         $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
         $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Search');
+//        test in search
+//        $return['ads'] = [
+//            148, 149, 150
+//        ];
         Mage::register('searchAdResponse', $return);
         Mage::log('My log entry'.time());
+    }
+    public function getSlotIdByPageType($entity_id, $page_type){
+        /** @var Citrus_Integration_Model_Slotid $slotModel */
+        $slotModel = Mage::getModel(Citrus_Integration_Model_Slotid::class);
+        $banners = $slotModel->getSlotIdById($entity_id,$page_type);
+        $result = null;
+        if($banners) {
+            $bannersMerge = '';
+            foreach ($banners as $banner){
+                $bannersMerge .= $banner['slot_id'].',';
+            }
+            $result = trim($bannersMerge, ',');
+        }
+        return $result;
     }
     public function addDiscountToProduct($observer){
         /** @var Mage_Catalog_Model_Product $product */

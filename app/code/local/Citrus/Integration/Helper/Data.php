@@ -14,6 +14,10 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     const CITRUS_AU_SERVER = "https://au-integration.citrusad.com/v1/";
     const CITRUS_US_SERVER = "https://us-integration.citrusad.com/v1/";
     const MAX_NUMBER_OF_ADS = 3;
+    const CITRUS_PAGE_TYPE_SEARCH = 3;
+    const CITRUS_PAGE_TYPE_ALL = 0;
+    const CITRUS_PAGE_TYPE_CATEGORY = 1;
+    const CITRUS_PAGE_TYPE_CMS = 2;
 
     public function getTeamId(){
         return Mage::getStoreConfig('citrus/citrus_group/team_id', Mage::app()->getStore());
@@ -594,5 +598,41 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             Mage::getSingleton('adminhtml/session')->addError($error);
             return false;
         }
+    }
+    public function getAllCategoriesArray($optionList = false)
+    {
+        $categories = array();
+        $allCategoriesCollection = Mage::getModel('catalog/category')
+            ->getCollection()
+            ->addAttributeToSelect('name')
+            ->addFieldToFilter('level', array('gt'=>'0'));
+        $allCategoriesArray = $allCategoriesCollection->load()->toArray();
+        $categoriesArray = $allCategoriesCollection
+            ->addAttributeToSelect('level')
+            ->addAttributeToSort('path', 'asc')
+            ->addFieldToFilter('is_active', array('eq'=>'1'))
+            ->addFieldToFilter('level', array('gt'=>'1'))
+            ->load()
+            ->toArray();
+        foreach ($categoriesArray as $categoryId => $category)
+        {
+            if (!isset($category['name'])) {
+                continue;
+            }
+            $categoryIds = explode('/', $category['path']);
+            $nameParts = array();
+            foreach($categoryIds as $catId) {
+                if($catId == 1) {
+                    continue;
+                }
+                $nameParts[] = $allCategoriesArray[$catId]['name'];
+            }
+            $categories[$categoryId] = array(
+                'value' => $categoryId,
+                'label' => implode(' / ', $nameParts)
+            );
+        }
+
+        return $categories;
     }
 }

@@ -16,14 +16,9 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
      */
     protected $_productCollection;
 
-
-    protected function _getProductCollection()
-    {
-        $collections = parent::_getProductCollection();
-        $categoryAdResponse = Mage::registry('categoryAdResponse');
+    public function getAdResponse($responses,$collections){
         $adProductIds = [];
-        $collections->getItems();
-        foreach ($categoryAdResponse['ads'] as $response){
+        foreach ($responses as $response){
             $adModel = Mage::getModel(Citrus_Integration_Model_Ad::class)->load($response);
             $id = $adModel->getGtin();
             $product = Mage::getModel(Mage_Catalog_Model_Product::class)->load($id);
@@ -31,6 +26,20 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
             $collections->removeItemByKey($id);
             $collections->addItem($product);
             $adProductIds[$citrus_ad_id] = $id;
+        }
+        return $adProductIds;
+    }
+    protected function _getProductCollection()
+    {
+        $collections = parent::_getProductCollection();
+        $categoryAdResponse = Mage::registry('categoryAdResponse');
+        $searchAdResponse = Mage::registry('searchAdResponse');
+        $collections->getItems();
+        $adProductIds = [];
+        if($categoryAdResponse){
+            $adProductIds = $this->getAdResponse($categoryAdResponse['ads'], $collections);
+        }elseif($searchAdResponse){
+            $adProductIds = $this->getAdResponse($searchAdResponse['ads'], $collections);
         }
         $items = $collections->getItems();
         foreach ($items as $key => $collection){
