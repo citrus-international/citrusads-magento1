@@ -141,7 +141,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         }
     }
 
-    public function handleAdsResponse($response, $pageType = null){
+    public function handleAdsResponse($response, $pageType = null, $adsEnable = true, $bannerEnable = true){
         if($response['success']){
             $data = json_decode($response['message'], true);
             $adModel = $this->getAdModel();
@@ -150,7 +150,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $host = $this->getHost();
             $adsRegistry = [];
             $bannerRegistry = [];
-            if($data['ads']){
+            if($data['ads'] && $adsEnable){
                 foreach ($data['ads'] as $ad){
                     $id = $adModel->getIdByCitrusId($ad['id']);
                     if($id){
@@ -211,7 +211,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     }
                 }
             }
-            if($data['banners']){
+            if($data['banners'] && $bannerEnable){
                 foreach ($data['banners'] as $banner){
                     $id = $bannerModel->getIdByCitrusId($banner['id']);
                     if($id){

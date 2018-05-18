@@ -2,7 +2,6 @@
 $installer = $this;
 $installer->startSetup();
 $installer->run("
-
 DROP TABLE IF EXISTS {$this->getTable('citrusintegration/slotid')};
 CREATE TABLE {$this->getTable('citrusintegration/slotid')} (
   `id` int(11) unsigned NOT NULL auto_increment,

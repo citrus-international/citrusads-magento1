@@ -87,66 +87,7 @@
                         </catalog_name>
                     </fields>
                 </citrus_group>
-                <citrus_banner translate="label" module="citrusintegration">
-                    <label>Banner Setting</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>10</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
-                    <fields>
-                        <search_slot_ids>
-                            <label>Search Banner SlotIds: </label>
-                            <comment>
-                                Banner SlotId in Search Page
-                            </comment>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </search_slot_ids>
-                    </fields>
-                    <fields>
-                        <search_limit>
-                            <label>Max Number Search Banner: </label>
-                            <comment>
-                                Max Banners per Search Page
-                            </comment>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </search_limit>
-                    </fields>
-                    <fields>
-                        <category_slot_ids>
-                            <label>Category Banner SlotIds: </label>
-                            <comment>
-                                Banner SlotId in Category Page
-                            </comment>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>30</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </category_slot_ids>
-                    </fields>
-                    <fields>
-                        <category_limit>
-                            <label>Max Number Category Banner: </label>
-                            <comment>
-                                Max Banners per Category Page
-                            </comment>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>40</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </category_limit>
-                    </fields>
-                </citrus_banner>
+
             </groups>
         </citrus>
         <citrus_sync translate="label" module="citrusintegration">
@@ -261,7 +202,7 @@
                     </fields>
 
                     <fields>
-                        <add translate="label">
+                        <add_order translate="label">
                             <label>Add all orders to queue</label>
                             <frontend_type>button</frontend_type>
                             <frontend_model>citrusintegration/adminhtml_system_config_form_button</frontend_model>
@@ -270,9 +211,60 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                             <button_url>adminhtml/citrusintegration_queue/order</button_url>
-                        </add>
+                        </add_order>
+                    </fields>
+
+                    <fields>
+                        <add_customer translate="label">
+                            <label>Add all Customers to queue</label>
+                            <frontend_type>button</frontend_type>
+                            <frontend_model>citrusintegration/adminhtml_system_config_form_button</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <button_url>adminhtml/citrusintegration_queue/customer</button_url>
+                        </add_customer>
                     </fields>
                 </citrus_order>
+                <citrus_banner>
+                    <label>Banners</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enable translate="label comment">
+                            <label>Enable: </label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enable>
+                    </fields>
+                </citrus_banner>
+                <citrus_ads>
+                    <label>Ads</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enable translate="label comment">
+                            <label>Enable: </label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enable>
+                    </fields>
+                </citrus_ads>
             </groups>
         </citrus_sync>
     </sections>

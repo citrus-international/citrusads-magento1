@@ -21,55 +21,63 @@ class Citrus_Integration_Model_Observer
     }
 
     public function sendContextAfterCategory($observer){
-        /** @var Mage_Catalog_Model_Category $category */
-        $category = $observer->getCategory();
-        $productFilters = '';
-        $parentCategories = $category->getParentCategories();
-        if(is_array($parentCategories)){
-            foreach ($parentCategories as $parentCategory){
-                $productFilters = $productFilters.','.$parentCategory->getName();
+        $bannerEnable = Mage::getStoreConfig('citrus_sync/citrus_banner/enable', Mage::app()->getStore());
+        $adsEnable = Mage::getStoreConfig('citrus_sync/citrus_ads/enable', Mage::app()->getStore());
+        if($bannerEnable || $adsEnable){
+            /** @var Mage_Catalog_Model_Category $category */
+            $category = $observer->getCategory();
+            $productFilters = '';
+            $parentCategories = $category->getParentCategories();
+            if(is_array($parentCategories)){
+                foreach ($parentCategories as $parentCategory){
+                    $productFilters = $productFilters.','.$parentCategory->getName();
+                }
+                $productFilters = trim($productFilters,',');
             }
-            $productFilters = trim($productFilters,',');
+            if($category->getLevel() != '1'){
+                $context = [
+                    'pageType' => 'Category',
+                    'productFilters' => $productFilters
+                ];
+                $banners = $this->getSlotIdByPageType($category->getEntityId(), Citrus_Integration_Helper_Data::CITRUS_PAGE_TYPE_CATEGORY);
+                if($banners) {
+                    $context['bannerSlotIds'] = $banners;
+                }
+                $context = $this->getCitrusHelper()->getContextData($context);
+                $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
+                $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Category', $adsEnable, $bannerEnable);
+                Mage::register('categoryAdResponse', $return);
+                Mage::log('My log entry'.time());
+            }
         }
-        if($category->getLevel() != '1'){
+    }
+    public function sendContextAfterSearch($observer){
+        $bannerEnable = Mage::getStoreConfig('citrus/citrus_banner/enable', Mage::app()->getStore());
+        $adsEnable = Mage::getStoreConfig('citrus/citrus_ads/enable', Mage::app()->getStore());
+        if($bannerEnable || $adsEnable) {
+            /** @var Mage_CatalogSearch_Model_Query $queryModel */
+            $queryModel = $observer->getCatalogsearchQuery();
+            $searchTerm = $queryModel->getQueryText();
+
             $context = [
-                'pageType' => 'Category',
-                'productFilters' => $productFilters
+                'pageType' => 'Search',
+                'searchTerm' => $searchTerm,
+                'maxNumberOfAds' => Citrus_Integration_Helper_Data::MAX_NUMBER_OF_ADS
             ];
-            $banners = $this->getSlotIdByPageType($category->getEntityId(), Citrus_Integration_Helper_Data::CITRUS_PAGE_TYPE_CATEGORY);
-            if($banners) {
+            $banners = $this->getSlotIdByPageType('search', Citrus_Integration_Helper_Data::CITRUS_PAGE_TYPE_SEARCH);
+            if ($banners) {
                 $context['bannerSlotIds'] = $banners;
             }
             $context = $this->getCitrusHelper()->getContextData($context);
             $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
-            $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Category');
-            Mage::register('categoryAdResponse', $return);
-            Mage::log('My log entry'.time());
-        }
-    }
-    public function sendContextAfterSearch($observer){
-        /** @var Mage_CatalogSearch_Model_Query $queryModel */
-        $queryModel = $observer->getCatalogsearchQuery();
-        $searchTerm = $queryModel->getQueryText();
-
-        $context = [
-            'pageType' => 'Search',
-            'searchTerm' => $searchTerm,
-            'maxNumberOfAds' => Citrus_Integration_Helper_Data::MAX_NUMBER_OF_ADS
-        ];
-        $banners = $this->getSlotIdByPageType('search', Citrus_Integration_Helper_Data::CITRUS_PAGE_TYPE_SEARCH);
-        if($banners) {
-            $context['bannerSlotIds'] = $banners;
-        }
-        $context = $this->getCitrusHelper()->getContextData($context);
-        $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
-        $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Search');
+            $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Search', $adsEnable, $bannerEnable);
 //        test in search
 //        $return['ads'] = [
 //            148, 149, 150
 //        ];
-        Mage::register('searchAdResponse', $return);
-        Mage::log('My log entry'.time());
+            Mage::register('searchAdResponse', $return);
+            Mage::log('My log entry' . time());
+        }
     }
     public function getSlotIdByPageType($entity_id, $page_type){
         /** @var Citrus_Integration_Model_Slotid $slotModel */

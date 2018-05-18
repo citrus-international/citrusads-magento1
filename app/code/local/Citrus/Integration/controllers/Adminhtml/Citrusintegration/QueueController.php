@@ -89,7 +89,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     public function orderAction(){
         $enable = Mage::getStoreConfig('citrus_sync/citrus_order/enable', Mage::app()->getStore());
         $status = Mage::getStoreConfig('citrus_sync/citrus_order/type_order', Mage::app()->getStore());
-        $catalogId = $this->getCitrusCatalogId();
+        $catalogId = $this->getHelper()->getCitrusCatalogId();
         $teamId = $this->getHelper()->getTeamId();
         if(!$catalogId || !$teamId){
             $message = Mage::helper('adminhtml')->__('Please save your api key first!');
@@ -123,8 +123,8 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(['message'=>$message]));
     }
     public function customerAction(){
-        $enable = Mage::getStoreConfig('citrus_sync/citrus_customer/enable', Mage::app()->getStore());
-        $catalogId = $this->getCitrusCatalogId();
+        $enable = Mage::getStoreConfig('citrus_sync/citrus_order/enable', Mage::app()->getStore());
+        $catalogId = $this->getHelper()->getCitrusCatalogId();
         $teamId = $this->getHelper()->getTeamId();
         if(!$catalogId || !$teamId){
             $message = Mage::helper('adminhtml')->__('Please save your api key first!');
