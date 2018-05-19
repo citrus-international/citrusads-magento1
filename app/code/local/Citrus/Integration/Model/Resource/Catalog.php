@@ -32,6 +32,26 @@ class Citrus_Integration_Model_Resource_Catalog extends Mage_Core_Model_Resource
     }
     /**
      * Get catalog_id
+     *
+     * @return string|false
+     */
+    public function getCatalogId()
+    {
+        $host = $this->getHelper()->getHost();
+        $adapter = $this->_getReadAdapter();
+        $teamId = $this->getHelper()->getTeamId();
+        $select = $adapter->select()
+            ->from(self::getMainTable(), 'catalog_id')
+            ->where('host = :host')
+            ->where('teamId = :teamId');
+        $bind = array(
+            ':host' => (string)$host,
+            ':teamId' => (string)$teamId
+        );
+        return $adapter->fetchOne($select, $bind);
+    }
+    /**
+     * Get catalog_id
      * @param $name string
      * @return string|false
      */
@@ -47,6 +67,28 @@ class Citrus_Integration_Model_Resource_Catalog extends Mage_Core_Model_Resource
             ->where('teamId = :teamId');
         $bind = array(
             ':name' => (string)$name,
+            ':host' => (string)$host,
+            ':teamId' => (string)$teamId
+        );
+        return $adapter->fetchOne($select, $bind);
+    }
+    /**
+     * Get id
+     * @param $citrusId string
+     * @return string|false
+     */
+    public function getIdByCitrusId($citrusId)
+    {
+        $host = $this->getHelper()->getHost();
+        $teamId = $this->getHelper()->getTeamId();
+        $adapter = $this->_getReadAdapter();
+        $select = $adapter->select()
+            ->from(self::getMainTable(), 'id')
+            ->where('catalog_id = :citrusId')
+            ->where('host = :host')
+            ->where('teamId = :teamId');
+        $bind = array(
+            ':citrusId' => (string)$citrusId,
             ':host' => (string)$host,
             ':teamId' => (string)$teamId
         );

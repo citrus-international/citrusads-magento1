@@ -134,12 +134,11 @@ class Citrus_Integration_Model_Observer
         if ($response['success']) {
             if($type == 'catalog'){
                 $data = json_decode($response['message'], true);
-                if(is_array($data['catalogs'])){
-                    $new = true;
+                if(is_array($data['catalogs']) && $data['catalogs'] ){
                     foreach ($data['catalogs'] as $catalog){
                         /** @var Citrus_Integration_Model_Catalog $model */
                         $model = Mage::getModel('citrusintegration/catalog');
-                        $id = $model->getIdByName($name);
+                        $id = $model->getCatalogId();
                         if(!$id){
                             $catalogData = [
                                 'catalog_id' => $catalog['id'],
@@ -150,16 +149,14 @@ class Citrus_Integration_Model_Observer
                             $model->addData($catalogData);
                             try {
                                 $model->save();
+                                $this->handleGetResponse($response, Citrus_Integration_Model_Catalog::ENTITY, $param);
                             } catch (Exception $e) {
 
                             }
                         }
-                        if($name == $catalog['name']){
-                            $new = false;
+                        else{
+                            $this->pushCatalog($name, $id);
                         }
-                    }
-                    if($new){
-                        $this->pushCatalog($name);
                     }
                 }
                 else{
@@ -174,10 +171,10 @@ class Citrus_Integration_Model_Observer
             Mage::throwException($error);
         }
     }
-    public function pushCatalog($name){
+    public function pushCatalog($name , $id = null){
         $requestModel = $this->getCitrusHelper()->getRequestModel();
-        $response = $requestModel->pushCatalogsRequest($name);
-        $this->getCitrusHelper()->handleResponse($response, 'catalog', $name);
+        $response = $requestModel->pushCatalogsRequest($name, $id);
+        $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Catalog::ENTITY, $name);
         Mage::log('push catalog -'.'\n'.json_encode($response), null, 'citrus.log', true);
     }
     public function createCatalog($observer)
@@ -185,10 +182,9 @@ class Citrus_Integration_Model_Observer
         $enable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
         $catalogName = Mage::getStoreConfig('citrus/citrus_group/catalog_name', Mage::app()->getStore());
         if ($enable) {
-
             $responseModel = $this->getCitrusHelper()->getResponseModel();
             $response = $responseModel->getCatalogListResponse();
-            $this->handleGetResponse($response, 'catalog', $catalogName);
+            $this->handleGetResponse($response, Citrus_Integration_Model_Catalog::ENTITY, $catalogName);
             Mage::log('create catalog -'.'\n'.json_encode($response), null, 'citrus.log', true);
         }
     }
@@ -244,7 +240,7 @@ class Citrus_Integration_Model_Observer
         $body = $helper->getProductData($entity);
         $response = $this->getCitrusHelper()->getRequestModel()->pushProductsRequest($body);
         $this->getCitrusHelper()->handleResponse($response);
-        Mage::log('push product-'.$entity->getEntityId().'\n'.json_encode($response), null, 'citrus.log', true);
+        Mage::log('push product-'.$entity->getEntityId().json_encode($response), null, 'citrus.log', true);
     }
     public function pushOrderToQueue($observer){
         /** @var Mage_Sales_Model_Order $order */
@@ -258,7 +254,7 @@ class Citrus_Integration_Model_Observer
         else{
             $body = $this->getCitrusHelper()->getOrderData($order);
             $response = $this->getCitrusHelper()->getRequestModel()->pushOrderRequest([$body]);
-            $this->getCitrusHelper()->handleResponse($response, 'order', $order->getIncrementId());
+            $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Order::ENTITY, $order->getIncrementId());
         }
     }
     public function pushCustomerToQueue($observer){
@@ -272,7 +268,7 @@ class Citrus_Integration_Model_Observer
             $body = $this->getCitrusHelper()->getCustomerData($customer);
             $response = $this->getCitrusHelper()->getRequestModel()->pushCustomerRequest([$body]);
 //            Mage::log('push customer -'.$customer->getEntityId().'\n'.json_encode($response), null, 'citrus.log', true);
-            $this->getCitrusHelper()->handleResponse($response, 'customer', $customer->getId());
+            $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Customer::ENTITY, $customer->getId());
         }
     }
     public function customerDeleteEventAction($observer){
@@ -281,7 +277,7 @@ class Citrus_Integration_Model_Observer
         $citrus_id = $this->getCitrusHelper()->getCitrusIdById(Citrus_Integration_Model_Customer::ENTITY, $customer->getId());
         if($citrus_id){
             $response = $this->getCitrusHelper()->getRequestModel()->deleteCustomerRequest($citrus_id);
-            Mage::log('delete customer-'.$customer->getEntityId().'\n'.json_encode($response), null, 'citrus.log', true);
+            Mage::log('delete customer-'.$customer->getEntityId().json_encode($response), null, 'citrus.log', true);
         }
     }
     /**

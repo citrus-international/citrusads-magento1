@@ -81,13 +81,16 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     }
     /**
      * @param null $name
+     * @param null $id
      * @return array
      */
-    public function pushCatalogsRequest($name = null){
+    public function pushCatalogsRequest($name = null, $id = null){
         $handle = 'catalogs?'.http_build_query(['teamId'=>$this->getCitrusHelper()->getTeamId()]);
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
         $params['name'] = $name ? $name : 'Catalog';
         $params['teamId'] = $this->getCitrusHelper()->getTeamId();
+        if($id)
+            $params['id'] = $id;
         $body = [
             'catalogs' =>
                 [

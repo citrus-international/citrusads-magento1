@@ -17,11 +17,20 @@ class Citrus_Integration_Model_Catalog extends Mage_Core_Model_Abstract
      * Retrieve catalog_id by name
      *
      * @param   string $name
-     * @return  integer
+     * @return  string
      */
     public function getCatalogIdByName($name)
     {
         return $this->_getResource()->getCatalogIdByName($name);
+    }
+    /**
+     * Retrieve catalog_id
+     *
+     * @return  string
+     */
+    public function getCatalogId()
+    {
+        return $this->_getResource()->getCatalogId();
     }
     /**
      * Retrieve id by name
@@ -32,6 +41,16 @@ class Citrus_Integration_Model_Catalog extends Mage_Core_Model_Abstract
     public function getIdByName($name)
     {
         return $this->_getResource()->getIdByName($name);
+    }
+    /**
+     * Retrieve id by citrus_id
+     *
+     * @param   string $citrusId
+     * @return  integer
+     */
+    public function getIdByCitrusId($citrusId)
+    {
+        return $this->_getResource()->getIdByCitrusId($citrusId);
     }
     /**
      * Retrieve resource instance wrapper

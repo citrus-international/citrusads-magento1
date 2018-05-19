@@ -346,7 +346,11 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     $catalogData['name'] = $catalog['name'];
                     $catalogData['host'] = $host;
                     $catalogData['teamId'] = $teamId;
+                    /** @var Citrus_Integration_Model_Catalog $model */
                     $model = Mage::getModel('citrusintegration/catalog')->setData($catalogData);
+                    $modelId = $model->getIdByCitrusId($catalog['id']);
+                    if($modelId)
+                        $model->load($modelId);
                     try {
                         $model->save();
                     } catch (Exception $e) {
