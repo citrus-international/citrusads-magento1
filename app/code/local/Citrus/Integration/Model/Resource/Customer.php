@@ -13,7 +13,7 @@ class Citrus_Integration_Model_Resource_Customer extends Mage_Core_Model_Resourc
      * @param string $entityId
      * @return string|false
      */
-    public function getCustomerIdByEntityId($entityId)
+    public function getCitrusIdById($entityId)
     {
         $adapter = $this->_getReadAdapter();
 

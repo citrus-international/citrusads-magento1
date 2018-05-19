@@ -2,6 +2,11 @@
 
 class Citrus_Integration_Model_Slotid extends Mage_Core_Model_Abstract
 {
+    /**
+     * Entity code.
+     * Can be used as part of method name for entity processing
+     */
+    const ENTITY                 = 'slotid';
     public function _construct()
     {
         parent::_construct();

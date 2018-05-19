@@ -129,7 +129,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function getCustomerIdByCustomer($customer){
         /** @var Citrus_Integration_Model_Customer $model */
         $model = Mage::getModel('citrusintegration/customer');
-        $customerId = $model->getCustomerIdByEntityId($customer->getId());
+        $customerId = $model->getCitrusIdById($customer->getId());
         if($customerId){
             return $customerId;
         }
@@ -407,6 +407,9 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function getCustomerData($entity){
         $teamId = $this->getTeamId();
         $data['teamId'] = $teamId;
+        $citrus_id = $this->getCitrusIdById(Citrus_Integration_Model_Customer::ENTITY, $entity->getId());
+        if($citrus_id)
+            $data['id'] = $citrus_id;
         $gender = $entity->getGender();
         if($gender == 1)
             $gender = 'Male';
@@ -416,12 +419,19 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $gender = 'Other';
         $data['gender'] = $gender;
         $dob = $entity->getDob();
-        $datetime = new DateTime($dob);
-        $year = $datetime->format('Y');
-        $data['yearOfBirth'] = (int)$year;
+        if($dob){
+            $datetime = new DateTime($dob);
+            $year = $datetime->format('Y');
+            $data['yearOfBirth'] = (int)$year;
+        }
         $address = $entity->getDefaultBillingAddress();
-        $data['postcode'] = isset($address) ? $address->getPostcode() : '';
+        $data['postcode'] = isset($address)&& $address ? $address->getPostcode() : '';
         return $data;
+    }
+    public function getCitrusIdById($type, $id){
+        $model = Mage::getModel('citrusintegration/'.$type);
+        $citrus_id = $model->getCitrusIdById($id);
+        return $citrus_id;
     }
     public function getProductData($entity){
         $data['gtin'] = $entity->getId();

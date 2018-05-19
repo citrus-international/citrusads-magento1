@@ -206,25 +206,24 @@
                     </citrusintegration>
                 </observers>
             </catalog_product_collection_load_after>
-            <!--<catalogsearch_index_process_complete>-->
+            <customer_save_after>
+                <observers>
+                    <citrusintegration>
+                        <type>singleton</type>
+                        <class>Citrus_Integration_Model_Observer</class>
+                        <method>pushCustomerToQueue</method>
+                    </citrusintegration>
+                </observers>
+            </customer_save_after>
+            <!--<customer_delete_after>-->
                 <!--<observers>-->
                     <!--<citrusintegration>-->
                         <!--<type>singleton</type>-->
                         <!--<class>Citrus_Integration_Model_Observer</class>-->
-                        <!--<method>sendContextAfterSearch</method>-->
+                        <!--<method>customerDeleteEventAction</method>-->
                     <!--</citrusintegration>-->
                 <!--</observers>-->
-            <!--</catalogsearch_index_process_complete>-->
-            <!--<catalogsearch_searchable_attributes_load_after>-->
-                <!--<observers>-->
-                    <!--<citrusintegration>-->
-                        <!--<type>singleton</type>-->
-                        <!--<class>Citrus_Integration_Model_Observer</class>-->
-                        <!--<method>sendContextAfterSearch</method>-->
-                    <!--</citrusintegration>-->
-                <!--</observers>-->
-            <!--</catalogsearch_searchable_attributes_load_after>-->
-
+            <!--</customer_delete_after>-->
         </events>
     </global>
     <adminhtml>

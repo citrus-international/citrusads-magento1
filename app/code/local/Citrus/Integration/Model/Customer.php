@@ -2,6 +2,11 @@
 
 class Citrus_Integration_Model_Customer extends Mage_Core_Model_Abstract
 {
+    /**
+     * Entity code.
+     * Can be used as part of method name for entity processing
+     */
+    const ENTITY                 = 'customer';
     public function _construct()
     {
         parent::_construct();
@@ -14,9 +19,9 @@ class Citrus_Integration_Model_Customer extends Mage_Core_Model_Abstract
      * @param   string $entityId
      * @return  integer
      */
-    public function getCustomerIdByEntityId($entityId)
+    public function getCitrusIdById($entityId)
     {
-        return $this->_getResource()->getCustomerIdByEntityId($entityId);
+        return $this->_getResource()->getCitrusIdById($entityId);
     }
     /**
      * Retrieve resource instance wrapper

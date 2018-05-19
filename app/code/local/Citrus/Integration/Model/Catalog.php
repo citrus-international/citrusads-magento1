@@ -2,6 +2,11 @@
 
 class Citrus_Integration_Model_Catalog extends Mage_Core_Model_Abstract
 {
+    /**
+     * Entity code.
+     * Can be used as part of method name for entity processing
+     */
+    const ENTITY                 = 'catalog';
     public function _construct()
     {
         parent::_construct();

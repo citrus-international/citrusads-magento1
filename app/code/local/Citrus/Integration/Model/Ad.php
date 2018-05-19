@@ -3,11 +3,18 @@
 class Citrus_Integration_Model_Ad extends Mage_Core_Model_Abstract
 {
     /**
+     * Entity code.
+     * Can be used as part of method name for entity processing
+     */
+    const ENTITY  = 'ad';
+    /**
      * Prefix of model events names
      *
      * @var string
      */
     protected $_eventPrefix = 'citrus_integration_ad';
+
+    protected $_eventObject = 'ad';
 
     public function _construct()
     {

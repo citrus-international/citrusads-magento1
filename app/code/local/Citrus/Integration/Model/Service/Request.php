@@ -163,7 +163,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
                 $result['message'] = $status.'-'.$data;
             }
             else
-                $result['message'] = $status.'-'.$data;
+                $result['message'] = $data;
         } catch (\Exception $exception) {
             $result['success'] = false;
             $result['message'] = $exception->getMessage();
@@ -191,7 +191,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
                 $result['message'] = $status.'-'.$data;
             }
             else
-                $result['message'] = $status.'-'.$data;
+                $result['message'] = $data;
         } catch (\Exception $exception) {
             $result['success'] = false;
             $result['message'] = $exception->getMessage();
