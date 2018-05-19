@@ -70,8 +70,8 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function getCitrusCatalogId(){
         /** @var Citrus_Integration_Model_Catalog $model */
         $model = Mage::getModel('citrusintegration/catalog');
-        $name = $this->getCitrusCatalogName();
-        return $model->getCatalogIdByName($name);
+//        $name = $this->getCitrusCatalogName();
+        return $model->getCatalogId();
     }
     public function getCitrusCatalogName(){
         return Mage::getStoreConfig('citrus/citrus_group/catalog_name', Mage::app()->getStore());
