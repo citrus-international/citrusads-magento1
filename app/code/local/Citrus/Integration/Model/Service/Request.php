@@ -106,6 +106,19 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         return self::requestDeleteApi($handle,$headers);
     }
     /**
+     * @param $gtin string
+     * @param $catalogId string
+     * @return array
+     */
+    public function deleteCatalogProductRequest($gtin, $catalogId = null){
+        if($catalogId == null){
+            $catalogId = $this->getCitrusHelper()->getCitrusCatalogId();
+        }
+        $handle = 'catalog-products/'.$catalogId.'/'.$gtin;
+        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        return self::requestDeleteApi($handle,$headers);
+    }
+    /**
      * @return false|Citrus_Integration_Model_Service_Authentication
      */
     protected function getAuthenticationModel(){
@@ -147,10 +160,10 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             }
             if(isset($status)&& $status != 200 ){
                 $result['success'] = false;
-                $result['message'] = $data;
+                $result['message'] = $status.'-'.$data;
             }
             else
-                $result['message'] = $data;
+                $result['message'] = $status.'-'.$data;
         } catch (\Exception $exception) {
             $result['success'] = false;
             $result['message'] = $exception->getMessage();
@@ -175,10 +188,10 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             }
             if(isset($status)&& $status != 200 ){
                 $result['success'] = false;
-                $result['message'] = $data;
+                $result['message'] = $status.'-'.$data;
             }
             else
-                $result['message'] = $data;
+                $result['message'] = $status.'-'.$data;
         } catch (\Exception $exception) {
             $result['success'] = false;
             $result['message'] = $exception->getMessage();

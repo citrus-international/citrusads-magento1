@@ -206,7 +206,16 @@ class Citrus_Integration_Model_Observer
 
         }
     }
-
+    //delete
+    /**
+     * @param $observer
+     */
+    public function productDeleteEventAction($observer){
+        /** @var Mage_Catalog_Model_Product $product */
+        $product = $observer->getProduct();
+        $response = $this->getCitrusHelper()->getRequestModel()->deleteCatalogProductRequest($product->getEntityId());
+        Mage::log('delete product-'.$product->getEntityId().'\n'.json_encode($response), null, 'citrus.log', true);
+    }
     public function pushProductToQueue($observer){
         /** @var Mage_Catalog_Model_Product $product */
         $product = $observer->getProduct();
@@ -214,6 +223,7 @@ class Citrus_Integration_Model_Observer
         if($realTime){
             if($product->hasDataChanges()){
                 $this->pushItemToQueue($product,$product->getId());
+                Mage::log('push to queue product-'.$product->getEntityId(), null, 'citrus.log', true);
             }
         }
         else{
@@ -221,7 +231,9 @@ class Citrus_Integration_Model_Observer
             $body = $helper->getCatalogProductData($product);
             $response = $this->getCitrusHelper()->getRequestModel()->pushCatalogProductsRequest($body);
             $this->getCitrusHelper()->handleResponse($response);
+            Mage::log('push catalog product-'.$product->getEntityId().'\n'.json_encode($response), null, 'citrus.log', true);
             $this->pushCatalogProductAfter($product);
+
         }
     }
     public function pushCatalogProductAfter($entity){
@@ -229,6 +241,7 @@ class Citrus_Integration_Model_Observer
         $body = $helper->getProductData($entity);
         $response = $this->getCitrusHelper()->getRequestModel()->pushProductsRequest($body);
         $this->getCitrusHelper()->handleResponse($response);
+        Mage::log('push product-'.$entity->getEntityId().'\n'.json_encode($response), null, 'citrus.log', true);
     }
     public function pushOrderToQueue($observer){
         /** @var Mage_Sales_Model_Order $order */

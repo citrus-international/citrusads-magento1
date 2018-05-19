@@ -228,6 +228,17 @@
         </events>
     </global>
     <adminhtml>
+        <events>
+            <catalog_product_delete_after>
+                <observers>
+                    <tag>
+                        <type>singleton</type>
+                        <class>Citrus_Integration_Model_Observer</class>
+                        <method>productDeleteEventAction</method>
+                    </tag>
+                </observers>
+            </catalog_product_delete_after>
+        </events>
         <layout>
             <updates>
                 <citrusintegration>
