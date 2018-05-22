@@ -402,6 +402,16 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $data['quantity'] = (int)$item->getQtyOrdered();
         $data['regularUnitPrice'] = (int)$item->getBasePrice();
         $data['totalOrderItemPriceAfterDiscounts'] = (float)$item->getRowTotal();
+        $info_buyRequest = $item->getProductOptionByCode('info_buyRequest');
+        if(isset($info_buyRequest['citrus_ad_id'])){
+            $data['adId'] = $info_buyRequest['citrus_ad_id'];
+            $adModel = $this->getAdModel();
+            $discountModel = $this->getDiscountModel();
+            $discount = $discountModel->load($adModel->load($adModel->getIdByCitrusId($info_buyRequest['citrus_ad_id']))->getDiscountId())->getAmount();
+            if(isset($discount)){
+                $data['citrusDiscountAmount'] = (int)$discount;
+            }
+        }
         return $data;
     }
     /**
