@@ -71,10 +71,6 @@ class Citrus_Integration_Model_Observer
             $context = $this->getCitrusHelper()->getContextData($context);
             $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
             $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Search', $adsEnable, $bannerEnable);
-//        test in search
-//        $return['ads'] = [
-//            148, 149, 150
-//        ];
             Mage::register('searchAdResponse', $return);
             Mage::log('My log entry' . time());
         }
