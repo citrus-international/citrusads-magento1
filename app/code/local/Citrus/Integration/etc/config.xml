@@ -215,15 +215,15 @@
                     </citrusintegration>
                 </observers>
             </customer_save_after>
-            <!--<customer_delete_after>-->
-                <!--<observers>-->
-                    <!--<citrusintegration>-->
-                        <!--<type>singleton</type>-->
-                        <!--<class>Citrus_Integration_Model_Observer</class>-->
-                        <!--<method>customerDeleteEventAction</method>-->
-                    <!--</citrusintegration>-->
-                <!--</observers>-->
-            <!--</customer_delete_after>-->
+            <customer_delete_after>
+                <observers>
+                    <citrusintegration>
+                        <type>singleton</type>
+                        <class>Citrus_Integration_Model_Observer</class>
+                        <method>customerDeleteEventAction</method>
+                    </citrusintegration>
+                </observers>
+            </customer_delete_after>
         </events>
     </global>
     <adminhtml>

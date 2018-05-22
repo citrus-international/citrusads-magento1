@@ -156,6 +156,7 @@ class Citrus_Integration_Model_Observer
                         }
                         else{
                             $this->pushCatalog($name, $id);
+                            break;
                         }
                     }
                 }
