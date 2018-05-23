@@ -21,7 +21,7 @@ class Citrus_Integration_Model_Sync
         return Mage::helper('citrusintegration/data');
     }
     public function syncData($type){
-        Mage::log('run sync data'.$type);
+        Mage::log('run sync data'.$type,null, 'citrus.log', true);
         $queueModel = $this->getQueueModel();
         $collectionDatas = $queueModel->getCollection()->addFieldToSelect('entity_id')
             ->addFieldToFilter('type', ['eq' => $type])->setPageSize(100);

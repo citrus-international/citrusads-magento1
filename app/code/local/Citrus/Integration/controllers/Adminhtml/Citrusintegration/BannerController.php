@@ -9,45 +9,6 @@ class Citrus_Integration_Adminhtml_Citrusintegration_BannerController extends Ma
         $this->_addContent($this->getLayout()->createBlock('citrusintegration/adminhtml_citrusintegration_banner'));
         $this->renderLayout();
     }
-//    public function infoAction()
-//    {
-//        $this->_initAction();
-//
-//        $id  = $this->getRequest()->getParam('id');
-//        $model = Mage::getModel('citrusintegration/ad');
-//        $discountModel = Mage::getModel('citrusintegration/discount');
-//        $bannerModel = Mage::getModel('citrusintegration/banner');
-//        $relevantModel = Mage::getModel('citrusintegration/relevant');
-//
-//        if ($id) {
-//            $model->load($id);
-//            if (!$model->getId()) {
-//                Mage::getSingleton('adminhtml/session')->addError($this->__('This ad no longer exists.'));
-//                $this->_redirect('*/*/');
-//                return;
-//            }
-//            else{
-//                $discountModel->load($model->getData('discount_id'));
-//                $bannerModel->load($model->getData('banner_id'));
-//                $relevantModel->load($model->getData('relevant_id'));
-//            }
-//        }
-//
-//        $this->_title($model->getId() ? $model->getName() : $this->__('New Baz'));
-//
-//        $data = Mage::getSingleton('adminhtml/session')->getBazData(true);
-//        if (!empty($data)) {
-//            $model->setData($data);
-//        }
-//        try{
-//            Mage::register('citrus_ad', $model);
-//        }catch (Exception $e){}
-//
-//
-//        $this->_initAction()
-//            ->_addContent($this->getLayout()->createBlock('citrusintegration/adminhtml_citrusintegration_ad_info'))
-//            ->renderLayout();
-//    }
     /**
      * Initialize action
      *

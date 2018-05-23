@@ -88,6 +88,9 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function getResponseModel(){
         return Mage::getModel('citrusintegration/service_response');
     }
+    public function log($messages, $file = '', $line = 0){
+            Mage::log($messages . ' on '.$file .':'.$line, null, 'citrus.log', true);
+    }
     /**
      * @param $entity Mage_Sales_Model_Order
      * @return mixed
@@ -160,7 +163,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                             $adModel->save();
                             $adsRegistry[] = $adModel->getId();
                         }catch (Exception $e){
-                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                             return false;
                         }
                     }
@@ -175,7 +178,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         try{
                             $discountModel->save();
                         }catch (Exception $e){
-                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                             return false;
                         }
                         $adModel->unsetData();
@@ -192,7 +195,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                             $adModel->save();
                             $adsRegistry[] = $adModel->getId();
                         }catch (Exception $e){
-                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                             return false;
                         }
                     }
@@ -216,7 +219,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                             $bannerModel->save();
                             $bannerRegistry[] = $bannerModel->getId();
                         }catch (Exception $e){
-                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                             return false;
                         }
                     }
@@ -237,20 +240,16 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                             $bannerModel->save();
                             $bannerRegistry[] = $bannerModel->getId();
                         }catch (Exception $e){
-                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                             return false;
                         }
                     }
                 }
             }
-//            Mage::getSingleton('adminhtml/session')->addSuccess('Your request is completed');
             return ['ads'=>$adsRegistry,'banners'=>$bannerRegistry];
         }
         else{
-            $data = json_decode($response['message'], true);
-            $error = $data['message'] != '' ? $data['message'] : 'Something went wrong. Please try again in a few minutes';
-            $error = Mage::helper('adminhtml')->__($error);
-            Mage::getSingleton('adminhtml/session')->addError($error);
+            $this->log('Get ads response error: '.$response['message'], __FILE__, __LINE__);
             return false;
         }
     }
@@ -266,7 +265,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     try{
                         $model->delete();
                     }catch (Exception $e) {
-                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                        $this->log('Handle banner response error: '.$e->getMessage(), __FILE__, __LINE__);
                     }
                 }
             }
@@ -280,7 +279,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         try{
                             $model->delete();
                         }catch (Exception $e) {
-                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                         }
                     }
                     $bannerData = [
@@ -297,7 +296,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     try{
                         $model->save();
                     }catch (Exception $e){
-                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                        $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                     }
                 }
                 else{
@@ -315,7 +314,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     try{
                         $model->save();
                     }catch (Exception $e){
-                        Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                        $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                     }
                 }
             }
@@ -341,7 +340,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     try {
                         $model->save();
                     } catch (Exception $e) {
-
+                        $this->log('Handle catalog response error: '.$e->getMessage(), __FILE__, __LINE__);
                     }
                 }
             }
@@ -354,7 +353,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     try {
                         $model->save();
                     } catch (Exception $e) {
-
+                        $this->log('Handle customer response error: '.$e->getMessage(), __FILE__, __LINE__);
                     }
                 }
 
@@ -368,16 +367,13 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     try {
                         $model->save();
                     } catch (Exception $e) {
-
+                        $this->log('Handle order response error: '.$e->getMessage(), __FILE__, __LINE__);
                     }
                 }
             }
         }
         else {
-            $data = json_decode($response['message'], true);
-            $error = $data['message'] != '' ? $data['message'] : 'Something went wrong. Please try again in a few minutes';
-            $error = Mage::helper('adminhtml')->__($error);
-            Mage::throwException($error);
+            $this->log('Handle response to citrus table:'.$response['message'], __FILE__, __LINE__);
         }
     }
     /**
@@ -566,7 +562,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                             $discountModel->save();
                             $adModel->save();
                         }catch (Exception $e){
-                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            $this->log('Handle ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                             return false;
                         }
                     }
@@ -581,7 +577,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         try{
                             $discountModel->save();
                         }catch (Exception $e){
-                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            $this->log('Handle ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                             return false;
                         }
                         $adModel->unsetData();
@@ -595,10 +591,8 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         $adModel->addData($adData);
                         try{
                             $adModel->save();
-//                           $this->handleBanner($data['banners'] = isset($data['banners']) ? $data['banners'] : null, $id);
-//                           $this->handleBanner($data['products'], $id);
                         }catch (Exception $e){
-                            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+                            $this->log('Handle ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                             return false;
                         }
                     }
@@ -607,10 +601,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             return true;
         }
         else{
-            $data = json_decode($response['message'], true);
-            $error = $data['message'] != '' ? $data['message'] : 'Something went wrong. Please try again in a few minutes';
-            $error = Mage::helper('adminhtml')->__($error);
-            Mage::getSingleton('adminhtml/session')->addError($error);
+            $this->log('Error when get response: '.$response['message'], __FILE__, __LINE__);
             return false;
         }
     }
