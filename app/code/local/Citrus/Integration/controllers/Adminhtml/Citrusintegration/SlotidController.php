@@ -6,8 +6,6 @@ class Citrus_Integration_Adminhtml_Citrusintegration_SlotidController extends Ma
     {
         $this->_title($this->__('SlotId List'));
         $this->loadLayout();
-        $this->_initAction();
-        $this->_initLayoutMessages('customer/session');
         $this->_addContent($this->getLayout()->createBlock('citrusintegration/adminhtml_citrusintegration_slotid'));
         $this->renderLayout();
     }

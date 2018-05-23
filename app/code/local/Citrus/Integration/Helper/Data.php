@@ -96,7 +96,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $teamId = $this->getTeamId();
         $data['teamId'] = $teamId;
         if($entity->getCustomerId())
-            $data['customerId'] = $this->getCustomerIdByCustomer($entity->getCustomer());
+            $data['customerId'] = $entity->getCustomerId();
         $datetime = DateTime::createFromFormat("Y-m-d H:i:s", $entity->getCreatedAt());
         $data['orderDate'] = $datetime->format(\DateTime::RFC3339);
         $orderItems = $entity->getAllItems();
@@ -126,20 +126,6 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         if(isset($context['customerId']))
             $data['customerId'] = $context['customerId'];
         return $data;
-    }
-    public function getCustomerIdByCustomer($customer){
-        /** @var Citrus_Integration_Model_Customer $model */
-        $model = Mage::getModel('citrusintegration/customer');
-        $customerId = $model->getCitrusIdById($customer->getId());
-        if($customerId){
-            return $customerId;
-        }
-        else{
-            $customerData = $this->getCustomerData($customer);
-            $response = $this->getRequestModel()->pushCustomerRequest([$customerData]);
-            $this->handleResponse($response, 'customer', $customer->getId());
-            return $this->getCustomerIdByCustomer($customer);
-        }
     }
 
     public function handleAdsResponse($response, $pageType = null, $adsEnable = true, $bannerEnable = true){

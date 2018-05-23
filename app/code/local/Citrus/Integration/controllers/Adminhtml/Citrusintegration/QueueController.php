@@ -6,8 +6,8 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     {
         $this->_title($this->__('Queue List'));
         $this->loadLayout();
-        $this->_initAction();
-        $this->_initLayoutMessages('customer/session');
+//        $this->_initAction();
+//        $this->_initLayoutMessages('adminhtml/session');
         $this->renderLayout();
     }
     /**

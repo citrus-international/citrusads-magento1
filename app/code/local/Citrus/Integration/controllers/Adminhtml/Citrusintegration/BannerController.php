@@ -6,8 +6,6 @@ class Citrus_Integration_Adminhtml_Citrusintegration_BannerController extends Ma
     {
         $this->_title($this->__('Banners List'));
         $this->loadLayout();
-        $this->_initAction();
-        $this->_initLayoutMessages('customer/session');
         $this->_addContent($this->getLayout()->createBlock('citrusintegration/adminhtml_citrusintegration_banner'));
         $this->renderLayout();
     }

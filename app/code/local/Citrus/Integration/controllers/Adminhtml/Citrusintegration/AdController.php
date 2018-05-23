@@ -6,8 +6,6 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
     {
         $this->_title($this->__('Ads List'));
         $this->loadLayout();
-        $this->_initAction();
-        $this->_initLayoutMessages('customer/session');
         $this->renderLayout();
     }
     public function infoAction()
