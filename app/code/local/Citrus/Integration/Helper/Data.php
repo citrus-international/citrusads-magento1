@@ -523,25 +523,29 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     }
     public function handleData($itemId, $type){
         $itemModel = Mage::getModel($type);
-        $entity = $itemModel->load($itemId);
+
         switch ($type){
             case 'catalog/product':
-                /** @var  $entity Mage_Catalog_Model_Product */
+                /** @var  $itemModel Mage_Catalog_Model_Product */
+                $entity = $itemModel->load($itemId);
                 $body = $this->getCatalogProductData($entity);
                 $response = $this->getRequestModel()->pushCatalogProductsRequest($body);
                 break;
             case 'customer/customer':
-                /** @var  $entity Mage_Customer_Model_Customer */
+                /** @var  $itemModel Mage_Customer_Model_Customer */
+                $entity = $itemModel->load($itemId);
                 $body = $this->getCustomerData($entity);
                 $response = $this->getRequestModel()->pushCustomerRequest([$body]);
                 break;
             case 'sales/order':
-                /** @var  $entity Mage_Sales_Model_Order */
+                /** @var  $itemModel Mage_Sales_Model_Order */
+                $entity = $itemModel->loadByIncrementId($itemId);
                 $body = $this->getOrderData($entity);
                 $response = $this->getRequestModel()->pushOrderRequest([$body]);
                 break;
             case 'products':
-                /** @var  $entity Mage_Catalog_Model_Product */
+                /** @var  $itemModel Mage_Catalog_Model_Product */
+                $entity = $itemModel->load($itemId);
                 $body = $this->getProductData($entity);
                 $response = $this->getRequestModel()->pushProductsRequest($body);
                 break;

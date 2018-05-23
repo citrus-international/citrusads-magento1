@@ -286,7 +286,7 @@ class Citrus_Integration_Model_Observer
         $queueModel = $this->getQueueModel();
         $queueCollection = $queueModel->getCollection()->addFieldToSelect('id')
             ->addFieldToFilter('type', ['eq'=> $item->getResourceName()])
-            ->addFieldToFilter('entity_id', ['eq' => $entity_id])
+            ->addFieldToFilter('entity_id', ['in' => $entity_id])
             ->getFirstItem();
         if($queueCollection->getData()){
             $queueModel->load($queueCollection->getId());

@@ -154,14 +154,20 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     public function pushItemToQueue($item){
         $queueModel = $this->getQueueModel();
         $queueCollection = $queueModel->getCollection()->addFieldToSelect('id')
-            ->addFieldToFilter('entity_id', ['eq' => $item->getId()])
+            ->addFieldToFilter('entity_id', ['in' => [$item->getId(), $item->getIncrementId()]])
             ->addFieldToFilter('type', ['eq' => $item->getResourceName()])
             ->getFirstItem();
         if($queueCollection->getData()){
             $queueModel->load($queueCollection->getId());
-            $queueModel->enqueue($item->getId(), $item->getResourceName());
+            if($item->getResourceName() == 'sales/order')
+                $queueModel->enqueue($item->getIncrementId(), $item->getResourceName());
+            else
+                $queueModel->enqueue($item->getId(), $item->getResourceName());
         }else {
-            $queueModel->enqueue($item->getId(), $item->getResourceName());
+            if($item->getResourceName() == 'sales/order')
+                $queueModel->enqueue($item->getIncrementId(), $item->getResourceName());
+            else
+                $queueModel->enqueue($item->getId(), $item->getResourceName());
         }
     }
     public function massSyncAction()
