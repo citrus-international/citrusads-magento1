@@ -95,8 +95,8 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function getOrderData($entity){
         $teamId = $this->getTeamId();
         $data['teamId'] = $teamId;
-        if(!$entity->getCustomerIsGuest())
-            $data['customerId'] = $this->getCustomerIdByCustomer();
+        if($entity->getCustomerId())
+            $data['customerId'] = $this->getCustomerIdByCustomer($entity->getCustomer());
         $datetime = DateTime::createFromFormat("Y-m-d H:i:s", $entity->getCreatedAt());
         $data['orderDate'] = $datetime->format(\DateTime::RFC3339);
         $orderItems = $entity->getAllItems();
