@@ -62,7 +62,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
         $body = [
             'catalogProducts' =>
-                [$body]
+                $body
         ];
         return self::requestPostApi($handle,$headers, $body);
     }
@@ -75,7 +75,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
         $body = [
             'products' =>
-                [$body]
+                $body
         ];
         return self::requestPostApi($handle,$headers, $body);
     }

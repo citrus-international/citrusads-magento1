@@ -183,7 +183,7 @@ class Citrus_Integration_Model_Observer
             $responseModel = $this->getCitrusHelper()->getResponseModel();
             $response = $responseModel->getCatalogListResponse();
             $this->handleGetResponse($response, Citrus_Integration_Model_Catalog::ENTITY, $catalogName);
-            $this->getCitrusHelper()->log('create catalog : '.$response['message'] , __FILE__, __LINE__);
+            $this->getCitrusHelper()->log('list catalog : '.$response['message'] , __FILE__, __LINE__);
         }
     }
     public function createRootCategory($storeId, $name){
@@ -226,8 +226,7 @@ class Citrus_Integration_Model_Observer
         else{
             $helper = $this->getCitrusHelper();
             $body = $helper->getCatalogProductData($product);
-            $response = $this->getCitrusHelper()->getRequestModel()->pushCatalogProductsRequest($body);
-            $this->getCitrusHelper()->handleResponse($response);
+            $response = $this->getCitrusHelper()->getRequestModel()->pushCatalogProductsRequest([$body]);
             $this->getCitrusHelper()->log('push catalog product-'.$product->getEntityId().':'.$response['message'], __FILE__, __LINE__);
             $this->pushCatalogProductAfter($product);
         }
@@ -235,8 +234,7 @@ class Citrus_Integration_Model_Observer
     public function pushCatalogProductAfter($entity){
         $helper = $this->getCitrusHelper();
         $body = $helper->getProductData($entity);
-        $response = $this->getCitrusHelper()->getRequestModel()->pushProductsRequest($body);
-        $this->getCitrusHelper()->handleResponse($response);
+        $response = $this->getCitrusHelper()->getRequestModel()->pushProductsRequest([$body]);
         $this->getCitrusHelper()->log('push product-'.$entity->getEntityId().':'.$response['message'], __FILE__, __LINE__);
     }
     public function pushOrderToQueue($observer){

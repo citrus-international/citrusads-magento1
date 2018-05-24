@@ -346,9 +346,9 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             }
             elseif($type == 'customer'){
                 $data = json_decode($response['message'], true);
-                foreach ($data['customers'] as $customer){
+                foreach ($data['customers'] as $key => $customer){
                     $customerData['citrus_id'] = $customer['id'];
-                    $customerData['entity_id'] = $name;
+                    $customerData['entity_id'] = isset($name[$key]) ? $name[$key] : $name;
                     $model = Mage::getModel('citrusintegration/customer')->setData($customerData);
                     try {
                         $model->save();
@@ -360,9 +360,9 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             }
             elseif($type == 'order'){
                 $data = json_decode($response['message'], true);
-                foreach ($data['orders'] as $order){
+                foreach ($data['orders'] as $key => $order){
                     $orderData['citrus_id'] = $order['id'];
-                    $orderData['entity_id'] = $name;
+                    $orderData['entity_id'] = isset($name[$key]) ? $name[$key] : $name;
                     $model = Mage::getModel('citrusintegration/order')->setData($orderData);
                     try {
                         $model->save();
@@ -503,43 +503,39 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         }
         return $results;
     }
-    public function handleData($itemId, $type){
-        $itemModel = Mage::getModel($type);
-
-        switch ($type){
-            case 'catalog/product':
-                /** @var  $itemModel Mage_Catalog_Model_Product */
-                $entity = $itemModel->load($itemId);
-                $body = $this->getCatalogProductData($entity);
-                $response = $this->getRequestModel()->pushCatalogProductsRequest($body);
-                break;
-            case 'customer/customer':
-                /** @var  $itemModel Mage_Customer_Model_Customer */
-                $entity = $itemModel->load($itemId);
-                $body = $this->getCustomerData($entity);
-                $response = $this->getRequestModel()->pushCustomerRequest([$body]);
-                break;
-            case 'sales/order':
-                /** @var  $itemModel Mage_Sales_Model_Order */
-                $entity = $itemModel->loadByIncrementId($itemId);
-                $body = $this->getOrderData($entity);
-                $response = $this->getRequestModel()->pushOrderRequest([$body]);
-                break;
-            case 'products':
-                /** @var  $itemModel Mage_Catalog_Model_Product */
-                $entity = $itemModel->load($itemId);
-                $body = $this->getProductData($entity);
-                $response = $this->getRequestModel()->pushProductsRequest($body);
-                break;
-        }
-        $this->handleResponse($response);
-    }
+//    public function handleData($itemId, $type){
+//        $itemModel = Mage::getModel($type);
+//
+//        switch ($type){
+//            case 'catalog/product':
+//                /** @var  $itemModel Mage_Catalog_Model_Product */
+//                $entity = $itemModel->load($itemId);
+//                $body = $this->getCatalogProductData($entity);
+//                $response = $this->getRequestModel()->pushCatalogProductsRequest($body);
+//                $body = $this->getProductData($entity);
+//                $response = $this->getRequestModel()->pushProductsRequest($body);
+//                break;
+//            case 'customer/customer':
+//                /** @var  $itemModel Mage_Customer_Model_Customer */
+//                $entity = $itemModel->load($itemId);
+//                $body = $this->getCustomerData($entity);
+//                $response = $this->getRequestModel()->pushCustomerRequest([$body]);
+//                break;
+//            case 'sales/order':
+//                /** @var  $itemModel Mage_Sales_Model_Order */
+//                $entity = $itemModel->loadByIncrementId($itemId);
+//                $body = $this->getOrderData($entity);
+//                $response = $this->getRequestModel()->pushOrderRequest([$body]);
+//                break;
+//        }
+//        $this->handleResponse($response);
+//    }
     public function handlePostResponse($response){
         if($response['success']){
             $data = json_decode($response['message'], true);
             $adModel = $this->getAdModel();
             $discountModel = $this->getDiscountModel();
-            $host = $this->getHelper()->getHost();
+            $host = $this->getHost();
             if($data['ads']){
                 foreach ($data['ads'] as $ad){
                     $id = $adModel->getIdByCitrusId($ad['id']);

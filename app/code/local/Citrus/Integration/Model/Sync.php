@@ -35,7 +35,7 @@ class Citrus_Integration_Model_Sync
                 $body[] = $data;
             }
             if($type == 'catalog/product'){
-                $response = $this->getHelper()->getRequestModel()->pushCatalogProductsRequest($body);
+                $response = $this->getHelper()->getRequestModel()->pushCatalogProductsRequest([$body]);
                 $this->getHelper()->handleResponse($response);
                 $this->syncData('products');
             }
@@ -48,7 +48,7 @@ class Citrus_Integration_Model_Sync
                 $this->getHelper()->handleResponse($response);
             }
             elseif($type =='products') {
-                $response = $this->getHelper()->getRequestModel()->pushProductsRequest($body);
+                $response = $this->getHelper()->getRequestModel()->pushProductsRequest([$body]);
                 $this->getHelper()->handleResponse($response);
             }
         }
