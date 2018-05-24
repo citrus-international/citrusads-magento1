@@ -191,7 +191,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         $sales_order[] = $requestData->getEntityId();
                     elseif($type == 'customer/customer')
                         $customer_customer[] = $requestData->getEntityId();
-//                    $queueModel->delete();
+                    $queueModel->delete();
                 }
                 $syncItems->addData(['catalog_product' => $catalog_product]);
                 $syncItems->addData(['sales_order' => $sales_order]);

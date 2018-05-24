@@ -157,7 +157,15 @@ class Citrus_Integration_Model_Observer
                     }
                 }
                 else{
-                    $this->pushCatalog($name);
+                    /** @var Citrus_Integration_Model_Catalog $model */
+                    $model = Mage::getModel('citrusintegration/catalog');
+                    $id = $model->getCatalogId();
+                    if(!$id){
+                        $this->pushCatalog($name);
+                    }
+                    else{
+                        $this->pushCatalog($name, $id);
+                    }
                 }
             }
         }
