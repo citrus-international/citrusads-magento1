@@ -48,6 +48,7 @@ class Citrus_Integration_Model_Observer
                 $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
                 $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Category', $adsEnable, $bannerEnable);
                 Mage::register('categoryAdResponse', $return);
+                $this->getCitrusHelper()->log('ads request category context -'.$productFilters.' : '.json_encode($context), __FILE__, __LINE__);
                 $this->getCitrusHelper()->log('ads request category -'.$productFilters.' : '.$response['message'], __FILE__, __LINE__);
             }
         }
@@ -225,19 +226,26 @@ class Citrus_Integration_Model_Observer
     public function pushProductToQueue($observer){
         /** @var Mage_Catalog_Model_Product $product */
         $product = $observer->getProduct();
-        $realTime = $enable = Mage::getStoreConfig('citrus_sync/citrus_product/sync_mode', Mage::app()->getStore());
-        if($realTime){
-            if($product->hasDataChanges()){
-                $this->pushItemToQueue($product,$product->getId());
-                $this->getCitrusHelper()->log('push to queue product-'.$product->getEntityId().':', __FILE__, __LINE__);
+
+        $enableProduct = $product->getStatus();
+        if($enableProduct == 1){
+            $realTime = $enable = Mage::getStoreConfig('citrus_sync/citrus_product/sync_mode', Mage::app()->getStore());
+            if($realTime){
+                if($product->hasDataChanges()){
+                    $this->pushItemToQueue($product,$product->getId());
+                    $this->getCitrusHelper()->log('push to queue product-'.$product->getEntityId().':', __FILE__, __LINE__);
+                }
+            }
+            else{
+                $helper = $this->getCitrusHelper();
+                $body = $helper->getCatalogProductData($product);
+                $response = $this->getCitrusHelper()->getRequestModel()->pushCatalogProductsRequest([$body]);
+                $this->getCitrusHelper()->log('push catalog product-'.$product->getEntityId().':'.$response['message'], __FILE__, __LINE__);
+                $this->pushCatalogProductAfter($product);
             }
         }
-        else{
-            $helper = $this->getCitrusHelper();
-            $body = $helper->getCatalogProductData($product);
-            $response = $this->getCitrusHelper()->getRequestModel()->pushCatalogProductsRequest([$body]);
-            $this->getCitrusHelper()->log('push catalog product-'.$product->getEntityId().':'.$response['message'], __FILE__, __LINE__);
-            $this->pushCatalogProductAfter($product);
+        else {
+            $this->productDeleteEventAction($observer);
         }
     }
     public function pushCatalogProductAfter($entity){
@@ -276,6 +284,7 @@ class Citrus_Integration_Model_Observer
             $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Customer::ENTITY, $customer->getId());
         }
     }
+
     public function customerDeleteEventAction($observer){
         /** @var Mage_Catalog_Model_Product $customer */
         $customer = $observer->getCustomer();
@@ -303,16 +312,23 @@ class Citrus_Integration_Model_Observer
             $queueModel->enqueue($entity_id, $item->getResourceName());
         }
     }
+
+    /**
+     * @param $type
+     * @return mixed
+     * @throws Mage_Core_Model_Store_Exception
+     */
     protected function getConfigValue($type)
     {
         $path = 'citrus_sync/'. $type .'/frequency';
 
         return Mage::getStoreConfig($path, Mage::app()->getStore());
     }
+    /**  */
     public function cronQueue(){
         $productCron = Mage::getStoreConfig('citrus_sync/citrus_product/sync_mode', Mage::app()->getStore());
         $orderCron = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
-        Mage::log('My log entry', null, 'citrus.log', true);
+        Mage::log('cron log start', null, 'citrus.log', true);
         if($productCron){
             if ($time = $this->getConfigValue('citrus_product')) {
                 if ($this->calculateTime($time)) {
