@@ -439,11 +439,12 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $data['size'] = $entity->getSize();
         $categoryIds = $entity->getCategoryIds();
         $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
-        if (is_array($categoryIds))
+        if (is_array($categoryIds)) {
             foreach ($categoryIds as $categoryId) {
                 $category = $catModel->load($categoryId);
-                $data['categoryHierarchies'][] = $category->getName();
+                $data['categoryHierarchies'][] = $this->getCategoryHierarchies($category);
             }
+        }
         return $data;
     }
     /**
@@ -469,10 +470,26 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
         if (is_array($categoryIds))
             foreach ($categoryIds as $categoryId) {
+            /** @var Mage_Catalog_Model_Category $category */
                 $category = $catModel->load($categoryId);
-                $data['categoryHierarchies'][] = $category->getName();
+                $data['categoryHierarchies'][] = $this->getCategoryHierarchies($category);
             }
         return $data;
+    }
+    /**
+     * @param Mage_Catalog_Model_Category $category
+     * @param array $array
+     * @return mixed
+     */
+    public function getCategoryHierarchies($category, $array = []){
+        $parents = explode('/', $category->getpath() );
+        foreach ($parents as $parentId){
+            $parent = Mage::getModel(Mage_Catalog_Model_Category::class)->load($parentId);
+            if($parent->getLevel() != 0 && $parent->getLevel() != 1){
+                $array[] = $parent->getName();
+            }
+        }
+        return $array;
     }
     /**
      * @param $product Mage_Catalog_Model_Product
