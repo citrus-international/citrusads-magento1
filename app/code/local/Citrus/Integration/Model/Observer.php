@@ -26,6 +26,7 @@ class Citrus_Integration_Model_Observer
         if($bannerEnable || $adsEnable){
             /** @var Mage_Catalog_Model_Category $category */
             $category = $observer->getCategory();
+            $websiteIds = Mage::app()->getStore()->getWebsiteId();
             $productFilters = '';
             $parentCategories = $category->getParentCategories();
             if(is_array($parentCategories)){
@@ -37,7 +38,7 @@ class Citrus_Integration_Model_Observer
             if($category->getLevel() != '1'){
                 $context = [
                     'pageType' => 'Category',
-                    'productFilters' => $productFilters
+                    'productFilters' => $websiteIds.','.$productFilters
                 ];
                 $banners = $this->getSlotIdByPageType($category->getEntityId(), Citrus_Integration_Helper_Data::CITRUS_PAGE_TYPE_CATEGORY);
                 if($banners) {
