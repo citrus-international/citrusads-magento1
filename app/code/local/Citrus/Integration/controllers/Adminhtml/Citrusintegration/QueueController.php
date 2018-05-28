@@ -227,7 +227,8 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             $responseCatalogProduct = $this->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProducts);
             $this->getHelper()->log('sync catalog product: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
             $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProducts);
-            $this->getHelper()->log('sync product: '.$responseProduct['message'], __FILE__, __LINE__);
+//            $this->getHelper()->log('sync product: '.$responseProduct['message'], __FILE__, __LINE__);
+            $this->getHelper()->log('sync product body: '.json_encode($bodyProducts), __FILE__, __LINE__);
         }
         if($sales_order){
             $body = [];

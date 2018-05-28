@@ -34,12 +34,18 @@ class Citrus_Integration_Model_Sync
             $customer_customer = [];
             foreach ($collections as $collection){
 //                $type = $collection->getType();
-                if($type == 'catalog/product')
+                if($type == 'catalog/product'){
                     $catalog_product[] = $collection->getEntityId();
-                elseif($type == 'sales/order')
+                    $collection->delete();
+                }
+                elseif($type == 'sales/order') {
                     $sales_order[] = $collection->getEntityId();
-                elseif($type == 'customer/customer')
+                    $collection->delete();
+                }
+                elseif($type == 'customer/customer') {
                     $customer_customer[] = $collection->getEntityId();
+                    $collection->delete();
+                }
             }
             $syncItems->addData(['catalog_product' => $catalog_product]);
             $syncItems->addData(['sales_order' => $sales_order]);

@@ -442,7 +442,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         if (is_array($categoryIds))
             foreach ($categoryIds as $categoryId) {
                 $category = $catModel->load($categoryId);
-                $data['categoryHierarchy'][] = $category->getName();
+                $data['categoryHierarchies'][] = $category->getName();
             }
         return $data;
     }
@@ -470,7 +470,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         if (is_array($categoryIds))
             foreach ($categoryIds as $categoryId) {
                 $category = $catModel->load($categoryId);
-                $data['categoryHierarchy'][] = $category->getName();
+                $data['categoryHierarchies'][] = $category->getName();
             }
         return $data;
     }
