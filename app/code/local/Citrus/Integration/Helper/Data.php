@@ -497,14 +497,19 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      */
     public function getProductFilter($product){
         $categories = $product->getCategoryIds();
+        $websites = $product->getWebsiteIds();
         $cats = [];
         if(is_array($categories)) {
             foreach ($categories as $category_id) {
-                $_cat = Mage::getModel('catalog/category')->load($category_id);
-                $cats[] = $_cat->getName();
+                /** @var Mage_Catalog_Model_Category $category */
+                $category = Mage::getModel(Mage_Catalog_Model_Category::class)->load($category_id);
+                $cats[] = $this->getCategoryHierarchies($category);
             }
         }
-        return array_merge([$product->getName()],$cats);
+        foreach ($cats as $cat){
+            $result = array_merge(isset($result) ? $result : [],$cat);
+        }
+        return array_unique(array_merge($websites,isset($result) ? $result : []));
     }
     public function getProductTags($id){
         $results = [];
