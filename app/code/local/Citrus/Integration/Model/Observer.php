@@ -313,7 +313,7 @@ class Citrus_Integration_Model_Observer
         $orderCron = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
         Mage::log('My log entry', null, 'citrus.log', true);
         if($productCron){
-            if ($time = $this->getConfigValue('citrus_sync/citrus_product/frequency')) {
+            if ($time = $this->getConfigValue('citrus_product')) {
                 if ($this->calculateTime($time)) {
                     $this->getCitrusHelper()->getSyncModel()->syncData('catalog/product');
                 }
@@ -342,7 +342,6 @@ class Citrus_Integration_Model_Observer
         if ($minute == 0) {
             $minute = 60;
         }
-
         return ($minute % $time == 0) || ($time == 120 && $hour % 2 == 0);
     }
 }
