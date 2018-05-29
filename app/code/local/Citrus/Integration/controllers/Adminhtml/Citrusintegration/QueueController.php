@@ -6,8 +6,6 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     {
         $this->_title($this->__('Queue List'));
         $this->loadLayout();
-//        $this->_initAction();
-//        $this->_initLayoutMessages('adminhtml/session');
         $this->renderLayout();
     }
     /**
@@ -226,8 +224,9 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             }
             $responseCatalogProduct = $this->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProducts);
             $this->getHelper()->log('sync catalog product: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
+            $this->getHelper()->log('sync catalog product body: '.json_encode($bodyCatalogProducts), __FILE__, __LINE__);
             $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProducts);
-//            $this->getHelper()->log('sync product: '.$responseProduct['message'], __FILE__, __LINE__);
+            $this->getHelper()->log('sync product: '.$responseProduct['message'], __FILE__, __LINE__);
             $this->getHelper()->log('sync product body: '.json_encode($bodyProducts), __FILE__, __LINE__);
         }
         if($sales_order){
@@ -300,7 +299,8 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         $data['inventory'] = (int)$collection->getQty();
                         $data['price'] = (int)$collection->getPrice();
                         $data['tags'] = $tags;
-                        $categoryIds = $collection->getCategoryIds();
+//                        $categoryIds = $collection->getCategoryIds();
+                        $categoryIds = $collection->getResource()->getCategoryIds($collection);
                         $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
                         if (is_array($categoryIds))
                             foreach ($categoryIds as $categoryId) {

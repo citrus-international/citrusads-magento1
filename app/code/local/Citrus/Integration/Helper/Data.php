@@ -430,6 +430,11 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $citrus_id = $model->getCitrusIdById($id);
         return $citrus_id;
     }
+    /**
+     * @param $entity Mage_Catalog_Model_Product
+     * @return mixed
+     * @throws Mage_Core_Model_Store_Exception
+     */
     public function getProductData($entity){
         $data['gtin'] = $entity->getId();
         $data['name'] = $entity->getName();
@@ -437,7 +442,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $data['images'] = [Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage())];
         if($entity->getSize())
             $data['size'] = $entity->getSize();
-        $categoryIds = $entity->getCategoryIds();
+        $categoryIds = $entity->getResource()->getCategoryIds($entity);
         $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
         if (is_array($categoryIds)) {
             foreach ($categoryIds as $categoryId) {
@@ -466,7 +471,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $data['price'] = (int)$entity->getPrice();
         $data['filters'] = $this->getProductFilter($entity);
         $data['tags'] = $tags;
-        $categoryIds = $entity->getCategoryIds();
+        $categoryIds = $entity->getResource()->getCategoryIds($entity);
         $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
         if (is_array($categoryIds))
             foreach ($categoryIds as $categoryId) {
@@ -496,11 +501,11 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      * @return array
      */
     public function getProductFilter($product){
-        $categories = $product->getCategoryIds();
+        $categoryIds = $product->getResource()->getCategoryIds($product);
         $websites = $product->getWebsiteIds();
         $cats = [];
-        if(is_array($categories)) {
-            foreach ($categories as $category_id) {
+        if(is_array($categoryIds)) {
+            foreach ($categoryIds as $category_id) {
                 /** @var Mage_Catalog_Model_Category $category */
                 $category = Mage::getModel(Mage_Catalog_Model_Category::class)->load($category_id);
                 $cats[] = $this->getCategoryHierarchies($category);
