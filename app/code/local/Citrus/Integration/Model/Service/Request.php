@@ -122,6 +122,20 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         return self::requestDeleteApi($handle,$headers);
     }
     /**
+     * @param $gtin string
+     * @param $catalogId string
+     * @return array
+     */
+    public function deleteProductRequest($gtin, $catalogId = null){
+        if($catalogId == null){
+            $catalogId = $this->getCitrusHelper()->getCitrusCatalogId();
+        }
+        $teamId = $this->getCitrusHelper()->getTeamId();
+        $handle = 'products/gtin'.$gtin.'?teamId='.$teamId;
+        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        return self::requestDeleteApi($handle,$headers);
+    }
+    /**
      * @return false|Citrus_Integration_Model_Service_Authentication
      */
     protected function getAuthenticationModel(){

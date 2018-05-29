@@ -433,7 +433,6 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     /**
      * @param $entity Mage_Catalog_Model_Product
      * @return mixed
-     * @throws Mage_Core_Model_Store_Exception
      */
     public function getProductData($entity){
         $data['gtin'] = $entity->getId();
@@ -461,26 +460,38 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $catalogId = $this->getCitrusCatalogId();
         $teamId = $this->getTeamId();
         $tags = $this->getProductTags($entity->getId());
-        $data['catalogId'] = $catalogId;
-        $data['teamId'] = $teamId;
-        $data['gtin'] = $entity->getId();
-        $data['name'] = $entity->getName();
-        if ($entity->getImage() != 'no_selection')
-            $data['images'] = [Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage())];
-        $data['inventory'] = (int)$stock->getQty();
-        $data['price'] = (int)$entity->getPrice();
-        $data['filters'] = $this->getProductFilter($entity);
-        $data['tags'] = $tags;
         $categoryIds = $entity->getResource()->getCategoryIds($entity);
         $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
-        if (is_array($categoryIds))
-            foreach ($categoryIds as $categoryId) {
-            /** @var Mage_Catalog_Model_Category $category */
+        if (is_array($categoryIds)){
+            foreach ($categoryIds as $key => $categoryId) {
+                /** @var Mage_Catalog_Model_Category $category */
                 $category = $catModel->load($categoryId);
-                $data['categoryHierarchies'][] = $this->getCategoryHierarchies($category);
+                $data[$key]['catalogId'] = $catalogId;
+                $data[$key]['teamId'] = $teamId;
+                $data[$key]['gtin'] = $entity->getId();
+                $data[$key]['inventory'] = (int)$stock->getQty();
+                $data[$key]['price'] = (int)$entity->getPrice();
+                $data[$key]['categoryHierarchy'] = $this->getCategoryHierarchies($category);
+                $data[$key]['tags'] = $tags;
+                $data[$key]['filters'] = $this->getProductFilter($entity);
+                $data[$key]['profit'] = null;
             }
+        }
+
+        else{
+            $data[0]['catalogId'] = $catalogId;
+            $data[0]['teamId'] = $teamId;
+            $data[0]['gtin'] = $entity->getId();
+            $data[0]['inventory'] = (int)$stock->getQty();
+            $data[0]['price'] = (int)$entity->getPrice();
+            $data[0]['tags'] = $tags;
+            $data[0]['filters'] = $this->getProductFilter($entity);
+            $data[0]['profit'] = null;
+        }
+
         return $data;
     }
+//    public function get
     /**
      * @param Mage_Catalog_Model_Category $category
      * @param array $array

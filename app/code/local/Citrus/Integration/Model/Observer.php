@@ -220,8 +220,10 @@ class Citrus_Integration_Model_Observer
     public function productDeleteEventAction($observer){
         /** @var Mage_Catalog_Model_Product $product */
         $product = $observer->getProduct();
-        $response = $this->getCitrusHelper()->getRequestModel()->deleteCatalogProductRequest($product->getEntityId());
-        $this->getCitrusHelper()->log('delete product-'.$product->getEntityId().':'. $response['message'] , __FILE__, __LINE__);
+        $response1 = $this->getCitrusHelper()->getRequestModel()->deleteCatalogProductRequest($product->getEntityId());
+        $response2 = $this->getCitrusHelper()->getRequestModel()->deleteProductRequest($product->getEntityId());
+        $this->getCitrusHelper()->log('delete catalog product-'.$product->getEntityId().':'. $response1['message'] , __FILE__, __LINE__);
+        $this->getCitrusHelper()->log('delete product-'.$product->getEntityId().':'. $response2['message'] , __FILE__, __LINE__);
     }
     public function pushProductToQueue($observer){
         /** @var Mage_Catalog_Model_Product $product */
@@ -239,7 +241,7 @@ class Citrus_Integration_Model_Observer
             else{
                 $helper = $this->getCitrusHelper();
                 $body = $helper->getCatalogProductData($product);
-                $response = $this->getCitrusHelper()->getRequestModel()->pushCatalogProductsRequest([$body]);
+                $response = $this->getCitrusHelper()->getRequestModel()->pushCatalogProductsRequest($body);
                 $this->getCitrusHelper()->log('push catalog product-'.$product->getEntityId().':'.$response['message'], __FILE__, __LINE__);
                 $this->pushCatalogProductAfter($product);
             }

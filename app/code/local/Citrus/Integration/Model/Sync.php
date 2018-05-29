@@ -65,7 +65,7 @@ class Citrus_Integration_Model_Sync
             foreach ($catalog_product as $productId){
                 /** @var Mage_Catalog_Model_Product $product */
                 $product = $productModel->load($productId);
-                $bodyCatalogProducts[] = $this->getHelper()->getCatalogProductData($product);
+                $bodyCatalogProducts = array_merge($bodyCatalogProducts, $this->getHelper()->getCatalogProductData($product));
                 $bodyProducts[] = $this->getHelper()->getProductData($product);
             }
             $responseCatalogProduct = $this->getHelper()->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProducts);

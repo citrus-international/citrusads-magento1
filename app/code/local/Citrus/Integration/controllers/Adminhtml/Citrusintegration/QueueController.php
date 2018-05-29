@@ -189,7 +189,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         $sales_order[] = $requestData->getEntityId();
                     elseif($type == 'customer/customer')
                         $customer_customer[] = $requestData->getEntityId();
-                    $queueModel->delete();
+//                    $queueModel->delete();
                 }
                 $syncItems->addData(['catalog_product' => $catalog_product]);
                 $syncItems->addData(['sales_order' => $sales_order]);
@@ -219,15 +219,26 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             foreach ($catalog_product as $productId){
                 /** @var Mage_Catalog_Model_Product $product */
                 $product = $productModel->load($productId);
-                $bodyCatalogProducts[] = $this->getHelper()->getCatalogProductData($product);
+                $bodyCatalogProducts = array_merge($bodyCatalogProducts, $this->getHelper()->getCatalogProductData($product));
                 $bodyProducts[] = $this->getHelper()->getProductData($product);
             }
-            $responseCatalogProduct = $this->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProducts);
-            $this->getHelper()->log('sync catalog product: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
-            $this->getHelper()->log('sync catalog product body: '.json_encode($bodyCatalogProducts), __FILE__, __LINE__);
-            $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProducts);
-            $this->getHelper()->log('sync product: '.$responseProduct['message'], __FILE__, __LINE__);
-            $this->getHelper()->log('sync product body: '.json_encode($bodyProducts), __FILE__, __LINE__);
+            $page = (int)(count($bodyCatalogProducts)/100);
+            for ($i = 0;$i <= $page; $i++){
+                $bodyCatalogProductsPage = array_slice($bodyCatalogProducts, $i*100, 29);
+                $bodyProductsPage = array_slice($bodyProducts, $i*100, 100);
+                $responseCatalogProduct = $this->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProductsPage);
+                $this->getHelper()->log('sync catalog product: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
+                $this->getHelper()->log('sync catalog product body: '.json_encode($bodyCatalogProductsPage), __FILE__, __LINE__);
+                $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProductsPage);
+                $this->getHelper()->log('sync product: '.$responseProduct['message'], __FILE__, __LINE__);
+                $this->getHelper()->log('sync product body: '.json_encode($bodyProductsPage), __FILE__, __LINE__);
+            }
+//            $responseCatalogProduct = $this->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProducts);
+//            $this->getHelper()->log('sync catalog product: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
+//            $this->getHelper()->log('sync catalog product body: '.json_encode($bodyCatalogProducts), __FILE__, __LINE__);
+//            $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProducts);
+//            $this->getHelper()->log('sync product: '.$responseProduct['message'], __FILE__, __LINE__);
+//            $this->getHelper()->log('sync product body: '.json_encode($bodyProducts), __FILE__, __LINE__);
         }
         if($sales_order){
             $body = [];
@@ -299,7 +310,6 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         $data['inventory'] = (int)$collection->getQty();
                         $data['price'] = (int)$collection->getPrice();
                         $data['tags'] = $tags;
-//                        $categoryIds = $collection->getCategoryIds();
                         $categoryIds = $collection->getResource()->getCategoryIds($collection);
                         $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
                         if (is_array($categoryIds))
@@ -315,9 +325,6 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             }
         }
     }
-//    public function pushCatalogProductAfter($body){
-//
-//    }
     public function massDeleteAction() {
         $requestIds = $this->getRequest()->getParam('id');
         if(!is_array($requestIds)) {
