@@ -131,7 +131,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             $catalogId = $this->getCitrusHelper()->getCitrusCatalogId();
         }
         $teamId = $this->getCitrusHelper()->getTeamId();
-        $handle = 'products/gtin'.$gtin.'?teamId='.$teamId;
+        $handle = 'products/'.$gtin.'?teamId='.$teamId;
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
         return self::requestDeleteApi($handle,$headers);
     }

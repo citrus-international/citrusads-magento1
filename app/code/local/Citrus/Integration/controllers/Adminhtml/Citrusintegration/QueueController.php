@@ -189,7 +189,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         $sales_order[] = $requestData->getEntityId();
                     elseif($type == 'customer/customer')
                         $customer_customer[] = $requestData->getEntityId();
-//                    $queueModel->delete();
+                    $queueModel->delete();
                 }
                 $syncItems->addData(['catalog_product' => $catalog_product]);
                 $syncItems->addData(['sales_order' => $sales_order]);
@@ -219,26 +219,30 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             foreach ($catalog_product as $productId){
                 /** @var Mage_Catalog_Model_Product $product */
                 $product = $productModel->load($productId);
-                $bodyCatalogProducts = array_merge($bodyCatalogProducts, $this->getHelper()->getCatalogProductData($product));
+                $catalogProductData = $this->getHelper()->getCatalogProductData($product);
+                foreach ($catalogProductData as $key => $oneData){
+                    $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = [], [$oneData]);
+                }
                 $bodyProducts[] = $this->getHelper()->getProductData($product);
+
             }
-            $page = (int)(count($bodyCatalogProducts)/100);
-            for ($i = 0;$i <= $page; $i++){
-                $bodyCatalogProductsPage = array_slice($bodyCatalogProducts, $i*100, 29);
+
+            foreach ($bodyCatalogProducts as $bodyCatalogProduct){
+                $pageCatalogProduct = (int)(count($bodyCatalogProduct)/100);
+                for ($i = 0;$i <= $pageCatalogProduct; $i++){
+                    $bodyCatalogProductsPage = array_slice($bodyCatalogProduct, $i*100, 100);
+                    $responseCatalogProduct = $this->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProductsPage);
+                    $this->getHelper()->log('sync catalog product: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
+                    $this->getHelper()->log('sync catalog product body: '.json_encode($bodyCatalogProductsPage), __FILE__, __LINE__);
+                }
+            }
+            $pageProduct = (int)(count($bodyProducts)/100);
+            for ($i = 0;$i <= $pageProduct; $i++){
                 $bodyProductsPage = array_slice($bodyProducts, $i*100, 100);
-                $responseCatalogProduct = $this->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProductsPage);
-                $this->getHelper()->log('sync catalog product: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
-                $this->getHelper()->log('sync catalog product body: '.json_encode($bodyCatalogProductsPage), __FILE__, __LINE__);
                 $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProductsPage);
                 $this->getHelper()->log('sync product: '.$responseProduct['message'], __FILE__, __LINE__);
                 $this->getHelper()->log('sync product body: '.json_encode($bodyProductsPage), __FILE__, __LINE__);
             }
-//            $responseCatalogProduct = $this->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProducts);
-//            $this->getHelper()->log('sync catalog product: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
-//            $this->getHelper()->log('sync catalog product body: '.json_encode($bodyCatalogProducts), __FILE__, __LINE__);
-//            $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProducts);
-//            $this->getHelper()->log('sync product: '.$responseProduct['message'], __FILE__, __LINE__);
-//            $this->getHelper()->log('sync product body: '.json_encode($bodyProducts), __FILE__, __LINE__);
         }
         if($sales_order){
             $body = [];
@@ -320,6 +324,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         $body[] = $data;
                     }
                     $response = $this->getRequestModel()->pushCatalogProductsRequest([$body]);
+                    $this->getHelper()->log('sync catalog product 1: '.$response['message'], __FILE__, __LINE__);
                     $this->handleResponse($response);
                 }
             }

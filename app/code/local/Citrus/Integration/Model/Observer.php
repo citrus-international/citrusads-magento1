@@ -241,8 +241,10 @@ class Citrus_Integration_Model_Observer
             else{
                 $helper = $this->getCitrusHelper();
                 $body = $helper->getCatalogProductData($product);
-                $response = $this->getCitrusHelper()->getRequestModel()->pushCatalogProductsRequest($body);
-                $this->getCitrusHelper()->log('push catalog product-'.$product->getEntityId().':'.$response['message'], __FILE__, __LINE__);
+                foreach ($body as $data){
+                    $response = $this->getCitrusHelper()->getRequestModel()->pushCatalogProductsRequest([$data]);
+                    $this->getCitrusHelper()->log('push catalog product-'.$product->getEntityId().':'.$response['message'], __FILE__, __LINE__);
+                }
                 $this->pushCatalogProductAfter($product);
             }
         }
@@ -286,6 +288,7 @@ class Citrus_Integration_Model_Observer
             $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Customer::ENTITY, $customer->getId());
         }
     }
+
 
     public function customerDeleteEventAction($observer){
         /** @var Mage_Catalog_Model_Product $customer */

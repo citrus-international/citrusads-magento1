@@ -462,7 +462,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $tags = $this->getProductTags($entity->getId());
         $categoryIds = $entity->getResource()->getCategoryIds($entity);
         $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
-        if (is_array($categoryIds)){
+        if (is_array($categoryIds) && $categoryIds){
             foreach ($categoryIds as $key => $categoryId) {
                 /** @var Mage_Catalog_Model_Category $category */
                 $category = $catModel->load($categoryId);
@@ -525,7 +525,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         foreach ($cats as $cat){
             $result = array_merge(isset($result) ? $result : [],$cat);
         }
-        return array_unique(array_merge($websites,isset($result) ? $result : []));
+        return array_values(array_unique(array_merge($websites,isset($result) ? $result : [])));
     }
     public function getProductTags($id){
         $results = [];
