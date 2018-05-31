@@ -27,21 +27,29 @@ To install the extension on your magento:
 Setup the Citrus Plugin
 -----
 
+#### General settings
+After the installation, go to `Magento admin panel -> System -> Configuration`, and click on `CITRUS INTEGRATION -> General Setting`.
 
-After the installation, Go to the magento admin panel
+Enable the plugin in Magento admin panel, input your `Team Id` and `Api Key` from Citrus and also select the `host` correctly.
 
-Go to `System -> Configuration`, and click on `CITRUS INTEGRATION -> General Setting` on the left sidebar
-
-To find out your `Team Id` and `Api Key`, please login Citrus client and go into the `Integration Settings` from the drop down list at the right top corner
-
-Enable the plugin in Magento admin panel, input your `Team Id` and `Api Key` from Citrus and also select the `host` correctly
+NB: To find out your `Team Id` and `Api Key`, please login Citrus client and go into the `Integration Settings` from the drop down list at the top right corner.
 
 Click `Save Config`
 
 Then you should be able to sync products, customers, orders and enable ads and banners and add widgets etc.
 
+#### Synchronization settings
+Go to `Magento admin panel -> System -> Configuration`, and click on `CITRUS INTEGRATION -> Synchronization Option` on the left sidebar.
 
-Go to `System -> Configuration -> CITRUS INTEGRATION -> Synchronization Option` on the left sidebar
+`Ads`(display ads) and `Banners` can be switched ON/OFF separately. 
+
+Enable synchronization for both `Customer/Orders` and `Products` and set sync modes as `Real-time`. 
+
+Click `Save Config`.
+
+Click buttons `Add all customers to queue`, `Add all orders to queue` and `Add all products to queue`.
+
+Now that we have all the customers/orders/products staged in the queue, go to `Magento admin panel -> Citrus -> Queue List`, select the items to submit, select `sync` and click `Submit` so that they are actully synced to Citrus.
 
 
 Troubleshooting
