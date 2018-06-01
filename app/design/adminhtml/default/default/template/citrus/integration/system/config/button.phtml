@@ -120,8 +120,13 @@
             url: '<?php /* @escapeNotVerified */ echo $this->escapeUrl($this->getButtonUrl()) ?>',
             data: [],
             showLoader: true,
+            beforeSend: function(){
+                console.log('hiii');
+                jQuery('#loading-mask').show()
+            },
             success: function (response) {
                 console.log(response);
+                jQuery('#loading-mask').hide();
                 var data = JSON.parse(response);
                 console.log(data.message);
                 showModal(
@@ -131,6 +136,7 @@
             },
             error: function (response) {
                 console.log(response);
+                jQuery('#loading-mask').hide();
                 showModal(
                     'Something went wrong with Ajax request, please refresh your browser',
                     '<?php /* @escapeNotVerified */ echo $this->escapeHtml($this->getLabel()) ?>'

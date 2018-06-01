@@ -381,7 +381,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      * @return array
      */
     public function getOrderItemData($item){
-        $data['gtin'] = $item->getProductId();
+        $data['gtin'] = $item->getSku();
         $data['quantity'] = (int)$item->getQtyOrdered();
         $data['regularUnitPrice'] = (int)$item->getBasePrice();
         $data['totalOrderItemPriceAfterDiscounts'] = (float)$item->getRowTotal();
@@ -435,7 +435,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      * @return mixed
      */
     public function getProductData($entity){
-        $data['gtin'] = $entity->getId();
+        $data['gtin'] = $entity->getSku();
         $data['name'] = $entity->getName();
         if ($entity->getImage() != 'no_selection')
             $data['images'] = [Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage())];
@@ -468,7 +468,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                 $category = $catModel->load($categoryId);
                 $data[$key]['catalogId'] = $catalogId;
                 $data[$key]['teamId'] = $teamId;
-                $data[$key]['gtin'] = $entity->getId();
+                $data[$key]['gtin'] = $entity->getSku();
                 $data[$key]['inventory'] = (int)$stock->getQty();
                 $data[$key]['price'] = (int)$entity->getPrice();
                 $data[$key]['categoryHierarchy'] = $this->getCategoryHierarchies($category);
@@ -481,7 +481,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         else{
             $data[0]['catalogId'] = $catalogId;
             $data[0]['teamId'] = $teamId;
-            $data[0]['gtin'] = $entity->getId();
+            $data[0]['gtin'] = $entity->getSku();
             $data[0]['inventory'] = (int)$stock->getQty();
             $data[0]['price'] = (int)$entity->getPrice();
             $data[0]['tags'] = $tags;

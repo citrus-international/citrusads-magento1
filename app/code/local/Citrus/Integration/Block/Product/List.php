@@ -20,12 +20,17 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
         $adProductIds = [];
         foreach ($responses as $response){
             $adModel = Mage::getModel(Citrus_Integration_Model_Ad::class)->load($response);
-            $id = $adModel->getGtin();
-            $product = Mage::getModel(Mage_Catalog_Model_Product::class)->load($id);
-            $citrus_ad_id = $adModel->getCitrusId();
-            $collections->removeItemByKey($id);
-            $collections->addItem($product);
-            $adProductIds[$citrus_ad_id] = $id;
+            $sku = $adModel->getGtin();
+            /** @var Mage_Catalog_Model_Product $productModel */
+            $productModel = Mage::getModel(Mage_Catalog_Model_Product::class);
+            $id = $productModel->getIdBySku($sku);
+            if($id) {
+                $product = $productModel->load($id);
+                $citrus_ad_id = $adModel->getCitrusId();
+                $collections->removeItemByKey($id);
+                $collections->addItem($product);
+                $adProductIds[$citrus_ad_id] = $id;
+            }
         }
         return $adProductIds;
     }
