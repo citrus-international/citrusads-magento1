@@ -56,6 +56,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             if ($enable) {
                 /** @var Mage_Catalog_Model_Product $productModel */
                 $productModel = $this->getProductModel();
+                /** @var Mage_Catalog_Model_Resource_Product_Collection $allCollections */
                 $allCollections = $productModel->getCollection()
                     ->addAttributeToSelect('*')
                     ->addAttributeToFilter('type_id', ['in' => ['simple', 'virtual']])
@@ -67,15 +68,10 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         'product_id=entity_id',
                         '{{table}}.stock_id=1',
                         'left'
-                    )
-                    ->setPageSize(100);
-                $numberOfPages = $allCollections->getLastPageNumber();
-                for ($i = 1; $i <= $numberOfPages; $i++) {
-                    $collections = $allCollections->setCurPage($i);
-                    foreach ($collections as $collection) {
+                    );
+                    foreach ($allCollections as $collection) {
                         $this->pushItemToQueue($collection);
                     }
-                }
                 $message = Mage::helper('adminhtml')->__('All Products have been added to queue, click here to go to check out sync queue');
             }
             else {
@@ -98,19 +94,14 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                 $orderModel = $this->getOrderModel();
                 if($status != ''){
                     $allCollections = $orderModel->getCollection()
-                        ->addAttributeToFilter('status', array('eq' => $status))
-                        ->setPageSize(100);
+                        ->addAttributeToFilter('status', array('eq' => $status));
                 }
                 else {
-                    $allCollections = $orderModel->getCollection()
-                        ->setPageSize(100);
+                    $allCollections = $orderModel->getCollection();
                 }
-                $numberOfPages = $allCollections->getLastPageNumber();
-                for ($i = 1; $i <= $numberOfPages; $i++) {
-                    $collections = $allCollections->setCurPage($i);
-                    foreach ($collections as $collection) {
-                        $this->pushItemToQueue($collection);
-                    }
+
+                foreach ($allCollections as $collection) {
+                    $this->pushItemToQueue($collection);
                 }
                 $message = Mage::helper('adminhtml')->__('All Orders have been added to queue, click here to go to check out sync queue');
             }
@@ -132,14 +123,10 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                 /** @var Mage_Catalog_Model_Product $productModel */
                 $customerModel = $this->getCustomerModel();
                 $allCollections = $customerModel->getCollection()
-                    ->addAttributeToSelect('*')
-                    ->setPageSize(100);
-                $numberOfPages = $allCollections->getLastPageNumber();
-                for ($i = 1; $i <= $numberOfPages; $i++) {
-                    $collections = $allCollections->setCurPage($i);
-                    foreach ($collections as $collection) {
-                        $this->pushItemToQueue($collection);
-                    }
+                    ->addAttributeToSelect('*');
+
+                foreach ($allCollections as $collection) {
+                    $this->pushItemToQueue($collection);
                 }
                 $message = Mage::helper('adminhtml')->__('All Customers have been added to queue, click here to go to check out sync queue');
             }
