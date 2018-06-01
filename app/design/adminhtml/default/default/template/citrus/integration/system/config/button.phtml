@@ -1,7 +1,5 @@
 <?php
 /** @var $this Citrus_Integration_Block_Adminhtml_System_Config_Form_Button */
-//$x = $this->escapeUrl($this->getButtonUrl());
-//$y =1;
 ?>
 <div class="actions button-container">
     <button class="button action-configure"
@@ -14,100 +12,22 @@
             echo $this->escapeHtml($this->getLabel()) ?></span>
     </button>
 </div>
-<div id="myModal" class="modal-popup" style="display: none">
-    <div class="modal-inner-wrap">
-        <header class="modal-header">
-            <h1 class="modal-title" id="modal-title" data-role="title"></h1>
-            <button class="action-close" id="closeBtn" type="button">
-                <span class="close">&times;</span>
-            </button>
-        </header>
-        <div class="modal-content" id="modal-content">
+
+<div id="message-popup-window-mask" style="display:none;"></div>
+<div id="message-popup-window" class="message-popup">
+    <div class="message-popup-head">
+        <a href="#" onclick="closeMessagePopup(); return false;" title="Close"><span>close</span></a>
+        <h2><?php echo $this->getLabel(); ?></h2>
+    </div>
+    <div class="message-popup-content">
+        <div class="message">
+            <span class="message-icon message-notice" style="background-image:url(http://widgets.magentocommerce.com/1.9.3.8/SEVERITY_NOTICE.gif);"></span>
+            <p class="message-text"></p>
         </div>
-        <footer class="modal-footer">
-            <button class="action-primary action-accept" type="button" data-role="action" id="acceptBtn"><span>OK</span>
-            </button>
-        </footer>
+        <p><a href="#" onclick="this.target='_blank';">OK</a></p>
     </div>
 </div>
-<style>
-    .modal-popup {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 999; /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgb(0, 0, 0); /* Fallback color */
-        background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-    }
 
-    .modal-inner-wrap {
-        margin: 5rem auto;
-        max-width: 900px;
-        width: 75%;
-        background-color: #fff;
-        box-shadow: 0 0 12px 2px rgba(0, 0, 0, 0.35);
-        display: -webkit-flex;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-flex-direction: column;
-        -ms-flex-direction: column;
-        flex-direction: column;
-        box-sizing: border-box;
-        height: auto;
-        left: 0;
-        position: absolute;
-        right: 0;
-        transition-duration: .2s;
-        -webkit-transition-property: -webkit-transform, visibility;
-        transition-property: transform, visibility;
-        transition-timing-function: ease;
-    }
-
-    .modal-popup .modal-header,
-    .modal-popup .modal-content,
-    .modal-popup .modal-footer {
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
-    .modal-popup .modal-header {
-        padding-bottom: 6px;
-        padding-top: 15px;
-    }
-
-    .modal-popup .modal-footer {
-        padding-top: 13px;
-        padding-bottom: 15px;
-        margin-top: auto;
-        text-align: right;
-    }
-
-    .modal-popup .action-close {
-        position: absolute;
-        right: 0;
-        top: 0;
-        margin: 10px 15px;
-    }
-
-    /* The Close Button */
-    .close {
-        color: #aaaaaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-    .close:hover,
-    .close:focus {
-        color: #000;
-        text-decoration: none;
-        cursor: pointer;
-    }
-</style>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
 <script type="text/javascript">// src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js">
     // $j=$(".modal-popup");
@@ -121,7 +41,10 @@
             data: [],
             showLoader: true,
             beforeSend: function(){
-                console.log('hiii');
+                var height = $('html-body').getHeight();
+                $('message-popup-window-mask').setStyle({'height':height+'px'});
+                toggleSelectsUnderBlock($('message-popup-window-mask'), false);
+                Element.show('message-popup-window-mask');
                 jQuery('#loading-mask').show()
             },
             success: function (response) {
@@ -129,42 +52,44 @@
                 jQuery('#loading-mask').hide();
                 var data = JSON.parse(response);
                 console.log(data.message);
-                showModal(
-                    data.message,
-                    '<?php /* @escapeNotVerified */ echo $this->escapeHtml($this->getLabel()) ?>'
+                openMessagePopup(
+                    data.message
                 );
             },
             error: function (response) {
                 console.log(response);
                 jQuery('#loading-mask').hide();
-                showModal(
-                    'Something went wrong with Ajax request, please refresh your browser',
-                    '<?php /* @escapeNotVerified */ echo $this->escapeHtml($this->getLabel()) ?>'
+                openMessagePopup(
+                    'Something went wrong with Ajax request, please refresh your browser'
                 );
             }
         });
     };
 
-    function showModal(content, title) {
-        var modal = document.getElementById('myModal');
-        var modal_header = document.getElementById('modal-title');
-        var modal_content = document.getElementById('modal-content');
-        var close = document.getElementById("closeBtn");
-        var accept = document.getElementById("acceptBtn");
-        jQuery(modal_header).html(title);
-        jQuery(modal_content).html(content);
-        modal.style.display = "block";
-        close.onclick = function () {
-            modal.style.display = "none";
-        };
-        accept.onclick = function () {
-            modal.style.display = "none";
-        };
-        window.onclick = function (event) {
-            if (event.target === modal) {
-                modal.style.display = "none";
-            }
-        }
+    var messagePopupClosed = false;
+    function openMessagePopup(content) {
+        var height = $('html-body').getHeight();
+        $('message-popup-window-mask').setStyle({'height':height+'px'});
+        toggleSelectsUnderBlock($('message-popup-window-mask'), false);
+        Element.show('message-popup-window-mask');
+        jQuery(document.getElementsByClassName('message-text')).html(content);
+        $('message-popup-window').addClassName('show');
     }
+    function closeMessagePopup() {
+        toggleSelectsUnderBlock($('message-popup-window-mask'), true);
+        Element.hide('message-popup-window-mask');
+        $('message-popup-window').removeClassName('show');
+        messagePopupClosed = true;
+    }
+    // Event.observe(window, 'load', openMessagePopup);
+    Event.observe(window, 'keyup', function(evt) {
+        if(messagePopupClosed) return;
+        var code;
+        if (evt.keyCode) code = evt.keyCode;
+        else if (evt.which) code = evt.which;
+        if (code == Event.KEY_ESC) {
+            closeMessagePopup();
+        }
+    });
     //]]>
 </script>

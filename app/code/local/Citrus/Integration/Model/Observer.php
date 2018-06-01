@@ -21,8 +21,10 @@ class Citrus_Integration_Model_Observer
     }
 
     public function sendContextAfterCategory($observer){
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
         $bannerEnable = Mage::getStoreConfig('citrus_sync/citrus_banner/enable', Mage::app()->getStore());
         $adsEnable = Mage::getStoreConfig('citrus_sync/citrus_ads/enable', Mage::app()->getStore());
+        if(!$moduleEnable) $bannerEnable = $adsEnable = 0;
         if($bannerEnable || $adsEnable){
             /** @var Mage_Catalog_Model_Category $category */
             $category = $observer->getCategory();
@@ -56,6 +58,8 @@ class Citrus_Integration_Model_Observer
     public function sendContextAfterSearch($observer){
         $bannerEnable = Mage::getStoreConfig('citrus_sync/citrus_banner/enable', Mage::app()->getStore());
         $adsEnable = Mage::getStoreConfig('citrus_sync/citrus_ads/enable', Mage::app()->getStore());
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if(!$moduleEnable) $bannerEnable = $adsEnable = 0;
         if($bannerEnable || $adsEnable) {
             /** @var Mage_CatalogSearch_Model_Query $queryModel */
             $queryModel = $observer->getCatalogsearchQuery();
@@ -92,10 +96,14 @@ class Citrus_Integration_Model_Observer
         return $result;
     }
     public function addDiscountToProduct($observer){
-        /** @var Mage_Catalog_Model_Product $product */
-        $product = $observer->getProduct();
-        $this->applyDiscount($product);
-        return $this;
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if($moduleEnable){
+            /** @var Mage_Catalog_Model_Product $product */
+            $product = $observer->getProduct();
+            $this->applyDiscount($product);
+            return $this;
+        }
+        else return $this;
     }
     public function applyDiscount($product){
         $adModel = Mage::getModel('citrusintegration/ad');
@@ -108,7 +116,7 @@ class Citrus_Integration_Model_Observer
             ->addFieldToFilter('host',['eq' => $host])
             ->addFieldToFilter('expiry', ['gteq' => $now]);
         foreach ($adCollections as $adCollection){
-            if($adCollection['gtin'] == $product->getId()){
+            if($adCollection['gtin'] == $product->getSku()){
                 $discount = $discountModel->load($adCollection->getDiscountId());
                 if($product->getFinalPrice() <= $discount->getMinPrice()){
                     continue;
@@ -120,11 +128,15 @@ class Citrus_Integration_Model_Observer
         }
     }
     public function applyDiscountListProduct($observer){
-        $collections = $observer->getCollection();
-        foreach ($collections as $collection){
-            $this->applyDiscount($collection);
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if($moduleEnable) {
+            $collections = $observer->getCollection();
+            foreach ($collections as $collection) {
+                $this->applyDiscount($collection);
+            }
+            return $this;
         }
-        return $this;
+        else return $this;
     }
     public function handleGetResponse($response, $type = null, $param = null){
         $name = $this->getCitrusHelper()->getCitrusCatalogName();
@@ -180,10 +192,13 @@ class Citrus_Integration_Model_Observer
         }
     }
     public function pushCatalog($name , $id = null){
-        $requestModel = $this->getCitrusHelper()->getRequestModel();
-        $response = $requestModel->pushCatalogsRequest($name, $id);
-        $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Catalog::ENTITY, $name);
-        $this->getCitrusHelper()->log('push catalog : '.$response['message'] , __FILE__, __LINE__);
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if($moduleEnable) {
+            $requestModel = $this->getCitrusHelper()->getRequestModel();
+            $response = $requestModel->pushCatalogsRequest($name, $id);
+            $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Catalog::ENTITY, $name);
+            $this->getCitrusHelper()->log('push catalog : ' . $response['message'], __FILE__, __LINE__);
+        }
     }
     public function createCatalog($observer)
     {
@@ -197,59 +212,67 @@ class Citrus_Integration_Model_Observer
         }
     }
     public function createRootCategory($storeId, $name){
-        /** @var Mage_Catalog_Model_Category $category */
-        $category = Mage::getModel('catalog/category');
-        $category->setStoreId($storeId);
-        $category->setName($name);
-        $category->setIsActive(1);
-        $category->setDisplayMode(Mage_Catalog_Model_Category::DM_PRODUCT);
-        $parentId = Mage_Catalog_Model_Category::TREE_ROOT_ID;
-        $parentCategory = Mage::getModel('catalog/category')->load($parentId);
-        $category->setPath($parentCategory->getPath());
-        try{
-            $category->save();
-            $this->getCitrusHelper()->log('create root category'.$category->getEntityId().':' , __FILE__, __LINE__);
-        }catch (Exception $e){
-            $this->getCitrusHelper()->log('create root category'.$e->getMessage() , __FILE__, __LINE__);
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if($moduleEnable) {
+            /** @var Mage_Catalog_Model_Category $category */
+            $category = Mage::getModel('catalog/category');
+            $category->setStoreId($storeId);
+            $category->setName($name);
+            $category->setIsActive(1);
+            $category->setDisplayMode(Mage_Catalog_Model_Category::DM_PRODUCT);
+            $parentId = Mage_Catalog_Model_Category::TREE_ROOT_ID;
+            $parentCategory = Mage::getModel('catalog/category')->load($parentId);
+            $category->setPath($parentCategory->getPath());
+            try {
+                $category->save();
+                $this->getCitrusHelper()->log('create root category' . $category->getEntityId() . ':', __FILE__, __LINE__);
+            } catch (Exception $e) {
+                $this->getCitrusHelper()->log('create root category' . $e->getMessage(), __FILE__, __LINE__);
+            }
         }
     }
     //delete
     /**
      * @param $observer
      */
-    public function productDeleteEventAction($observer){
-        /** @var Mage_Catalog_Model_Product $product */
-        $product = $observer->getProduct();
-        $response1 = $this->getCitrusHelper()->getRequestModel()->deleteCatalogProductRequest($product->getEntityId());
-        $response2 = $this->getCitrusHelper()->getRequestModel()->deleteProductRequest($product->getEntityId());
-        $this->getCitrusHelper()->log('delete catalog product-'.$product->getEntityId().':'. $response1['message'] , __FILE__, __LINE__);
-        $this->getCitrusHelper()->log('delete product-'.$product->getEntityId().':'. $response2['message'] , __FILE__, __LINE__);
+    public function productDeleteEventAction($observer)
+    {
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if ($moduleEnable) {
+            /** @var Mage_Catalog_Model_Product $product */
+            $product = $observer->getProduct();
+            $response1 = $this->getCitrusHelper()->getRequestModel()->deleteCatalogProductRequest($product->getEntityId());
+            $response2 = $this->getCitrusHelper()->getRequestModel()->deleteProductRequest($product->getEntityId());
+            $this->getCitrusHelper()->log('delete catalog product-' . $product->getEntityId() . ':' . $response1['message'], __FILE__, __LINE__);
+            $this->getCitrusHelper()->log('delete product-' . $product->getEntityId() . ':' . $response2['message'], __FILE__, __LINE__);
+        }
     }
     public function pushProductToQueue($observer){
-        /** @var Mage_Catalog_Model_Product $product */
-        $product = $observer->getProduct();
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if($moduleEnable) {
+            /** @var Mage_Catalog_Model_Product $product */
+            $product = $observer->getProduct();
 
-        $enableProduct = $product->getStatus();
-        if($enableProduct == 1){
-            $realTime = $enable = Mage::getStoreConfig('citrus_sync/citrus_product/sync_mode', Mage::app()->getStore());
-            if($realTime){
-                if($product->hasDataChanges()){
-                    $this->pushItemToQueue($product,$product->getId());
-                    $this->getCitrusHelper()->log('push to queue product-'.$product->getEntityId().':', __FILE__, __LINE__);
+            $enableProduct = $product->getStatus();
+            if ($enableProduct == 1) {
+                $realTime = $enable = Mage::getStoreConfig('citrus_sync/citrus_product/sync_mode', Mage::app()->getStore());
+                if ($realTime) {
+                    if ($product->hasDataChanges()) {
+                        $this->pushItemToQueue($product, $product->getId());
+                        $this->getCitrusHelper()->log('push to queue product-' . $product->getEntityId() . ':', __FILE__, __LINE__);
+                    }
+                } else {
+                    $helper = $this->getCitrusHelper();
+                    $body = $helper->getCatalogProductData($product);
+                    foreach ($body as $data) {
+                        $response = $this->getCitrusHelper()->getRequestModel()->pushCatalogProductsRequest([$data]);
+                        $this->getCitrusHelper()->log('push catalog product-' . $product->getEntityId() . ':' . $response['message'], __FILE__, __LINE__);
+                    }
+                    $this->pushCatalogProductAfter($product);
                 }
+            } else {
+                $this->productDeleteEventAction($observer);
             }
-            else{
-                $helper = $this->getCitrusHelper();
-                $body = $helper->getCatalogProductData($product);
-                foreach ($body as $data){
-                    $response = $this->getCitrusHelper()->getRequestModel()->pushCatalogProductsRequest([$data]);
-                    $this->getCitrusHelper()->log('push catalog product-'.$product->getEntityId().':'.$response['message'], __FILE__, __LINE__);
-                }
-                $this->pushCatalogProductAfter($product);
-            }
-        }
-        else {
-            $this->productDeleteEventAction($observer);
         }
     }
     public function pushCatalogProductAfter($entity){
@@ -259,44 +282,51 @@ class Citrus_Integration_Model_Observer
         $this->getCitrusHelper()->log('push product-'.$entity->getEntityId().':'.$response['message'], __FILE__, __LINE__);
     }
     public function pushOrderToQueue($observer){
-        /** @var Mage_Sales_Model_Order $order */
-        $order = $observer->getOrder();
-        $customer = $order->getCustomer();
-        $realTimeOrder = $enable = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
-        if($realTimeOrder){
-            $this->pushItemToQueue($order, $order->getIncrementId());
-            if($order->getCustomerId())
-                $this->pushItemToQueue($customer, $customer->getId());
-        }
-        else{
-            $body = $this->getCitrusHelper()->getOrderData($order);
-            $response = $this->getCitrusHelper()->getRequestModel()->pushOrderRequest([$body]);
-            $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Order::ENTITY, $order->getIncrementId());
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if($moduleEnable) {
+            /** @var Mage_Sales_Model_Order $order */
+            $order = $observer->getOrder();
+            $customer = $order->getCustomer();
+            $realTimeOrder = $enable = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
+            if ($realTimeOrder) {
+                $this->pushItemToQueue($order, $order->getIncrementId());
+                if ($order->getCustomerId())
+                    $this->pushItemToQueue($customer, $customer->getId());
+            } else {
+                $body = $this->getCitrusHelper()->getOrderData($order);
+                $response = $this->getCitrusHelper()->getRequestModel()->pushOrderRequest([$body]);
+                $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Order::ENTITY, $order->getIncrementId());
+            }
         }
     }
     public function pushCustomerToQueue($observer){
-        /** @var Mage_Customer_Model_Customer $customer */
-        $customer = $observer->getCustomer();
-        $realTimeOrder = $enable = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
-        if($realTimeOrder){
-            $this->pushItemToQueue($customer, $customer->getId());
-        }
-        else{
-            $body = $this->getCitrusHelper()->getCustomerData($customer);
-            $response = $this->getCitrusHelper()->getRequestModel()->pushCustomerRequest([$body]);
-            $this->getCitrusHelper()->log('push customer-'.$customer->getEntityId().':'.$response['message'], __FILE__, __LINE__);
-            $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Customer::ENTITY, $customer->getId());
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if($moduleEnable) {
+            /** @var Mage_Customer_Model_Customer $customer */
+            $customer = $observer->getCustomer();
+            $realTimeOrder = $enable = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
+            if ($realTimeOrder) {
+                $this->pushItemToQueue($customer, $customer->getId());
+            } else {
+                $body = $this->getCitrusHelper()->getCustomerData($customer);
+                $response = $this->getCitrusHelper()->getRequestModel()->pushCustomerRequest([$body]);
+                $this->getCitrusHelper()->log('push customer-' . $customer->getEntityId() . ':' . $response['message'], __FILE__, __LINE__);
+                $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Customer::ENTITY, $customer->getId());
+            }
         }
     }
 
 
     public function customerDeleteEventAction($observer){
-        /** @var Mage_Catalog_Model_Product $customer */
-        $customer = $observer->getCustomer();
-        $citrus_id = $this->getCitrusHelper()->getCitrusIdById(Citrus_Integration_Model_Customer::ENTITY, $customer->getId());
-        if($citrus_id){
-            $response = $this->getCitrusHelper()->getRequestModel()->deleteCustomerRequest($citrus_id);
-            $this->getCitrusHelper()->log('delete customer-'.$customer->getEntityId().':'.$response['message'], __FILE__, __LINE__);
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if($moduleEnable) {
+            /** @var Mage_Catalog_Model_Product $customer */
+            $customer = $observer->getCustomer();
+            $citrus_id = $this->getCitrusHelper()->getCitrusIdById(Citrus_Integration_Model_Customer::ENTITY, $customer->getId());
+            if ($citrus_id) {
+                $response = $this->getCitrusHelper()->getRequestModel()->deleteCustomerRequest($citrus_id);
+                $this->getCitrusHelper()->log('delete customer-' . $customer->getEntityId() . ':' . $response['message'], __FILE__, __LINE__);
+            }
         }
     }
     /**
@@ -331,21 +361,24 @@ class Citrus_Integration_Model_Observer
     }
     /**  */
     public function cronQueue(){
-        $productCron = Mage::getStoreConfig('citrus_sync/citrus_product/sync_mode', Mage::app()->getStore());
-        $orderCron = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
-        Mage::log('cron log start', null, 'citrus.log', true);
-        if($productCron){
-            if ($time = $this->getConfigValue('citrus_product')) {
-                if ($this->calculateTime($time)) {
-                    $this->getCitrusHelper()->getSyncModel()->syncData('catalog/product');
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if($moduleEnable) {
+            $productCron = Mage::getStoreConfig('citrus_sync/citrus_product/sync_mode', Mage::app()->getStore());
+            $orderCron = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
+            Mage::log('cron log start', null, 'citrus.log', true);
+            if ($productCron) {
+                if ($time = $this->getConfigValue('citrus_product')) {
+                    if ($this->calculateTime($time)) {
+                        $this->getCitrusHelper()->getSyncModel()->syncData('catalog/product');
+                    }
                 }
             }
-        }
-        if($orderCron){
-            if ($time = $this->getConfigValue('citrus_sync/citrus_order/frequency')) {
-                if ($this->calculateTime($time)) {
-                    $this->getCitrusHelper()->getSyncModel()->syncData('customer/customer');
-                    $this->getCitrusHelper()->getSyncModel()->syncData('sales/order');
+            if ($orderCron) {
+                if ($time = $this->getConfigValue('citrus_sync/citrus_order/frequency')) {
+                    if ($this->calculateTime($time)) {
+                        $this->getCitrusHelper()->getSyncModel()->syncData('customer/customer');
+                        $this->getCitrusHelper()->getSyncModel()->syncData('sales/order');
+                    }
                 }
             }
         }

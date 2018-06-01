@@ -46,93 +46,104 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         return Mage::getModel('citrusintegration/queue');
     }
     public function productAction(){
-        $enable = Mage::getStoreConfig('citrus_sync/citrus_product/enable', Mage::app()->getStore());
-        $catalogId = $this->getHelper()->getCitrusCatalogId();
-        $teamId = $this->getHelper()->getTeamId();
-        if(!$catalogId || !$teamId){
-            $message = Mage::helper('adminhtml')->__('Please save your api key first!');
-        }
-        else {
-            if ($enable) {
-                /** @var Mage_Catalog_Model_Product $productModel */
-                $productModel = $this->getProductModel();
-                /** @var Mage_Catalog_Model_Resource_Product_Collection $allCollections */
-                $allCollections = $productModel->getCollection()
-                    ->addAttributeToSelect('*')
-                    ->addAttributeToFilter('type_id', ['in' => ['simple', 'virtual']])
-                    ->addAttributeToFilter('status', 1)
-                    ->joinField(
-                        'qty',
-                        'cataloginventory/stock_item',
-                        'qty',
-                        'product_id=entity_id',
-                        '{{table}}.stock_id=1',
-                        'left'
-                    );
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if($moduleEnable) {
+            $enable = Mage::getStoreConfig('citrus_sync/citrus_product/enable', Mage::app()->getStore());
+            $catalogId = $this->getHelper()->getCitrusCatalogId();
+            $teamId = $this->getHelper()->getTeamId();
+            if (!$catalogId || !$teamId) {
+                $message = Mage::helper('adminhtml')->__('Please save your api key first!');
+            } else {
+                if ($enable) {
+                    /** @var Mage_Catalog_Model_Product $productModel */
+                    $productModel = $this->getProductModel();
+                    /** @var Mage_Catalog_Model_Resource_Product_Collection $allCollections */
+                    $allCollections = $productModel->getCollection()
+                        ->addAttributeToSelect('*')
+                        ->addAttributeToFilter('type_id', ['in' => ['simple', 'virtual']])
+                        ->addAttributeToFilter('status', 1)
+                        ->joinField(
+                            'qty',
+                            'cataloginventory/stock_item',
+                            'qty',
+                            'product_id=entity_id',
+                            '{{table}}.stock_id=1',
+                            'left'
+                        );
                     foreach ($allCollections as $collection) {
                         $this->pushItemToQueue($collection);
                     }
-                $message = Mage::helper('adminhtml')->__('All Products have been added to queue, click here to go to check out sync queue');
+                    $message = Mage::helper('adminhtml')->__('All Products have been added to queue, click <a href="' . Mage::helper("adminhtml")->getUrl("adminhtml/citrusintegration_queue/index") . '">here</a> to go to check out sync queue');
+                } else {
+                    $message = Mage::helper('adminhtml')->__('Please enable sync product!');
+                }
             }
-            else {
-                $message = Mage::helper('adminhtml')->__('Please enable sync product!');
-            }
+        }
+        else{
+            $message = Mage::helper('adminhtml')->__('Please enable module!');
         }
         $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(['message'=>$message]));
     }
     public function orderAction(){
-        $enable = Mage::getStoreConfig('citrus_sync/citrus_order/enable', Mage::app()->getStore());
-        $status = Mage::getStoreConfig('citrus_sync/citrus_order/type_order', Mage::app()->getStore());
-        $catalogId = $this->getHelper()->getCitrusCatalogId();
-        $teamId = $this->getHelper()->getTeamId();
-        if(!$catalogId || !$teamId){
-            $message = Mage::helper('adminhtml')->__('Please save your api key first!');
-        }
-        else {
-            if ($enable) {
-                /** @var Mage_Catalog_Model_Product $productModel */
-                $orderModel = $this->getOrderModel();
-                if($status != ''){
-                    $allCollections = $orderModel->getCollection()
-                        ->addAttributeToFilter('status', array('eq' => $status));
-                }
-                else {
-                    $allCollections = $orderModel->getCollection();
-                }
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if($moduleEnable) {
+            $enable = Mage::getStoreConfig('citrus_sync/citrus_order/enable', Mage::app()->getStore());
+            $status = Mage::getStoreConfig('citrus_sync/citrus_order/type_order', Mage::app()->getStore());
+            $catalogId = $this->getHelper()->getCitrusCatalogId();
+            $teamId = $this->getHelper()->getTeamId();
+            if (!$catalogId || !$teamId) {
+                $message = Mage::helper('adminhtml')->__('Please save your api key first!');
+            } else {
+                if ($enable) {
+                    /** @var Mage_Catalog_Model_Product $productModel */
+                    $orderModel = $this->getOrderModel();
+                    if ($status != '') {
+                        $allCollections = $orderModel->getCollection()
+                            ->addAttributeToFilter('status', array('eq' => $status));
+                    } else {
+                        $allCollections = $orderModel->getCollection();
+                    }
 
-                foreach ($allCollections as $collection) {
-                    $this->pushItemToQueue($collection);
+                    foreach ($allCollections as $collection) {
+                        $this->pushItemToQueue($collection);
+                    }
+                    $message = Mage::helper('adminhtml')->__('All Orders have been added to queue, click <a href="' . Mage::helper("adminhtml")->getUrl("adminhtml/citrusintegration_queue/index") . '">here</a> to go to check out sync queue');
+                } else {
+                    $message = Mage::helper('adminhtml')->__('Please enable sync order!');
                 }
-                $message = Mage::helper('adminhtml')->__('All Orders have been added to queue, click here to go to check out sync queue');
             }
-            else {
-                $message = Mage::helper('adminhtml')->__('Please enable sync order!');
-            }
+        }
+        else{
+            $message = Mage::helper('adminhtml')->__('Please enable module!');
         }
         $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(['message'=>$message]));
     }
     public function customerAction(){
-        $enable = Mage::getStoreConfig('citrus_sync/citrus_order/enable', Mage::app()->getStore());
-        $catalogId = $this->getHelper()->getCitrusCatalogId();
-        $teamId = $this->getHelper()->getTeamId();
-        if(!$catalogId || !$teamId){
-            $message = Mage::helper('adminhtml')->__('Please save your api key first!');
-        }
-        else {
-            if ($enable) {
-                /** @var Mage_Catalog_Model_Product $productModel */
-                $customerModel = $this->getCustomerModel();
-                $allCollections = $customerModel->getCollection()
-                    ->addAttributeToSelect('*');
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if($moduleEnable) {
+            $enable = Mage::getStoreConfig('citrus_sync/citrus_order/enable', Mage::app()->getStore());
+            $catalogId = $this->getHelper()->getCitrusCatalogId();
+            $teamId = $this->getHelper()->getTeamId();
+            if (!$catalogId || !$teamId) {
+                $message = Mage::helper('adminhtml')->__('Please save your api key first!');
+            } else {
+                if ($enable) {
+                    /** @var Mage_Catalog_Model_Product $productModel */
+                    $customerModel = $this->getCustomerModel();
+                    $allCollections = $customerModel->getCollection()
+                        ->addAttributeToSelect('*');
 
-                foreach ($allCollections as $collection) {
-                    $this->pushItemToQueue($collection);
+                    foreach ($allCollections as $collection) {
+                        $this->pushItemToQueue($collection);
+                    }
+                    $message = Mage::helper('adminhtml')->__('All Customers have been added to queue, click <a href="' . Mage::helper("adminhtml")->getUrl("adminhtml/citrusintegration_queue/index") . '">here</a> to go to check out sync queue');
+                } else {
+                    $message = Mage::helper('adminhtml')->__('Please enable sync customer!');
                 }
-                $message = Mage::helper('adminhtml')->__('All Customers have been added to queue, click here to go to check out sync queue');
             }
-            else {
-                $message = Mage::helper('adminhtml')->__('Please enable sync customer!');
-            }
+        }
+        else{
+            $message = Mage::helper('adminhtml')->__('Please enable module!');
         }
         $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(['message'=>$message]));
     }
@@ -157,39 +168,45 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     }
     public function massSyncAction()
     {
-        $requestIds = $this->getRequest()->getParam('id');
-        if(!is_array($requestIds)) {
-            Mage::getSingleton('adminhtml/session')->addError(Mage::helper('adminhtml')->__('Please select request(s)'));
-        } else {
-            try {
-                $queueModel = Mage::getModel('citrusintegration/queue');
-                $syncItems = new Varien_Object;
-                $catalog_product=[];
-                $sales_order=[];
-                $customer_customer=[];
-                foreach ($requestIds as $key => $requestId) {
-                    $requestData = $queueModel->load($requestId);
-                    $type = $requestData->getType();
-                    if($type == 'catalog/product')
-                        $catalog_product[] = $requestData->getEntityId();
-                    elseif($type == 'sales/order')
-                        $sales_order[] = $requestData->getEntityId();
-                    elseif($type == 'customer/customer')
-                        $customer_customer[] = $requestData->getEntityId();
-                    $queueModel->delete();
+        $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        if($moduleEnable) {
+            $requestIds = $this->getRequest()->getParam('id');
+            if (!is_array($requestIds)) {
+                Mage::getSingleton('adminhtml/session')->addError(Mage::helper('adminhtml')->__('Please select request(s)'));
+            } else {
+                try {
+                    $queueModel = Mage::getModel('citrusintegration/queue');
+                    $syncItems = new Varien_Object;
+                    $catalog_product = [];
+                    $sales_order = [];
+                    $customer_customer = [];
+                    foreach ($requestIds as $key => $requestId) {
+                        $requestData = $queueModel->load($requestId);
+                        $type = $requestData->getType();
+                        if ($type == 'catalog/product')
+                            $catalog_product[] = $requestData->getEntityId();
+                        elseif ($type == 'sales/order')
+                            $sales_order[] = $requestData->getEntityId();
+                        elseif ($type == 'customer/customer')
+                            $customer_customer[] = $requestData->getEntityId();
+                        $queueModel->delete();
+                    }
+                    $syncItems->addData(['catalog_product' => $catalog_product]);
+                    $syncItems->addData(['sales_order' => $sales_order]);
+                    $syncItems->addData(['customer_customer' => $customer_customer]);
+                    $this->pushSyncItem($syncItems);
+                    Mage::getSingleton('adminhtml/session')->addSuccess(
+                        Mage::helper('adminhtml')->__(
+                            'Total of %d record(s) were successfully synced', count($requestIds)
+                        )
+                    );
+                } catch (Exception $e) {
+                    Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                 }
-                $syncItems->addData(['catalog_product' => $catalog_product]);
-                $syncItems->addData(['sales_order' => $sales_order]);
-                $syncItems->addData(['customer_customer' => $customer_customer]);
-                $this->pushSyncItem($syncItems);
-                Mage::getSingleton('adminhtml/session')->addSuccess(
-                    Mage::helper('adminhtml')->__(
-                        'Total of %d record(s) were successfully synced', count($requestIds)
-                    )
-                );
-            } catch (Exception $e) {
-                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
+        }
+        else{
+            Mage::getSingleton('adminhtml/session')->addError('Please enable module!');
         }
         $this->_redirect('*/*/');
     }
