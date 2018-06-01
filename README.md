@@ -103,8 +103,8 @@ If your plugins do override the same method of ours, you might need to use mergi
 inheritance. You need to make sure the logic and functionality from both plugins need to be implemented correctly and 
 this requires understanding of the code and programming skills.
 
-Furthermore, we implemented our click/impression functionalities in Javascript which depends on the data in list.phtml 
-so if you have modified this file, you probably need to merge our logic with yours in this file as well. 
+Furthermore, we implemented our click/impression functionalities in Javascript which depends on the data in `list.phtml` 
+so if your plugins have modified this file, you probably need to merge our logic with yours in this file as well. 
 Logs
 -----
 The requests log file is located at `/var/www/html/web/var/log/citrus.log`.
