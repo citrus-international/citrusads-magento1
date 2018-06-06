@@ -86,7 +86,11 @@ class Citrus_Integration_Model_Observer
                 $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
 
                 $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Category', $adsEnable, $bannerEnable);
-                Mage::register('categoryAdResponse', $return);
+                try {
+                    Mage::register('categoryAdResponse', $return);
+                }catch (Exception $exception){
+                    $this->getCitrusHelper()->log('categoryAdResponse: '. Mage::registry('categoryAdResponse'), __FILE__, __LINE__);
+                }
                 $this->getCitrusHelper()->log('ads request category context -'.$productFilters.' : '.json_encode($context), __FILE__, __LINE__);
                 $this->getCitrusHelper()->log('ads request category -'.$productFilters.' : '.$response['message'], __FILE__, __LINE__);
             }
