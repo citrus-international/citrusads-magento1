@@ -5,6 +5,7 @@ class Citrus_Integration_Helper_Product_View extends Mage_Catalog_Helper_Product
     // List of exceptions throwable during prepareAndRender() method
     public $ERR_NO_PRODUCT_LOADED = 1;
     public $ERR_BAD_CONTROLLER_INTERFACE = 2;
+
     /**
      * Prepares product view page - inits layout and all needed stuff
      *
@@ -59,7 +60,9 @@ class Citrus_Integration_Helper_Product_View extends Mage_Catalog_Helper_Product
             ->renderLayout();
         return $this;
     }
-    public function checkProduct($product_id){
+
+    public function checkProduct($product_id)
+    {
         $productModel = Mage::getModel(Mage_Catalog_Model_Product::class);
         /** @var Mage_Catalog_Model_Product $product */
         $product = $productModel->load($product_id);
@@ -78,8 +81,7 @@ class Citrus_Integration_Helper_Product_View extends Mage_Catalog_Helper_Product
             }
             Mage::register('redirect_op', $attribute_values);
             return $parentProduct->getId();
-        }
-        else{
+        } else {
             return $product_id;
         }
     }
