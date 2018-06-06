@@ -20,6 +20,42 @@ class Citrus_Integration_Model_Observer
         return Mage::helper('citrusintegration/data');
     }
 
+//    public function handleProductChild($observer){
+//        $controller_action = $observer->getControllerAction();
+//        $product_id = $controller_action->getRequest()->getParam('id');
+//        $categoryId = $controller_action->getRequest()->getParam('category');
+//        $productModel = Mage::getModel(Mage_Catalog_Model_Product::class);
+//        try {
+//            /** @var Mage_Catalog_Model_Product $product */
+//            $product = $productModel->load($product_id);
+//            /** @var Mage_Catalog_Model_Product_Type_Configurable $configurationModel */
+//            $configurationModel = Mage::getModel(Mage_Catalog_Model_Product_Type_Configurable::class);
+//            $parentIds = $configurationModel->getParentIdsByChild($product->getId());
+//
+//            if (!empty($parentIds)) {
+//                $parentProduct = Mage::getModel('catalog/product')->load($parentIds[0]);
+//                $attributes = $parentProduct->getTypeInstance()->getConfigurableAttributes($parentProduct);
+//                $attribute_values = [];
+//                foreach ($attributes->getItems() as $attribute) {
+//                    /** @var Mage_Catalog_Model_Product_Type_Configurable_Attribute $attribute_code */
+//                    $_attr = $attribute->getProductAttribute();
+//                    $attribute_code = (string)$_attr->getAttributeCode();
+//                    $attribute_values[$attribute_code] = $product->getData($attribute_code);
+//                }
+//
+////                Mage::register('redirect_op', $attribute_values);
+////                /** @var Mage_Adminhtml_Controller_Action $x */
+////                $requestPath = $parentProduct->getUrlModel()->_getRequestPath($parentProduct, $categoryId);
+//                $requestPath = $parentProduct->getUrlModel()->getUrl($parentProduct);
+//                $response = Mage::app()->getResponse();
+//                Mage::getSingleton('core/session')->setData('redirect_op', $attribute_values);
+//                return $response->setRedirect($requestPath, 301)->sendHeaders();
+//            }
+//        }catch (Exception $e){
+//            $this->getCitrusHelper()->log($e->getMessage(), __FILE__, __LINE__);
+//        }
+//
+//    }
     public function sendContextAfterCategory($observer){
         $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
         $bannerEnable = Mage::getStoreConfig('citrus_sync/citrus_banner/enable', Mage::app()->getStore());
@@ -48,8 +84,18 @@ class Citrus_Integration_Model_Observer
                 }
                 $context = $this->getCitrusHelper()->getContextData($context);
                 $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
+//
+                $response['message'] = json_decode($response['message'], true);
+                $response['message']['ads']['0']['gtin'] = 'msj007';
+                $response['message'] = json_encode($response['message']);
+//
                 $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Category', $adsEnable, $bannerEnable);
-                Mage::register('categoryAdResponse', $return);
+                try {
+                    Mage::register('categoryAdResponse', $return);
+                }catch (Exception $exception){
+
+                    $this->getCitrusHelper()->log('categoryAdResponse: '. Mage::registry('categoryAdResponse'), __FILE__, __LINE__);
+                }
                 $this->getCitrusHelper()->log('ads request category context -'.$productFilters.' : '.json_encode($context), __FILE__, __LINE__);
                 $this->getCitrusHelper()->log('ads request category -'.$productFilters.' : '.$response['message'], __FILE__, __LINE__);
             }

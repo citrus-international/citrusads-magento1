@@ -31,3 +31,13 @@ else $hostUrl = trim(Citrus_Integration_Model_Service_Authentication::CITRUS_STA
         })
     })
 </script>
+<?php
+$op_values = Mage::registry('redirect_op');//->getData('redirect_op');
+foreach ($op_values as $op_value):
+?>
+<script type="text/javascript">
+    jQuery('.product-options').ready(function () {
+        jQuery(".configurable-swatch-list li#option<?php echo $op_value ?> a span").trigger("click");
+    });
+</script>
+<?php endforeach; ?>

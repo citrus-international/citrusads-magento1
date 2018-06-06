@@ -145,6 +145,11 @@
             <citrusintegration>
                 <class>Citrus_Integration_Helper</class>
             </citrusintegration>
+            <catalog>
+                <rewrite>
+                    <product_view>Citrus_Integration_Helper_Product_View</product_view> <!--this tag <address> is the class after Helper folder -->
+                </rewrite>
+            </catalog>
         </helpers>
         <blocks>
             <citrusintegration>
