@@ -41,7 +41,7 @@
                     </citrusintegration>
                 </observers>
             </catalogsearch_query_load_after>
-            <catalog_category_load_after>
+            <catalog_controller_category_init_after>
                 <observers>
                     <citrusintegration>
                         <type>singleton</type>
@@ -49,7 +49,7 @@
                         <method>sendContextAfterCategory</method>
                     </citrusintegration>
                 </observers>
-            </catalog_category_load_after>
+            </catalog_controller_category_init_after>
         </events>
     </frontend>
     <!---->
