@@ -189,7 +189,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                             $sales_order[] = $requestData->getEntityId();
                         elseif ($type == 'customer/customer')
                             $customer_customer[] = $requestData->getEntityId();
-                        $queueModel->delete();
+//                        $queueModel->delete();
                     }
                     $syncItems->addData(['catalog_product' => $catalog_product]);
                     $syncItems->addData(['sales_order' => $sales_order]);
@@ -223,6 +223,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             foreach ($catalog_product as $productId){
                 /** @var Mage_Catalog_Model_Product $product */
                 $product = $productModel->load($productId);
+                $product->unsetData('website_ids');
                 $catalogProductData = $this->getHelper()->getCatalogProductData($product);
                 foreach ($catalogProductData as $key => $oneData){
                     $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = [], [$oneData]);
