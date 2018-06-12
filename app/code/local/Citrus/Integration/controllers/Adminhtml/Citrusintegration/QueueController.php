@@ -180,7 +180,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     $catalog_product = [];
                     $sales_order = [];
                     $customer_customer = [];
-                    foreach ($requestIds as $key => $requestId) {
+                    foreach (array_slice($requestIds, 0, 400) as $key => $requestId) {
                         $requestData = $queueModel->load($requestId);
                         $type = $requestData->getType();
                         if ($type == 'catalog/product')
@@ -195,11 +195,19 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     $syncItems->addData(['sales_order' => $sales_order]);
                     $syncItems->addData(['customer_customer' => $customer_customer]);
                     $this->pushSyncItem($syncItems);
-                    Mage::getSingleton('adminhtml/session')->addSuccess(
-                        Mage::helper('adminhtml')->__(
-                            'Total of %d record(s) were successfully synced', count($requestIds)
-                        )
-                    );
+                    if(count(array_slice($requestIds, 0, 400)) < count($requestIds)){
+                        Mage::getSingleton('adminhtml/session')->addSuccess(
+                            Mage::helper('adminhtml')->__(
+                                'The data is too large, please continue your steps. Total of %d record(s) were successfully synced', count(array_slice($requestIds, 0, 400))
+                            )
+                        );
+                    }
+                    else
+                        Mage::getSingleton('adminhtml/session')->addSuccess(
+                            Mage::helper('adminhtml')->__(
+                                'Total of %d record(s) were successfully synced', count($requestIds)
+                            )
+                        );
                 } catch (Exception $e) {
                     Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                 }
@@ -221,8 +229,9 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             /** @var Mage_Catalog_Model_Product $productModel */
             $productModel = Mage::getModel(Mage_Catalog_Model_Product::class);
             foreach ($catalog_product as $productId){
+
                 /** @var Mage_Catalog_Model_Product $product */
-                $product = $productModel->load($productId);
+                  $product = $productModel->load($productId);
                 $product->unsetData('website_ids');
                 $catalogProductData = $this->getHelper()->getCatalogProductData($product);
                 foreach ($catalogProductData as $key => $oneData){
@@ -278,6 +287,9 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         }
     }
 
+    public function catalogProductCallback($args){
+        $x = 1;
+    }
     public function pushProducts(){
 
         $enable = Mage::getStoreConfig('citrus_sync/citrus_group/push_current_product', Mage::app()->getStore());
