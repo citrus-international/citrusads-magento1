@@ -177,7 +177,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             }
             if(isset($status)&& $status != 200 ){
                 $result['success'] = false;
-                $result['message'] = $status.'-'.$data;
+                $result['message'] = $data;
             }
             else
                 $result['message'] = $data;

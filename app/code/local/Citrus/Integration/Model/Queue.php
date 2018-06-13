@@ -16,6 +16,9 @@ class Citrus_Integration_Model_Queue extends Mage_Core_Model_Abstract
     {
         return parent::_getResource();
     }
+    public function getCount(){
+        return $this->_getResource()->getCount();
+    }
 
     public function enqueue($entityId, $type){
         $data = [
