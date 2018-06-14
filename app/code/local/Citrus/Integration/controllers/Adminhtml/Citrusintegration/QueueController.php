@@ -291,18 +291,20 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             }
 
             foreach ($bodyCatalogProducts as $bodyCatalogProduct){
-                $pageCatalogProduct = (int)(count($bodyCatalogProduct)/100);
+                $pageCatalogProduct = count($bodyCatalogProduct)/100;
                 for ($i = 0;$i <= $pageCatalogProduct; $i++){
                     $bodyCatalogProductsPage = array_slice($bodyCatalogProduct, $i*100, 100);
-                    $responseCatalogProduct = $this->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProductsPage);//$bodyCatalogProductsPage
-                    $this->getHelper()->log('sync catalog product: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
-                    $this->getHelper()->log('sync catalog product body: '.json_encode($bodyCatalogProductsPage), __FILE__, __LINE__);
-                    if($responseCatalogProduct['success']){
-                        $productSuccess = true;
-                    }
-                    else{
-                        $productSuccess = false;
-                        $productMessage = $responseCatalogProduct['message'];
+                    if(!empty($bodyCatalogProductsPage)){
+                        $responseCatalogProduct = $this->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProductsPage);//$bodyCatalogProductsPage
+                        $this->getHelper()->log('sync catalog product: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
+                        $this->getHelper()->log('sync catalog product body: '.json_encode($bodyCatalogProductsPage), __FILE__, __LINE__);
+                        if($responseCatalogProduct['success']){
+                            $productSuccess = true;
+                        }
+                        else{
+                            $productSuccess = false;
+                            $productMessage = $responseCatalogProduct['message'];
+                        }
                     }
                 }
             }
@@ -328,15 +330,16 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             $orderPage = count($body)/100;
             for($i = 0; $i <= $orderPage; $i++){
                 $bodyOrdersPage = array_slice($body, $i*100, 100);
-                $response = $this->getRequestModel()->pushOrderRequest($bodyOrdersPage);
-                $this->getHelper()->handleResponse($response, 'order', $sales_order);
-                $this->getHelper()->log('sync sales order: '.$response['message'], __FILE__, __LINE__);
-                if($response['success']){
-                    $orderSuccess = true;
-                }
-                else{
-                    $orderSuccess = false;
-                    $orderMessage = $response['message'];
+                if(!empty($bodyOrdersPage)) {
+                    $response = $this->getRequestModel()->pushOrderRequest($bodyOrdersPage);
+                    $this->getHelper()->handleResponse($response, 'order', $sales_order);
+                    $this->getHelper()->log('sync sales order: ' . $response['message'], __FILE__, __LINE__);
+                    if ($response['success']) {
+                        $orderSuccess = true;
+                    } else {
+                        $orderSuccess = false;
+                        $orderMessage = $response['message'];
+                    }
                 }
             }
         }
@@ -353,15 +356,16 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             $customerPage = count($body)/100;
             for($i = 0; $i <= $customerPage; $i++){
                 $bodyCustomersPage = array_slice($body, $i*100, 100);
-                $response = $this->getRequestModel()->pushCustomerRequest($bodyCustomersPage);
-                $this->getHelper()->handleResponse($response, 'customer', $customer_customer);
-                $this->getHelper()->log('sync sales order: '.$response['message'], __FILE__, __LINE__);
-                if($response['success']){
-                    $customerSuccess = true;
-                }
-                else{
-                    $customerSuccess = false;
-                    $customerMessage = $response['message'];
+                if(!empty($bodyOrdersPage)) {
+                    $response = $this->getRequestModel()->pushCustomerRequest($bodyCustomersPage);
+                    $this->getHelper()->handleResponse($response, 'customer', $customer_customer);
+                    $this->getHelper()->log('sync sales order: ' . $response['message'], __FILE__, __LINE__);
+                    if ($response['success']) {
+                        $customerSuccess = true;
+                    } else {
+                        $customerSuccess = false;
+                        $customerMessage = $response['message'];
+                    }
                 }
             }
         }
