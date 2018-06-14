@@ -356,7 +356,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             $customerPage = count($body)/100;
             for($i = 0; $i <= $customerPage; $i++){
                 $bodyCustomersPage = array_slice($body, $i*100, 100);
-                if(!empty($bodyOrdersPage)) {
+                if(!empty($bodyCustomersPage)) {
                     $response = $this->getRequestModel()->pushCustomerRequest($bodyCustomersPage);
                     $this->getHelper()->handleResponse($response, 'customer', $customer_customer);
                     $this->getHelper()->log('sync sales order: ' . $response['message'], __FILE__, __LINE__);
