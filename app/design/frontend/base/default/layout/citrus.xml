@@ -16,20 +16,24 @@
     <catalog_category_default>
         <reference name="product_list">
             <action method="setTemplate"><template>citrus/catalog/product/list.phtml</template></action>
+            <action method="addCss"><stylesheet>citrus/css/citrus-badge.css</stylesheet></action>
         </reference>
     </catalog_category_default>
     <catalog_category_layered>
         <reference name="product_list">
             <action method="setTemplate"><template>citrus/catalog/product/list.phtml</template></action>
+            <action method="addCss"><stylesheet>citrus/css/citrus-badge.css</stylesheet></action>
         </reference>
     </catalog_category_layered>
     <catalogsearch_result_index translate="label">
         <reference name="search.result">
             <action method="setTemplate"><template>citrus/catalogsearch/result.phtml</template></action>
+            <action method="addCss"><stylesheet>citrus/css/citrus-badge.css</stylesheet></action>
         </reference>
         <!--<block type="catalogsearch/result" name="search.result" template="catalogsearch/result.phtml">-->
         <reference name="search_result_list">
             <action method="setTemplate"><template>citrus/catalog/product/list.phtml</template></action>
+            <action method="addCss"><stylesheet>citrus/css/citrus-badge.css</stylesheet></action>
         </reference>
     </catalogsearch_result_index>
 </layout>
