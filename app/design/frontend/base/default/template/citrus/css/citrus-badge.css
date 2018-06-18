@@ -1,0 +1,14 @@
+span.citrus-badge {
+  position: absolute;
+  background: #4BC910;
+  height: 2.rem;
+  top: 1rem;
+  right: 1.5rem;
+  width: 5.2rem;
+  text-align: center;
+  line-height: 2rem;
+  font-size: 1.6rem;
+  border-radius: 35%;
+  color: white;
+  border: 1px solid #667777;
+}
