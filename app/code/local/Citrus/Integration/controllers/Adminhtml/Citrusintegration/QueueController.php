@@ -218,19 +218,17 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         $queueModel = Mage::getModel('citrusintegration/queue');
         $session = Mage::getSingleton('adminhtml/session');
         $syncItems = new Varien_Object;
-        $catalog_product = [];
-        $sales_order = [];
-        $customer_customer = [];
-        foreach ($args as $key => $requestId) {
-            $requestData = $queueModel->load($requestId);
-            $type = $requestData->getType();
-            if ($type == 'catalog/product')
-                $catalog_product[] = $requestData->getEntityId();
-            elseif ($type == 'sales/order')
-                $sales_order[] = $requestData->getEntityId();
-            elseif ($type == 'customer/customer')
-                $customer_customer[] = $requestData->getEntityId();
-        }
+        $catalog_product = $queueModel->getCollection()->addFieldToSelect('entity_id')
+            ->addFieldToFilter('id', ['in' => $args])
+            ->addFieldToFilter('type', 'catalog/product');
+        $sales_order = $queueModel->getCollection()->addFieldToSelect('entity_id')
+            ->addFieldToFilter('id', ['in' => $args])
+            ->addFieldToFilter('type', 'sales/order');
+        $customer_customer = $queueModel->getCollection()->addFieldToSelect('entity_id')
+            ->addFieldToFilter('id', ['in' => $args])
+            ->addFieldToFilter('type', 'customer/customer');
+
+
         $syncItems->addData(['catalog_product' => $catalog_product]);
         $syncItems->addData(['sales_order' => $sales_order]);
         $syncItems->addData(['customer_customer' => $customer_customer]);
@@ -239,29 +237,21 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         $productMessage = $session->getData('productMessage');
         $return = $this->pushSyncItem($syncItems);
         if($return['success']){
-            foreach ($args as $requestId){
-                $queueModel->load($requestId);
-                $queueModel->delete();
-            }
+            $queueModel->makeDelete($args);
+
         }
         else{
-            foreach ($args as $requestId){
-                $requestData = $queueModel->load($requestId);
-                $type = $requestData->getType();
-                if ($type == 'catalog/product' && !$return['productMessage'])
-                    $queueModel->delete();
-                elseif ($type == 'sales/order' && !$return['orderMessage'])
-                    $queueModel->delete();
-                elseif ($type == 'customer/customer' && !$return['customerMessage'])
-                    $queueModel->delete();
-
-            }
+            if (!$return['productMessage'])
+                $queueModel->makeDelete($args,'catalog/product');
+            elseif (!$return['orderMessage'])
+                $queueModel->makeDelete($args,'sales/order');
+            elseif (!$return['customerMessage'])
+                $queueModel->makeDelete($args,'customer/customer');
         }
         $return['orderMessage'] = $orderMessage ? $orderMessage : $return['orderMessage'];
         $return['customerMessage'] = $customerMessage ? $customerMessage : $return['customerMessage'];
         $return['productMessage'] = $productMessage ? $productMessage : $return['productMessage'];
         $session->setData($return);
-        ///
     }
     protected function pushSyncItem($syncItems){
         $catalog_product = $syncItems->getCatalogProduct();
@@ -272,24 +262,26 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         $orderSuccess = true;
         $customerMessage = $productMessage = $orderMessage = 0;
         if($catalog_product){
-
             $bodyCatalogProducts = [];
             $bodyProducts = [];
             /** @var Mage_Catalog_Model_Product $productModel */
             $productModel = Mage::getModel(Mage_Catalog_Model_Product::class);
-            foreach ($catalog_product as $productId){
-
-                /** @var Mage_Catalog_Model_Product $product */
-                $product = $productModel->load($productId);
-                $product->unsetData('website_ids');
-                $catalogProductData = $this->getHelper()->getCatalogProductData($product);
-                foreach ($catalogProductData as $key => $oneData){
-                    $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = [], [$oneData]);
-                }
-                $bodyProducts[] = $this->getHelper()->getProductData($product);
-
+            $productIds = [];
+            foreach ($catalog_product as $productItem){
+                $productIds[] = $productItem->getEntityId();
             }
-
+            if($productIds){
+                $productCollection = $productModel->getCollection()->addAttributeToSelect('*')
+                    ->addAttributeToFilter('entity_id', ['in' => $productIds]);
+                foreach ($productCollection as $product){
+                    $catalogProductData = $this->getHelper()->getCatalogProductData($product);
+                    foreach ($catalogProductData as $key => $oneData){
+                        $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = [], [$oneData]);
+                    }
+                    $bodyProducts[] = $this->getHelper()->getProductData($product);
+                }
+                unset($productCollection);
+            }
             foreach ($bodyCatalogProducts as $bodyCatalogProduct){
                 $pageCatalogProduct = count($bodyCatalogProduct)/100;
                 for ($i = 0;$i <= $pageCatalogProduct; $i++){
@@ -323,18 +315,26 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             $body = [];
             /** @var Mage_Sales_Model_Order $orderModel */
             $orderModel = Mage::getModel(Mage_Sales_Model_Order::class);
-            foreach ($sales_order as $orderIncrementId){
-                /** @var Mage_Sales_Model_Order $order */
-                $order = $orderModel->loadByIncrementId($orderIncrementId);
-                $data = $this->getHelper()->getOrderData($order);
-                $body[] = $data;
+            $orderIncrementId = [];
+            foreach ($sales_order as $orderItem){
+                $orderIncrementId[] = $orderItem->getEntityId();
             }
+            if($orderIncrementId){
+                $orderCollection = $orderModel->getCollection()->addAttributeToSelect('*')
+                    ->addAttributeToFilter('increment_id', ['in' => $orderIncrementId]);
+                foreach ($orderCollection as $order){
+                    $data = $this->getHelper()->getOrderData($order);
+                    $body[] = $data;
+                }
+                unset($orderCollection);
+            }
+
             $orderPage = count($body)/100;
             for($i = 0; $i <= $orderPage; $i++){
                 $bodyOrdersPage = array_slice($body, $i*100, 100);
                 if(!empty($bodyOrdersPage)) {
                     $response = $this->getRequestModel()->pushOrderRequest($bodyOrdersPage);
-                    $this->getHelper()->handleResponse($response, 'order', $sales_order);
+                    $this->getHelper()->handleResponse($response, 'order', $orderIncrementId);
                     $this->getHelper()->log('sync sales order: ' . $response['message'], __FILE__, __LINE__);
                     if ($response['success']) {
                         $orderSuccess = true;
@@ -346,21 +346,27 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             }
         }
         if($customer_customer){
-
             $body = [];
             $customerModel = Mage::getModel(Mage_Customer_Model_Customer::class);
-            foreach ($customer_customer as $customerId){
-                /** @var Mage_Customer_Model_Customer $customer */
-                $customer = $customerModel->load($customerId);
-                $data = $this->getHelper()->getCustomerData($customer);
-                $body[] = $data;
+            $customerIds = [];
+            foreach ($customer_customer as $customerItem){
+                $customerIds[] = $customerItem->getEntityId();
+            }
+            if($customerIds){
+                $customerCollection = $customerModel->getCollection()->addAttributeToSelect('*')
+                    ->addAttributeToFilter('entity_id', ['in' => $customerIds]);
+                foreach ($customerCollection as $customer){
+                    $data = $this->getHelper()->getOrderData($customer);
+                    $body[] = $data;
+                }
+                unset($customerCollection);
             }
             $customerPage = count($body)/100;
             for($i = 0; $i <= $customerPage; $i++){
                 $bodyCustomersPage = array_slice($body, $i*100, 100);
                 if(!empty($bodyCustomersPage)) {
                     $response = $this->getRequestModel()->pushCustomerRequest($bodyCustomersPage);
-                    $this->getHelper()->handleResponse($response, 'customer', $customer_customer);
+                    $this->getHelper()->handleResponse($response, 'customer', $customerIds);
                     $this->getHelper()->log('sync sales order: ' . $response['message'], __FILE__, __LINE__);
                     if ($response['success']) {
                         $customerSuccess = true;

@@ -11,4 +11,12 @@ class Citrus_Integration_Model_Resource_Queue extends Mage_Core_Model_Resource_D
         $adapter = $this->_getReadAdapter();
         return $adapter->fetchOne('SELECT COUNT(*) FROM '.self::getMainTable());
     }
+    public function makeDelete($ids, $type = null)
+    {
+        $adapter = $this->_getReadAdapter();
+        if($type)
+            $adapter->delete(self::getMainTable(), 'id in ('.implode(',',$ids).') and type = "'.$type.'"');
+        else
+            $adapter->delete(self::getMainTable(), 'id in ('.implode(',',$ids).')');
+    }
 }
