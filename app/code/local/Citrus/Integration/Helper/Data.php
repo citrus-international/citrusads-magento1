@@ -124,10 +124,8 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $data['bannerSlotIds'] = $arrays;
         }
         if(isset($context['productFilters'])){
-            $arrays = explode(',',$context['productFilters']);
-//            foreach ($arrays as $array){
+            $arrays = explode(',',trim($context['productFilters'], ','));
                 $data['productFilters'] = [$arrays];
-//            }
         }
         if(isset($context['customerId']))
             $data['customerId'] = $context['customerId'];
@@ -515,8 +513,21 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      * @return array
      */
     public function getProductFilter($product){
+        $attributes = Mage::getStoreConfig('citrus_sync/product_attribute_filter/attribute', Mage::app()->getStore());
+        $attribute_value = [];
+        if($attributes) {
+            $attributes = explode(',', $attributes);
+            foreach ( $attributes as $attribute) {
+                $attributeValue = $product->getData($attribute);
+                if($attributeValue)
+                    $attribute_value[] = $attribute.'_'.$attributeValue;
+            }
+        }
         $categoryIds = $product->getResource()->getCategoryIds($product);
         $websites = $product->getWebsiteIds();
+        if($attribute_value){
+            $websites = array_merge($websites, $attribute_value);
+        }
         $cats = [];
         if(is_array($categoryIds)) {
             foreach ($categoryIds as $category_id) {

@@ -75,7 +75,13 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         else{
             $message = Mage::helper('adminhtml')->__('Please enable module!');
         }
-        $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(['message'=>$message]));
+        $params = $this->getRequest()->getParams();
+        if(!$params['redirect']){
+            $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(['message'=>$message]));
+        }
+        else
+
+            $this->_redirect('*/citrusintegration_queue/index');
     }
     public function orderAction(){
         $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
@@ -147,7 +153,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             ->addFieldToFilter('type', ['eq' => $item->getResourceName()])
             ->getFirstItem();
         if($queueCollection->getData()){
-            $queueModel->load($queueCollection->getId());
+//            $queueModel->load($queueCollection->getId());
             if($item->getResourceName() == 'sales/order')
                 $queueModel->enqueue($item->getIncrementId(), $item->getResourceName());
             else

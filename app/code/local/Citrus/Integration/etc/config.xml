@@ -233,6 +233,15 @@
     </global>
     <adminhtml>
         <events>
+            <!--<admin_system_config_changed_section_citrus_sync>-->
+                <!--<observers>-->
+                    <!--<citrusintegration>-->
+                        <!--<type>singleton</type>-->
+                        <!--<class>Citrus_Integration_Model_Observer</class>-->
+                        <!--<method>addProductAttributeFilter</method>-->
+                    <!--</citrusintegration>-->
+                <!--</observers>-->
+            <!--</admin_system_config_changed_section_citrus_sync>-->
             <catalog_product_delete_after>
                 <observers>
                     <tag>

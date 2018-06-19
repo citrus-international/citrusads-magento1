@@ -265,6 +265,38 @@
                         </enable>
                     </fields>
                 </citrus_ads>
+                <product_attribute_filter>
+                    <label>Product Attribute Filter</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <attribute translate="label comment">
+                            <label>Select Attributes: </label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>citrusintegration/system_config_source_attribute</source_model>
+                            <backend_model>citrusintegration/system_config_backend_product_attribute</backend_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </attribute>
+                    </fields>
+                    <!--<fields>-->
+                        <!--<add_filter translate="label">-->
+                            <!--<label>Save and add all products to queue</label>-->
+                            <!--<frontend_type>button</frontend_type>-->
+                            <!--<frontend_model>citrusintegration/adminhtml_system_config_form_button</frontend_model>-->
+                            <!--<sort_order>20</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<button_url>adminhtml/citrusintegration_queue/product</button_url>-->
+                        <!--</add_filter>-->
+                    <!--</fields>-->
+                </product_attribute_filter>
             </groups>
         </citrus_sync>
     </sections>

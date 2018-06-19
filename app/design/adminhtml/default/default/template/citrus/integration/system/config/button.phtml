@@ -33,8 +33,17 @@
     // $j=$(".modal-popup");
     $.noConflict();
     var buttonDataRole = document.getElementById("<?php /* @escapeNotVerified */ echo $this->getId() ?>");
+    var queueContinue = document.getElementById("queue_continue");
+    if(queueContinue !== 'undefined' && queueContinue !== null ) {
+        queueContinue.onclick = function () {
+            var height = $('html-body').getHeight();
+            $('message-popup-window-mask').setStyle({'height':height+'px'});
+            toggleSelectsUnderBlock($('message-popup-window-mask'), false);
+            Element.show('message-popup-window-mask');
+            jQuery('#loading-mask').show()
+        }
+    }
     buttonDataRole.onclick = function () {
-        console.log('hihih');
         jQuery.ajax({
             type: "GET",
             url: '<?php /* @escapeNotVerified */ echo $this->escapeUrl($this->getButtonUrl()) ?>',
