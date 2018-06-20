@@ -50,6 +50,15 @@
                     </citrusintegration>
                 </observers>
             </catalog_controller_category_init_after>
+            <cms_page_load_after>
+                <observers>
+                    <citrusintegration>
+                        <type>singleton</type>
+                        <class>Citrus_Integration_Model_Observer</class>
+                        <method>sendContextAfterCms</method>
+                    </citrusintegration>
+                </observers>
+            </cms_page_load_after>
         </events>
     </frontend>
     <!---->
@@ -233,15 +242,6 @@
     </global>
     <adminhtml>
         <events>
-            <!--<admin_system_config_changed_section_citrus_sync>-->
-                <!--<observers>-->
-                    <!--<citrusintegration>-->
-                        <!--<type>singleton</type>-->
-                        <!--<class>Citrus_Integration_Model_Observer</class>-->
-                        <!--<method>addProductAttributeFilter</method>-->
-                    <!--</citrusintegration>-->
-                <!--</observers>-->
-            <!--</admin_system_config_changed_section_citrus_sync>-->
             <catalog_product_delete_after>
                 <observers>
                     <tag>

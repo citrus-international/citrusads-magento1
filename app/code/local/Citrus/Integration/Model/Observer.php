@@ -19,11 +19,52 @@ class Citrus_Integration_Model_Observer
     public static function getCitrusHelper(){
         return Mage::helper('citrusintegration/data');
     }
+    public function sendContextAfterCms($observer){
+        $homeConfig = Mage::getStoreConfig('web/default/cms_home_page', Mage::app()->getStore());
+        $bannerEnable = Mage::getStoreConfig('citrus_sync/citrus_banner/enable', Mage::app()->getStore());
+        /** @var Mage_Cms_Model_Page $cms */
+        $cms = $observer->getData('object');
+        if($homeConfig == $cms->getIdentifier()){
+            $websiteIds = [];
+            $storeIds = $cms->getStoreId();
+            foreach ($storeIds as $storeId){
+                $websiteIds[] = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
+            }
+            if($websiteIds)
+                $context['productFilters'] = implode(',' ,array_unique($websiteIds));
+            $context['pageType'] = 'Home';
+            $banners = $this->getSlotIdByPageType($cms->getIdentifier(), Citrus_Integration_Helper_Data::CITRUS_PAGE_TYPE_CMS);
+            if($banners) {
+                $context['bannerSlotIds'] = $banners;
+            }
+            $context = $this->getCitrusHelper()->getContextData($context);
+            $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
+
+            $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Home', false, $bannerEnable);
+            try {
+                Mage::register('categoryAdResponse', $return);
+            }catch (Exception $exception){
+                $this->getCitrusHelper()->log('categoryAdResponse: '. Mage::registry('categoryAdResponse'), __FILE__, __LINE__);
+            }
+            $this->getCitrusHelper()->log('ads request homepage context '.' : '.json_encode($context), __FILE__, __LINE__);
+            $this->getCitrusHelper()->log('ads request homepage '.' : '.$response['message'], __FILE__, __LINE__);
+        }
+    }
     public function sendContextAfterCategory($observer){
         $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
         $bannerEnable = Mage::getStoreConfig('citrus_sync/citrus_banner/enable', Mage::app()->getStore());
         $adsEnable = Mage::getStoreConfig('citrus_sync/citrus_ads/enable', Mage::app()->getStore());
         $attributes = Mage::getStoreConfig('citrus_sync/product_attribute_filter/attribute', Mage::app()->getStore());
+        $request = Mage::app()->getRequest()->getParams();
+        if($attributes){
+            $tmpAttributes = [];
+            foreach (explode(',', $attributes) as $attribute){
+                if(isset($request[$attribute])){
+                    $tmpAttributes[] = $attribute.'_'.$request[$attribute];
+                }
+            }
+            $attributes = implode(',',$tmpAttributes);
+        }
         if(!$moduleEnable) $bannerEnable = $adsEnable = 0;
         if($bannerEnable || $adsEnable){
             /** @var Mage_Catalog_Model_Category $category */
