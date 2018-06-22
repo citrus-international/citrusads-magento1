@@ -37,33 +37,35 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
     protected function _getProductCollection()
     {
         $collections = parent::_getProductCollection();
-        try{
-            $categoryAdResponse = Mage::registry('categoryAdResponse');
-            $searchAdResponse = Mage::registry('searchAdResponse');
-            $collections->getItems();
-            $adProductIds = [];
-            if($categoryAdResponse){
-                $adProductIds = $this->getAdResponse($categoryAdResponse['ads'], $collections);
-            }elseif($searchAdResponse){
-                $adProductIds = $this->getAdResponse($searchAdResponse['ads'], $collections);
+        $adsEnable = Mage::getStoreConfig('citrus_sync/citrus_ads/enable', Mage::app()->getStore());
+        if($adsEnable) {
+            try {
+                $categoryAdResponse = Mage::registry('categoryAdResponse');
+                $searchAdResponse = Mage::registry('searchAdResponse');
+                $collections->getItems();
+                $adProductIds = [];
+                if ($categoryAdResponse) {
+                    $adProductIds = $this->getAdResponse($categoryAdResponse['ads'], $collections);
+                } elseif ($searchAdResponse) {
+                    $adProductIds = $this->getAdResponse($searchAdResponse['ads'], $collections);
+                }
+                $items = $collections->getItems();
+                foreach ($items as $key => $collection) {
+                    if (in_array($key, $adProductIds)) {
+                        $collection->addData(['ad_index' => '0']);
+                        $collection->addData(['citrus_ad_id' => array_search($key, $adProductIds)]);
+                    } else
+                        $collection->addData(['ad_index' => '1']);
+                }
+                usort($items, array('Citrus_Integration_Block_Product_List', 'sortByIndex'));
+                foreach ($items as $key => $item) {
+                    $collections->removeItemByKey($item->getEntityId());
+                    $collections->addItem($item);
+                }
+            } catch (Exception $e) {
+                Mage::helper('citrusintegration')->log('Collection product error: ' . $e->getMessage(), __FILE__, __LINE__);
             }
-            $items = $collections->getItems();
-            foreach ($items as $key => $collection){
-                if(in_array($key, $adProductIds)){
-                    $collection->addData(['ad_index' => '0']);
-                    $collection->addData(['citrus_ad_id' => array_search($key, $adProductIds)]);
-                }else
-                    $collection->addData(['ad_index' => '1']);
-            }
-            usort($items,array('Citrus_Integration_Block_Product_List','sortByIndex'));
-            foreach ($items as $key => $item) {
-                $collections->removeItemByKey($item->getEntityId());
-                $collections->addItem($item);
-            }
-        }catch (Exception $e){
-            Mage::helper('citrusintegration')->log('Collection product error: '.$e->getMessage(), __FILE__, __LINE__);
         }
-
         return $collections;
     }
 
