@@ -1,6 +1,11 @@
 <?xml version="1.0"?>
 <layout version="0.1.0">
     <default>
+        <reference name="head">
+            <action method="addCss">
+                <stylesheet>citrus/css/styles.css</stylesheet>
+            </action>
+        </reference>
         <reference name="content">
             <block name="content_top" type="core/text_list" before="-" translate="label">
                 <label>Main Content Top</label>
