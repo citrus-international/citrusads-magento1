@@ -420,7 +420,7 @@ class Citrus_Integration_Model_Observer
                 }
             }
             if ($orderCron) {
-                if ($time = $this->getConfigValue('citrus_sync/citrus_order/frequency')) {
+                if ($time = $this->getConfigValue('citrus_order')) {
                     if ($this->calculateTime($time)) {
                         $this->getCitrusHelper()->getSyncModel()->syncData('customer/customer');
                         $this->getCitrusHelper()->getSyncModel()->syncData('sales/order');
@@ -444,5 +444,6 @@ class Citrus_Integration_Model_Observer
             $minute = 60;
         }
         return ($minute % $time == 0) || ($time == 120 && $hour % 2 == 0);
+//        return true;
     }
 }

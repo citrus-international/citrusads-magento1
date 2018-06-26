@@ -9,6 +9,12 @@ class Citrus_Integration_Model_Sync
         return Mage::getModel('citrusintegration/queue');
     }
     /**
+     * @return false|Citrus_Integration_Model_Service_Request
+     */
+    protected function getRequestModel(){
+        return Mage::getModel('citrusintegration/service_request');
+    }
+    /**
      * @return false|Citrus_Integration_Model_Customer
      */
     protected function getCitrusCustomerModel(){
@@ -24,16 +30,12 @@ class Citrus_Integration_Model_Sync
         Mage::log('run sync data'.$type,null, 'citrus.log', true);
         $queueModel = $this->getQueueModel();
         $collectionDatas = $queueModel->getCollection()->addFieldToSelect('entity_id')
-            ->addFieldToFilter('type', ['eq' => $type])->setPageSize(100);
-        $numberOfPages = $collectionDatas->getLastPageNumber();
-        for ($i = 1; $i <= $numberOfPages; $i++) {
-            $collections = $collectionDatas->setCurPage($i);
+            ->addFieldToFilter('type', ['eq' => $type])->setPageSize(100)->setCurPage(1);
             $syncItems = new Varien_Object;
             $catalog_product = [];
             $sales_order = [];
             $customer_customer = [];
-            foreach ($collections as $collection){
-//                $type = $collection->getType();
+            foreach ($collectionDatas as $collection){
                 if($type == 'catalog/product'){
                     $catalog_product[] = $collection->getEntityId();
                     $collection->delete();
@@ -51,7 +53,6 @@ class Citrus_Integration_Model_Sync
             $syncItems->addData(['sales_order' => $sales_order]);
             $syncItems->addData(['customer_customer' => $customer_customer]);
             $this->pushSyncItem($syncItems);
-        }
     }
     protected function pushSyncItem($syncItems){
         $catalog_product = $syncItems->getCatalogProduct();
@@ -62,43 +63,82 @@ class Citrus_Integration_Model_Sync
             $bodyProducts = [];
             /** @var Mage_Catalog_Model_Product $productModel */
             $productModel = Mage::getModel(Mage_Catalog_Model_Product::class);
-            foreach ($catalog_product as $productId){
-                /** @var Mage_Catalog_Model_Product $product */
-                $product = $productModel->load($productId);
-                $bodyCatalogProducts = array_merge($bodyCatalogProducts, $this->getHelper()->getCatalogProductData($product));
+            $productCollection = $productModel->getCollection()->addAttributeToSelect('*')
+                ->addAttributeToFilter('entity_id', ['in' => $catalog_product]);
+            foreach ($productCollection as $product){
+                $catalogProductData = $this->getHelper()->getCatalogProductData($product);
+                foreach ($catalogProductData as $key => $oneData){
+                    $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = [], [$oneData]);
+                }
                 $bodyProducts[] = $this->getHelper()->getProductData($product);
             }
-            $responseCatalogProduct = $this->getHelper()->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProducts);
-            $this->getHelper()->log('sync catalog product by cron: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
-            $responseProduct = $this->getHelper()->getRequestModel()->pushProductsRequest($bodyProducts);
-            $this->getHelper()->log('sync product by cron: '.$responseProduct['message'], __FILE__, __LINE__);
+            unset($productCollection);
+            foreach ($bodyCatalogProducts as $bodyCatalogProduct){
+                $pageCatalogProduct = count($bodyCatalogProduct)/100;
+                for ($i = 0;$i <= $pageCatalogProduct; $i++){
+                    $bodyCatalogProductsPage = array_slice($bodyCatalogProduct, $i*100, 100);
+                    if(!empty($bodyCatalogProductsPage)){
+                        $responseCatalogProduct = $this->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProductsPage);//$bodyCatalogProductsPage
+                        $this->getHelper()->log('cron - sync catalog product: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
+                        $this->getHelper()->log('cron - sync catalog product body: '.json_encode($bodyCatalogProductsPage), __FILE__, __LINE__);
+                    }
+                }
+            }
+            $pageProduct = count($bodyProducts)/100;
+            for ($i = 0;$i <= $pageProduct; $i++) {
+                $bodyProductsPage = array_slice($bodyProducts, $i * 100, 100);
+                if (!empty($bodyProductsPage)) {
+                    $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProductsPage);
+                    $this->getHelper()->log('cron - sync product: ' . $responseProduct['message'], __FILE__, __LINE__);
+                    $this->getHelper()->log('cron - sync product body: ' . json_encode($bodyProductsPage), __FILE__, __LINE__);
+                }
+            }
         }
+
         if($sales_order){
             $body = [];
             /** @var Mage_Sales_Model_Order $orderModel */
             $orderModel = Mage::getModel(Mage_Sales_Model_Order::class);
-            foreach ($sales_order as $orderIncrementId){
-                /** @var Mage_Sales_Model_Order $order */
-                $order = $orderModel->loadByIncrementId($orderIncrementId);
-                $data = $this->getHelper()->getOrderData($order);
-                $body[] = $data;
+            $orderIncrementId = [];
+            foreach ($sales_order as $orderItem){
+                $orderIncrementId[] = $orderItem->getEntityId();
             }
-            $response = $this->getHelper()->getRequestModel()->pushOrderRequest($body);
-            $this->getHelper()->handleResponse($response, 'order', $sales_order);
-            $this->getHelper()->log('sync sales order by cron: '.$response['message'], __FILE__, __LINE__);
+            if($orderIncrementId){
+                $orderCollection = $orderModel->getCollection()->addAttributeToSelect('*')
+                    ->addAttributeToFilter('increment_id', ['in' => $orderIncrementId]);
+                foreach ($orderCollection as $order){
+                    $data = $this->getHelper()->getOrderData($order);
+                    $body[] = $data;
+                }
+                unset($orderCollection);
+            }
+            if(!empty($body)) {
+                $response = $this->getRequestModel()->pushOrderRequest($body);
+                $this->getHelper()->handleResponse($response, 'order', $orderIncrementId);
+                $this->getHelper()->log('cron - sync sales order: ' . $response['message'], __FILE__, __LINE__);
+            }
         }
         if($customer_customer){
             $body = [];
             $customerModel = Mage::getModel(Mage_Customer_Model_Customer::class);
-            foreach ($customer_customer as $customerId){
-                /** @var Mage_Customer_Model_Customer $customer */
-                $customer = $customerModel->load($customerId);
-                $data = $this->getHelper()->getCustomerData($customer);
-                $body[] = $data;
+            $customerIds = [];
+            foreach ($customer_customer as $customerItem){
+                $customerIds[] = $customerItem->getEntityId();
             }
-            $response = $this->getHelper()->getRequestModel()->pushCustomerRequest($body);
-            $this->getHelper()->handleResponse($response, 'customer', $customer_customer);
-            $this->getHelper()->log('sync customer by cron: '.$response['message'], __FILE__, __LINE__);
+            if($customerIds){
+                $customerCollection = $customerModel->getCollection()->addAttributeToSelect('*')
+                    ->addAttributeToFilter('entity_id', ['in' => $customerIds]);
+                foreach ($customerCollection as $customer){
+                    $data = $this->getHelper()->getOrderData($customer);
+                    $body[] = $data;
+                }
+                unset($customerCollection);
+            }
+            if(!empty($body)) {
+                $response = $this->getRequestModel()->pushCustomerRequest($body);
+                $this->getHelper()->handleResponse($response, 'customer', $customerIds);
+                $this->getHelper()->log('cron - sync sales order: ' . $response['message'], __FILE__, __LINE__);
+            }
         }
     }
 }
