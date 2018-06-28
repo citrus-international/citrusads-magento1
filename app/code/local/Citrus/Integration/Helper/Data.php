@@ -452,21 +452,17 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         }
         return $data;
     }
-    /**
-     * @param $entity Mage_Catalog_Model_Product
-     * @return array
-     */
-    public function getCatalogProductData($entity){
+
+    public function getCatalogProductData($entity, $catalogId, $catModel){
         $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($entity);
-        $catalogId = $this->getCitrusCatalogId();
         $teamId = $this->getTeamId();
         $tags = $this->getProductTags($entity->getId());
         $categoryIds = $entity->getResource()->getCategoryIds($entity);
-        $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
-        if (is_array($categoryIds) && $categoryIds){
-            foreach ($categoryIds as $key => $categoryId) {
-                /** @var Mage_Catalog_Model_Category $category */
-                $category = $catModel->load($categoryId);
+
+        $data = array();
+        if ($categoryIds && is_array($categoryIds)){
+            $categories = $catModel->getCollection()->addFieldToFilter('id', ['in' => $categoryIds]);
+            foreach ($categories as $key => $category) {
                 $data[$key]['catalogId'] = $catalogId;
                 $data[$key]['teamId'] = $teamId;
                 $data[$key]['gtin'] = $entity->getSku();
@@ -477,9 +473,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                 $data[$key]['filters'] = $this->getProductFilter($entity);
                 $data[$key]['profit'] = null;
             }
-        }
-
-        else{
+        } else{
             $data[0]['catalogId'] = $catalogId;
             $data[0]['teamId'] = $teamId;
             $data[0]['gtin'] = $entity->getSku();
@@ -499,9 +493,11 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      * @return mixed
      */
     public function getCategoryHierarchies($category, $array = []){
-        $parents = explode('/', $category->getpath() );
-        foreach ($parents as $parentId){
-            $parent = Mage::getModel(Mage_Catalog_Model_Category::class)->load($parentId);
+        $parentsId = explode('/', $category->getpath() );
+        $parents = Mage::getModel(Mage_Catalog_Model_Category::class)->getCollection()
+            ->addFieldToFilter('id', ['in' => $parentsId]);
+        foreach ($parents as $parent){
+//            $parent = Mage::getModel(Mage_Catalog_Model_Category::class)->load($parentId);
             if($parent->getLevel() != 0 && $parent->getLevel() != 1){
                 $array[] = $parent->getName();
             }

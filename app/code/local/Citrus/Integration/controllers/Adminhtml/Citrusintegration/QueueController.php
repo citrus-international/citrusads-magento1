@@ -2,6 +2,12 @@
 
 class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mage_Adminhtml_Controller_Action
 {
+
+    // Declare some class members
+    private $catModel;
+    private $catalogId;
+    private $category;
+
     public function indexAction()
     {
         $this->_title($this->__('Queue List'));
@@ -260,6 +266,10 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         }
     }
     protected function pushSyncItem($syncItems){
+
+        $catalogId = $this->getHelper()->getCitrusCatalogId();
+        $categoryModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
+
         $catalog_product = $syncItems->getCatalogProduct();
         $sales_order = $syncItems->getSalesOrder();
         $customer_customer = $syncItems->getCustomerCustomer();
@@ -280,11 +290,16 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                 $productCollection = $productModel->getCollection()->addAttributeToSelect('*')
                     ->addAttributeToFilter('entity_id', ['in' => $productIds]);
                 foreach ($productCollection as $product){
-                    $catalogProductData = $this->getHelper()->getCatalogProductData($product);
+                    $catalogProductData = $this->getHelper()->getCatalogProductData($product, $catalogId, $categoryModel);
                     foreach ($catalogProductData as $key => $oneData){
                         $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = [], [$oneData]);
+                        $tmpCategoryHierarchies[] = $oneData['categoryHierarchy'];
                     }
-                    $bodyProducts[] = $this->getHelper()->getProductData($product);
+
+                    // Can re-use the categoryHierarchy data created by getCatalogProductData
+                    $tmpBodyProduct = $this->getHelper()->getProductData($product);
+                    $tmpBodyProduct['categoryHierarchies'] = $tmpCategoryHierarchies;
+                    $bodyProducts[] = $tmpBodyProduct;
                 }
                 unset($productCollection);
             }
