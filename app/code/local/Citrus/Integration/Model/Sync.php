@@ -89,6 +89,10 @@ class Citrus_Integration_Model_Sync
                 $bodyProductsPage = array_slice($bodyProducts, $i * 100, 100);
                 if (!empty($bodyProductsPage)) {
                     $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProductsPage);
+                    if($responseProduct['success']){
+                        $queueModel = $this->getQueueModel();
+                        $queueModel->makeDeleteItems($catalog_product, 'catalog/product');
+                    }
                     $this->getHelper()->log('cron - sync product: ' . $responseProduct['message'], __FILE__, __LINE__);
                     $this->getHelper()->log('cron - sync product body: ' . json_encode($bodyProductsPage), __FILE__, __LINE__);
                 }
@@ -114,6 +118,10 @@ class Citrus_Integration_Model_Sync
             }
             if(!empty($body)) {
                 $response = $this->getRequestModel()->pushOrderRequest($body);
+                if($response['success']){
+                    $queueModel = $this->getQueueModel();
+                    $queueModel->makeDeleteItems($sales_order, 'sales/order');
+                }
                 $this->getHelper()->handleResponse($response, 'order', $orderIncrementId);
                 $this->getHelper()->log('cron - sync sales order: ' . $response['message'], __FILE__, __LINE__);
             }
@@ -136,9 +144,14 @@ class Citrus_Integration_Model_Sync
             }
             if(!empty($body)) {
                 $response = $this->getRequestModel()->pushCustomerRequest($body);
+                if($response['success']){
+                    $queueModel = $this->getQueueModel();
+                    $queueModel->makeDeleteItems($customer_customer, 'customer/customer');
+                }
                 $this->getHelper()->handleResponse($response, 'customer', $customerIds);
                 $this->getHelper()->log('cron - sync sales order: ' . $response['message'], __FILE__, __LINE__);
             }
         }
     }
+
 }

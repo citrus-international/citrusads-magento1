@@ -37,4 +37,7 @@ class Citrus_Integration_Model_Queue extends Mage_Core_Model_Abstract
     public function makeDelete($ids, $type = null){
         return $this->_getResource()->makeDelete($ids, $type);
     }
+    public function makeDeleteItems($ids, $type){
+        return $this->_getResource()->makeDeleteItems($ids, $type);
+    }
 }

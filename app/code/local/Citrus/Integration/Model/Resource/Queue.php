@@ -21,4 +21,11 @@ class Citrus_Integration_Model_Resource_Queue extends Mage_Core_Model_Resource_D
                 $adapter->delete(self::getMainTable(), 'id in (' . implode(',', $ids) . ')');
         }
     }
+    public function makeDeleteItems($ids, $type)
+    {
+        $adapter = $this->_getReadAdapter();
+        if ($ids) {
+            $adapter->delete(self::getMainTable(), 'entity_id in (' . implode(',', $ids) . ') and type = "' . $type . '"');
+        }
+    }
 }
