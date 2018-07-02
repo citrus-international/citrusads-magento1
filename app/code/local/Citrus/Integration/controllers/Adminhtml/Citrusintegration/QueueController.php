@@ -173,6 +173,8 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     }
     public function massSyncAction()
     {
+        $time_start = microtime(true);
+
         $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
         if($moduleEnable) {
             $requestIds = $this->getRequest()->getParam('id');
@@ -224,6 +226,11 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         else{
             Mage::getSingleton('adminhtml/session')->addError('Please enable module!');
         }
+
+        $time_end = microtime(true);
+        $performance_time = ($time_end - $time_start);
+        error_log("Total Performance Time: " . $performance_time . ' seconds' .PHP_EOL);
+
         $this->_redirect('*/*/');
     }
     public function catalogProductCallback($args, $count, $oldItem){
