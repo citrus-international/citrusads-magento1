@@ -55,21 +55,21 @@ Now that we have all the customers/orders/products staged in the queue, go to `M
 Troubleshooting
 -----
 
-There are conflicts when two (or more) modules rewrite the same class. In that case, the class will only be overwritten
-by one module, so the rest of the modules will not work properly, which in some cases can have a fatal impact on your
-platform. So before you install our plugin, please make sure that there will be no conflicts happening in your installed
-plugins with our plugin. This can be done by checking the content of the <rewrite> in the "config.xml" files on all
+Conflicts arise when two (or more) modules rewrite the same class. In that case, the class will be overwritten
+by only one module, so the rest of the modules will not work properly. In some cases, this can have a fatal impact on your
+platform. Before you install this plugin, make sure that there will be no conflicts between in your installed
+plugins and our plugin. This can be done by checking the content of the <rewrite> in the "config.xml" files on all
 installed modules in your platform. Alternatively, you can use this tool module to help you detect the conflicts easily
 
 https://marketplace.magento.com/alekseon-modules-conflict-detector.html
 .
 
-If there is no conflict, you are all good to go.
+If there is no conflict, no further configuration is necessary and the plugin will work as described.
 
-If there are conflicts between the plugins, you need to search your way to solve them. You can use
+If there are conflicts between the plugins, you must resolve them. You can use
 
 either
-* Merging - merge the code from one conflicting file into another and switch off the rewrite config.xml in one
+* Merging - merge the code from one conflicting file into another and switch off the rewrite config.xml in one of them
 
 or
 * Class inheritance - switch off the rewrite in one config.xml and then make the conflicting extension PHP file extend
@@ -78,9 +78,10 @@ the other extension
 or
 * both
 
-which does depend on the conflicts themselves. 
+Which of these you choose depends on the nature of the conflict. 
 
-In our plugin, we rewrote the class `Mage_Catalog_Block_Product_List` by class `Citrus_Integration_Block_Product_List`.
+
+In our plugin, we rewrote the class `Mage_Catalog_Block_Product_List` with class `Citrus_Integration_Block_Product_List`.
 ```$xslt
 <blocks>
     <catalog>
@@ -94,17 +95,17 @@ In our plugin, we rewrote the class `Mage_Catalog_Block_Product_List` by class `
 The `Citrus_Integration_Block_Product_List` class overrides ```_getProductCollection()``` and adds two new methods 
 ```getAdResponse()``` and ```sortByIndex()```. 
 
-If your plugins do not override the same methods, you can use class inheritance and make our class extend yours or the 
-vice versa and then switch off the corresponding `<rewrite>`. If you want to use merging in this case , you need to 
-move the logic in the conflicting class to the one you want to merge to and switch off 
-the corresponding `<rewrite>`.   
+If your plugins do not override the same methods, then you can use class inheritance and make our class extend yours (or 
+vice versa) and then switch off the corresponding `<rewrite>`. If you want to use merging in this case, you must 
+move the logic in the conflicting class to the one you want to merge to and switch off the corresponding `<rewrite>`.   
 
-If your plugins do override the same method of ours, you might need to use merging in this case with or without class 
-inheritance. You need to make sure the logic and functionality from both plugins need to be implemented correctly and 
-this requires understanding of the code and programming skills.
+If your plugins do override the methods that Citrus requires, you might need to use merging with or without class 
+inheritance. Make sure that the logic and functionality from both plugins is implemented correctly. 
+This requires understanding of the code and programming skills.
 
 Furthermore, we implemented our click/impression functionalities in Javascript which depends on the data in `list.phtml` 
-so if your plugins have modified this file, you probably need to merge our logic with yours in this file as well. 
+If your plugins have modified this file, you must merge the logic of the Citrus plugin with the logic of your plugins in this file as well. 
+
 Logs
 -----
 The requests log file is located at `/var/www/html/web/var/log/citrus.log`.
