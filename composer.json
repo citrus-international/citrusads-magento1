@@ -1,0 +1,10 @@
+{
+  "name": "citrus-international/CitrusAds_extension",
+  "license": "OSL-3.0",
+  "type": "magento-module",
+  "description": "The Citrus Product Integration Plugin helps e-commerce providers who use Magento to integrate with the Citrus API. This extension reduces the amount of development that retailers must do in order to integrate with the Citrus API. This makes it possible for suppliers to advertise on retailer e-commerce websites.n",
+  "require": {
+    "php": "~5.6"
+  },
+  "version": "1.0.0"
+}
