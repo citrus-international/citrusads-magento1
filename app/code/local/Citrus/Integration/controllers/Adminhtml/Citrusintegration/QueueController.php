@@ -266,10 +266,6 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         }
     }
     protected function pushSyncItem($syncItems){
-
-        $catalogId = $this->getHelper()->getCitrusCatalogId();
-        $categoryModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
-
         $catalog_product = $syncItems->getCatalogProduct();
         $sales_order = $syncItems->getSalesOrder();
         $customer_customer = $syncItems->getCustomerCustomer();
@@ -290,7 +286,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                 $productCollection = $productModel->getCollection()->addAttributeToSelect('*')
                     ->addAttributeToFilter('entity_id', ['in' => $productIds]);
                 foreach ($productCollection as $product){
-                    $catalogProductData = $this->getHelper()->getCatalogProductData($product, $catalogId, $categoryModel);
+                    $catalogProductData = $this->getHelper()->getCatalogProductData($product);
                     foreach ($catalogProductData as $key => $oneData){
                         $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = [], [$oneData]);
                         if (isset($oneData['categoryHierarchy'])) {

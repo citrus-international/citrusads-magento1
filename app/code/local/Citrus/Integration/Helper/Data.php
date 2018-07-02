@@ -453,16 +453,16 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         return $data;
     }
 
-    public function getCatalogProductData($entity, $catalogId, $catModel){
+    public function getCatalogProductData($entity){
         $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($entity);
+        $catalogId = $this->getCitrusCatalogId();
+        $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
         $teamId = $this->getTeamId();
         $tags = $this->getProductTags($entity->getId());
         $categoryIds = $entity->getResource()->getCategoryIds($entity);
 
         $data = array();
         if ($categoryIds && is_array($categoryIds)){
-//            $categories = $catModel->getCollection()->addFieldToFilter('id', ['in' => $categoryIds]);
-
             // Pre-generate category hierarchies
             $cats = [];
             $catsMap = [];
