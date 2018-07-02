@@ -461,16 +461,34 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
 
         $data = array();
         if ($categoryIds && is_array($categoryIds)){
-            $categories = $catModel->getCollection()->addFieldToFilter('id', ['in' => $categoryIds]);
-            foreach ($categories as $key => $category) {
+//            $categories = $catModel->getCollection()->addFieldToFilter('id', ['in' => $categoryIds]);
+
+            // Pre-generate category hierarchies
+            $cats = [];
+            $catsMap = [];
+            if(is_array($categoryIds)) {
+                foreach ($categoryIds as $category_id) {
+                    $category = $catModel->load($category_id);
+                    $hierarchy = $this->getCategoryHierarchies($category);
+                    $cats[] = $hierarchy;
+                    $catsMap[$category_id] = $hierarchy;
+                }
+            }
+            foreach ($cats as $cat){
+                $result = array_merge(isset($result) ? $result : [],$cat);
+            }
+
+            foreach ($categoryIds as $key => $categoryId) {
+//            foreach ($categories as $key => $category) {
+//                $category = $catModel->load($categoryId);
                 $data[$key]['catalogId'] = $catalogId;
                 $data[$key]['teamId'] = $teamId;
                 $data[$key]['gtin'] = $entity->getSku();
                 $data[$key]['inventory'] = (int)$stock->getQty();
                 $data[$key]['price'] = (int)$entity->getPrice();
-                $data[$key]['categoryHierarchy'] = $this->getCategoryHierarchies($category);
+                $data[$key]['categoryHierarchy'] = $catsMap[$categoryId];
                 $data[$key]['tags'] = $tags;
-                $data[$key]['filters'] = $this->getProductFilter($entity);
+                $data[$key]['filters'] = $this->getProductFilter($entity, $result);
                 $data[$key]['profit'] = null;
             }
         } else{
@@ -495,7 +513,8 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     public function getCategoryHierarchies($category, $array = []){
         $parentsId = explode('/', $category->getpath() );
         $parents = Mage::getModel(Mage_Catalog_Model_Category::class)->getCollection()
-            ->addFieldToFilter('id', ['in' => $parentsId]);
+            ->addAttributeToSelect(array('level', 'name'))
+            ->addFieldToFilter('entity_id', ['in' => $parentsId]);
         foreach ($parents as $parent){
 //            $parent = Mage::getModel(Mage_Catalog_Model_Category::class)->load($parentId);
             if($parent->getLevel() != 0 && $parent->getLevel() != 1){
@@ -504,11 +523,13 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         }
         return $array;
     }
+
     /**
      * @param $product Mage_Catalog_Model_Product
+     * @param $result
      * @return array
      */
-    public function getProductFilter($product){
+    public function getProductFilter($product, $result = null){
         $attributes = Mage::getStoreConfig('citrus_sync/product_attribute_filter/attribute', Mage::app()->getStore());
         $attribute_value = [];
         if($attributes) {
@@ -519,22 +540,22 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     $attribute_value[] = $attribute.'_'.$attributeValue;
             }
         }
-        $categoryIds = $product->getResource()->getCategoryIds($product);
+//        $categoryIds = $product->getResource()->getCategoryIds($product);
         $websites = $product->getWebsiteIds();
         if($attribute_value){
             $websites = array_merge($websites, $attribute_value);
         }
-        $cats = [];
-        if(is_array($categoryIds)) {
-            foreach ($categoryIds as $category_id) {
-                /** @var Mage_Catalog_Model_Category $category */
-                $category = Mage::getModel(Mage_Catalog_Model_Category::class)->load($category_id);
-                $cats[] = $this->getCategoryHierarchies($category);
-            }
-        }
-        foreach ($cats as $cat){
-            $result = array_merge(isset($result) ? $result : [],$cat);
-        }
+//        $cats = [];
+//        if(is_array($categoryIds)) {
+//            foreach ($categoryIds as $category_id) {
+//                /** @var Mage_Catalog_Model_Category $category */
+//                $category = Mage::getModel(Mage_Catalog_Model_Category::class)->load($category_id);
+//                $cats[] = $this->getCategoryHierarchies($category);
+//            }
+//        }
+//        foreach ($cats as $cat){
+//            $result = array_merge(isset($result) ? $result : [],$cat);
+//        }
         return array_values(array_unique(array_merge($websites,isset($result) ? $result : [])));
     }
     public function getProductTags($id){
