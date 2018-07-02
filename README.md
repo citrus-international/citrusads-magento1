@@ -49,7 +49,7 @@ Click `Save Config`.
 
 Click buttons `Add all customers to queue`, `Add all orders to queue` and `Add all products to queue`.
 
-Now that we have all the customers/orders/products staged in the queue, go to `Magento admin panel -> Citrus -> Queue List`, select the items to submit, select `sync` and click `Submit` so that they are actully synced to Citrus.
+Now that we have all the customers/orders/products staged in the queue, go to `Magento admin panel -> Citrus -> Queue List`, select the items to submit, select `sync` and click `Submit`. This will sync the items with Citrus.
 
 
 Troubleshooting
