@@ -11,7 +11,7 @@ Note
 Requirements
 ------------
 
-- Magento 1.x (to be determined)
+- Magento 1.9.x 
 
 
 Installation
