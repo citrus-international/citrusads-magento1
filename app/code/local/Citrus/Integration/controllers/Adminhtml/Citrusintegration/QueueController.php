@@ -293,7 +293,9 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     $catalogProductData = $this->getHelper()->getCatalogProductData($product, $catalogId, $categoryModel);
                     foreach ($catalogProductData as $key => $oneData){
                         $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = [], [$oneData]);
-                        $tmpCategoryHierarchies[] = $oneData['categoryHierarchy'];
+                        if (isset($oneData['categoryHierarchy'])) {
+                            $tmpCategoryHierarchies[] = $oneData['categoryHierarchy'];
+                        }
                     }
 
                     // Can re-use the categoryHierarchy data created by getCatalogProductData
