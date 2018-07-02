@@ -24,19 +24,19 @@ To install the extension on your magento:
 2. Upload the `citrusad-[version_num].tgz` file and click on upload
 
 
-Setup the Citrus Plugin
+Set up the Citrus Plugin
 -----
 
 #### General settings
-After the installation, go to `Magento admin panel -> System -> Configuration`, and click on `CITRUS INTEGRATION -> General Setting`.
+After the installation, go to `Magento admin panel -> System -> Configuration`, and click `CITRUS INTEGRATION -> General Setting`.
 
-Enable the plugin in Magento admin panel, input your `Team Id` and `Api Key` from Citrus and also select the `host` correctly.
+Enable the plugin in the Magento admin panel, input your `Team Id` and `Api Key` from Citrus, and select the correct `host`.
 
-NB: To find out your `Team Id` and `Api Key`, please login Citrus client and go into the `Integration Settings` from the drop down list at the top right corner.
+NB: To retrieve your `Team Id` and `Api Key`, log in to the Citrus client and go into the `Integration Settings` menu from the drop-down list in the top right corner.
 
 Click `Save Config`
 
-Then you should be able to sync products, customers, orders and enable ads and banners and add widgets etc.
+When you have clicked `Save Config`, you will be able to sync products, customers, and orders, and enable ads and banners and add widgets.
 
 #### Synchronization settings
 Go to `Magento admin panel -> System -> Configuration`, and click on `CITRUS INTEGRATION -> Synchronization Option` on the left sidebar.
