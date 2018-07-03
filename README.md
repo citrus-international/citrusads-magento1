@@ -113,3 +113,4 @@ The requests log file is located at `/var/www/html/web/var/log/citrus.log`.
 
 Licence
 -----
+Apache Licence 2.0 
