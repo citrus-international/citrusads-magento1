@@ -9,7 +9,7 @@
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR
     . dirname(__FILE__) . '/../../app' . PATH_SEPARATOR . dirname(__FILE__));
 //Set custom memory limit
-ini_set('memory_limit', '512M');
+ini_set('memory_limit', '1024M');
 //Include Magento libraries
 require_once 'Mage.php';
 //Start the Magento application
