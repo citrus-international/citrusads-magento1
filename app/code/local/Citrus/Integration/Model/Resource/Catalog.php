@@ -97,7 +97,8 @@ class Citrus_Integration_Model_Resource_Catalog extends Mage_Core_Model_Resource
     /**
      * @return Mage_Core_Helper_Abstract|Citrus_Integration_Helper_Data
      */
-    protected function getHelper(){
+    protected function getHelper()
+    {
         return Mage::helper('citrusintegration/data');
     }
 }

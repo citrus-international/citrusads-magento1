@@ -14,21 +14,24 @@ class Citrus_Integration_Block_Adminhtml_Template_Grid_Renderer_PageId extends M
             $out = "Search Page";
         }
         elseif($page_type == 1){
-            $result = [];
+            $result = array();
             foreach ($page_ids as $page_id){
                 $result[] = Mage::getModel(Mage_Catalog_Model_Category::class)->load($page_id)->getName();
             }
+
             $out = json_encode($result);
             $out = str_replace(str_split('\\/:*?"<>|[]'), ' ', $out);
         }
         else{
-            $result = [];
+            $result = array();
             foreach ($page_ids as $page_id){
                 $result[] = Mage::getModel(Mage_Cms_Model_Page::class)->load($page_id)->getTitle();
             }
+
             $out = json_encode($result);
             $out = str_replace(str_split('\\/:*?"<>|[]'), ' ', $out);
         }
+
         return $out;
     }
 }

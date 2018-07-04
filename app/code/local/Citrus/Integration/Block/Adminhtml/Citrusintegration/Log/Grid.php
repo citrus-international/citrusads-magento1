@@ -26,7 +26,8 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Log_Grid extends Mage
     protected function _prepareColumns()
     {
         try{
-            $this->addColumn('id',
+            $this->addColumn(
+                'id',
                 array(
                     'header'=> $this->__('ID'),
                     'align' =>'left',
@@ -34,14 +35,16 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Log_Grid extends Mage
                     'index' => 'id'
                 )
             );
-            $this->addColumn('entity_id',
+            $this->addColumn(
+                'entity_id',
                 array(
                     'header'=> $this->__('Magento Entity'),
                     'align' =>'left',
                     'index' => 'entity_id'
                 )
             );
-            $this->addColumn('type',
+            $this->addColumn(
+                'type',
                 array(
                     'header'=> $this->__('Type'),
                     'align' =>'left',
@@ -49,33 +52,37 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Log_Grid extends Mage
                 )
             );
 
-            $this->addColumn('dequeue_time',
+            $this->addColumn(
+                'dequeue_time',
                 array(
                     'header'=> $this->__('Enqueue Time'),
                     'index' => 'dequeue_time'
                 )
             );
-            $this->addColumn('status',
+            $this->addColumn(
+                'status',
                 array(
                     'header'=> $this->__('Status'),
                     'index' => 'enqueue_time'
                 )
             );
-            $this->addColumn('citrus_id',
+            $this->addColumn(
+                'citrus_id',
                 array(
                     'header'=> $this->__('Citrus Id'),
                     'index' => 'citrus_id'
                 )
             );
-            $this->addColumn('message',
+            $this->addColumn(
+                'message',
                 array(
                     'header'=> $this->__('Message'),
                     'index' => 'message'
                 )
             );
         }catch (Exception $e){
-
         }
+
         return parent::_prepareColumns();
     }
 

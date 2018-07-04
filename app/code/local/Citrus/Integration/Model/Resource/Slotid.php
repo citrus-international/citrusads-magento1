@@ -6,7 +6,8 @@ class Citrus_Integration_Model_Resource_Slotid extends Mage_Core_Model_Resource_
     {
         $this->_init('citrusintegration/slotid', 'id');
     }
-    public function getSlotIdById($entity_id, $page_type){
+    public function getSlotIdById($entity_id, $page_type)
+    {
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
             ->from(self::getMainTable(), 'slot_id')

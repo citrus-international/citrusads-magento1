@@ -16,28 +16,31 @@ class Citrus_Integration_Model_Queue extends Mage_Core_Model_Abstract
     {
         return parent::_getResource();
     }
-    public function getCount(){
+    public function getCount()
+    {
         return $this->_getResource()->getCount();
     }
 
-    public function enqueue($entityId, $type){
-        $data = [
+    public function enqueue($entityId, $type)
+    {
+        $data = array(
             'type' => $type,
             'entity_id' => $entityId,
             'enqueue_time' => time()
-        ];
+        );
         $this->addData($data);
         try{
             $this->save();
         }catch(Exception $e){
-
         }
 
     }
-    public function makeDelete($ids, $type = null){
+    public function makeDelete($ids, $type = null)
+    {
         return $this->_getResource()->makeDelete($ids, $type);
     }
-    public function makeDeleteItems($ids, $type){
+    public function makeDeleteItems($ids, $type)
+    {
         return $this->_getResource()->makeDeleteItems($ids, $type);
     }
 }

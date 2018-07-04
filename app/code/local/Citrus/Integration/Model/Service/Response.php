@@ -27,9 +27,9 @@ class Citrus_Integration_Model_Service_Response extends Varien_Object
     {
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
         $teamId = $this->getCitrusHelper()->getTeamId();
-        $data = [
+        $data = array(
             'teamId' => $teamId
-        ];
+        );
         $handle = 'catalogs?'.http_build_query($data);
         return self::requestGetApi($handle, $headers);
     }
@@ -67,7 +67,7 @@ class Citrus_Integration_Model_Service_Response extends Varien_Object
     public function requestGetApi($handle, $headers = array(), $params = '')
     {
         $url = $this->getCitrusHelper()->getHost() . $handle;
-        $result = ['success' => true];
+        $result = array('success' => true);
         try {
             $curl = new Varien_Http_Adapter_Curl();
             $curl->write(Zend_Http_Client::GET, $url, '1.1', $headers);
@@ -79,6 +79,7 @@ class Citrus_Integration_Model_Service_Response extends Varien_Object
             if ($data === false) {
                 return false;
             }
+
             if (isset($status) && $status != 200) {
                 $result['success'] = false;
                 $result['message'] = $data;

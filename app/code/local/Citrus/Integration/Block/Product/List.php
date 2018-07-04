@@ -16,8 +16,9 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
      */
     protected $_productCollection;
 
-    public function getAdResponse($responses,$collections){
-        $adProductIds = [];
+    public function getAdResponse($responses,$collections)
+    {
+        $adProductIds = array();
         foreach ($responses as $response){
             $adModel = Mage::getModel(Citrus_Integration_Model_Ad::class)->load($response);
             $sku = $adModel->getGtin();
@@ -32,6 +33,7 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
                 $adProductIds[$citrus_ad_id] = $id;
             }
         }
+
         return $adProductIds;
     }
     protected function _getProductCollection()
@@ -47,29 +49,31 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
             $categoryAdResponse = Mage::registry('categoryAdResponse');
             $searchAdResponse = Mage::registry('searchAdResponse');
             $collections->getItems();
-            $adProductIds = [];
+            $adProductIds = array();
             if($categoryAdResponse){
                 $adProductIds = $this->getAdResponse($categoryAdResponse['ads'], $collections);
             }elseif($searchAdResponse){
                 $adProductIds = $this->getAdResponse($searchAdResponse['ads'], $collections);
             }
+
             $items = $collections->getItems();
             foreach ($items as $key => $collection){
                 if(in_array($key, $adProductIds)){
-                    $collection->addData(['ad_index' => '0']);
-                    $collection->addData(['citrus_ad_id' => array_search($key, $adProductIds)]);
+                    $collection->addData(array('ad_index' => '0'));
+                    $collection->addData(array('citrus_ad_id' => array_search($key, $adProductIds)));
                 }else
-                    $collection->addData(['ad_index' => '1']);
+                    $collection->addData(array('ad_index' => '1'));
             }
-            usort($items,array('Citrus_Integration_Block_Product_List','sortByIndex'));
+
+            usort($items, array('Citrus_Integration_Block_Product_List','sortByIndex'));
             foreach ($items as $key => $item) {
                 $collections->removeItemByKey($item->getEntityId());
                 $collections->addItem($item);
             }
-
         }catch (Exception $e){
             Mage::helper('citrusintegration')->log('Collection product error: '.$e->getMessage(), __FILE__, __LINE__);
         }
+
         return $collections;
     }
 
@@ -78,6 +82,7 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
         if($a->getAdIndex() ==  $b->getAdIndex()){
             return 0 ;
         }
+
         return ($a->getAdIndex() < $b->getAdIndex()) ? -1 : 1;
     }
 }

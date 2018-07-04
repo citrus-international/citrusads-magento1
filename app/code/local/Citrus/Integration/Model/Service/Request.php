@@ -2,155 +2,171 @@
 
 class Citrus_Integration_Model_Service_Request extends Varien_Object
 {
-    public function requestingAnAd($body){
+    public function requestingAnAd($body)
+    {
         $handle = 'ads/generate';
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
-        return self::requestPostApi($handle,$headers, $body);
+        return self::requestPostApi($handle, $headers, $body);
     }
     /**
      * @param $body array
      * @return array
      */
-    public function pushOrderRequest($body){
+    public function pushOrderRequest($body)
+    {
         $handle = 'orders';
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
-        $body = [
+        $body = array(
             'orders' =>
                 $body
-        ];
-        return self::requestPostApi($handle,$headers, $body);
+        );
+        return self::requestPostApi($handle, $headers, $body);
     }
 
     /**
      * @param $orderId
      * @return array|bool
      */
-    public function deleteOrderRequest($orderId){
+    public function deleteOrderRequest($orderId)
+    {
         $handle = 'orders/'.$orderId;
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
-        return self::requestDeleteApi($handle,$headers);
+        return self::requestDeleteApi($handle, $headers);
     }
     /**
      * @param $body array
      * @return array
      */
-    public function pushCustomerRequest($body){
+    public function pushCustomerRequest($body)
+    {
         $handle = 'customers';
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
-        $body = [
+        $body = array(
             'customers' =>
                 $body
-        ];
-        return self::requestPostApi($handle,$headers, $body);
+        );
+        return self::requestPostApi($handle, $headers, $body);
     }
 
     /**
      * @param $customerId
      * @return array|bool
      */
-    public function deleteCustomerRequest($customerId){
+    public function deleteCustomerRequest($customerId)
+    {
         $handle = 'customers/'.$customerId;
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
-        return self::requestDeleteApi($handle,$headers);
+        return self::requestDeleteApi($handle, $headers);
     }
     /**
      * @param null $body
      * @return array
      */
-    public function pushCatalogProductsRequest($body = null){
+    public function pushCatalogProductsRequest($body = null)
+    {
         $handle = 'catalog-products';
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
-        $body = [
+        $body = array(
             'catalogProducts' =>
                 $body
-        ];
-        return self::requestPostApi($handle,$headers, $body);
+        );
+        return self::requestPostApi($handle, $headers, $body);
     }
     /**
      * @param null $body
      * @return array
      */
-    public function pushProductsRequest($body = null){
+    public function pushProductsRequest($body = null)
+    {
         $handle = 'products';
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
-        $body = [
+        $body = array(
             'products' =>
                 $body
-        ];
-        return self::requestPostApi($handle,$headers, $body);
+        );
+        return self::requestPostApi($handle, $headers, $body);
     }
     /**
      * @param null $name
      * @param null $id
      * @return array
      */
-    public function pushCatalogsRequest($name = null, $id = null){
-        $handle = 'catalogs?'.http_build_query(['teamId'=>$this->getCitrusHelper()->getTeamId()]);
+    public function pushCatalogsRequest($name = null, $id = null)
+    {
+        $handle = 'catalogs?'.http_build_query(array('teamId'=>$this->getCitrusHelper()->getTeamId()));
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
         $params['name'] = $name ? $name : 'Catalog';
         $params['teamId'] = $this->getCitrusHelper()->getTeamId();
         if($id)
             $params['id'] = $id;
-        $body = [
+        $body = array(
             'catalogs' =>
-                [
+                array(
                     $params
-                ]
-        ];
-        return self::requestPostApi($handle,$headers, $body);
+                )
+        );
+        return self::requestPostApi($handle, $headers, $body);
     }
     /**
      * @param $catalogId string
      * @return array
      */
-    public function deleteCatalogRequest($catalogId){
+    public function deleteCatalogRequest($catalogId)
+    {
         $handle = 'catalogs/'.$catalogId;
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
-        return self::requestDeleteApi($handle,$headers);
+        return self::requestDeleteApi($handle, $headers);
     }
     /**
      * @param $gtin string
      * @param $catalogId string
      * @return array
      */
-    public function deleteCatalogProductRequest($gtin, $catalogId = null){
+    public function deleteCatalogProductRequest($gtin, $catalogId = null)
+    {
         if($catalogId == null){
             $catalogId = $this->getCitrusHelper()->getCitrusCatalogId();
         }
+
         $handle = 'catalog-products/'.$catalogId.'/'.$gtin;
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
-        return self::requestDeleteApi($handle,$headers);
+        return self::requestDeleteApi($handle, $headers);
     }
     /**
      * @param $gtin string
      * @param $catalogId string
      * @return array
      */
-    public function deleteProductRequest($gtin, $catalogId = null){
+    public function deleteProductRequest($gtin, $catalogId = null)
+    {
         if($catalogId == null){
             $catalogId = $this->getCitrusHelper()->getCitrusCatalogId();
         }
+
         $teamId = $this->getCitrusHelper()->getTeamId();
         $handle = 'products/'.$gtin.'?teamId='.$teamId;
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
-        return self::requestDeleteApi($handle,$headers);
+        return self::requestDeleteApi($handle, $headers);
     }
     /**
      * @return false|Citrus_Integration_Model_Service_Authentication
      */
-    protected function getAuthenticationModel(){
+    protected function getAuthenticationModel()
+    {
         return Mage::getModel('citrusintegration/service_authentication');
     }
     /**
      * @return false|Citrus_Integration_Model_Catalog
      */
-    protected function getCatalogModel(){
+    protected function getCatalogModel()
+    {
         return Mage::getModel('citrusintegration/catalog');
     }
     /**
      * @return false|Citrus_Integration_Helper_Data
      */
-    protected function getCitrusHelper(){
+    protected function getCitrusHelper()
+    {
         return Mage::helper('citrusintegration/data');
     }
     /**
@@ -162,11 +178,11 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     public function requestPostApi($handle, $headers = array(), $params = '')
     {
         $url = $this->getCitrusHelper()->getHost().$handle;
-        $result = ['success' => true];
+        $result = array('success' => true);
         $body = json_encode($params);
         try {
             $curl = new Varien_Http_Adapter_Curl();
-            $curl->write(Zend_Http_Client::POST, $url , '1.1', $headers, $body);
+            $curl->write(Zend_Http_Client::POST, $url, '1.1', $headers, $body);
             $data = $curl->read();
             $data = preg_split('/^\r\n/m', $data);
             $data = trim($data[1]);
@@ -175,7 +191,8 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             if ($data === false) {
                 return false;
             }
-            if(isset($status)&& $status != 200 ){
+
+            if(isset($status)&& $status != 200){
                 $result['success'] = false;
                 $result['message'] = $data;
             }
@@ -185,12 +202,13 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             $result['success'] = false;
             $result['message'] = $exception->getMessage();
         }
+
         return $result;
     }
     public function requestDeleteApi($handle, $headers = array(), $params = '')
     {
         $url = $this->getCitrusHelper()->getHost().$handle;
-        $result = ['success' => true];
+        $result = array('success' => true);
         try {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
@@ -203,7 +221,8 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             if ($data === false) {
                 return false;
             }
-            if(isset($status)&& $status != 200 ){
+
+            if(isset($status)&& $status != 200){
                 $result['success'] = false;
                 $result['message'] = $status.'-'.$data;
             }
@@ -213,6 +232,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             $result['success'] = false;
             $result['message'] = $exception->getMessage();
         }
+
         return $result;
     }
 }

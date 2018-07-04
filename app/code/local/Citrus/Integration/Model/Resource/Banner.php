@@ -22,7 +22,7 @@ class Citrus_Integration_Model_Resource_Banner extends Mage_Core_Model_Resource_
             ->from(self::getMainTable(), 'id')
             ->where('slotId = :slotId')
             ->where('host = :host')
-            ->where('expiry >= :expiry' );
+            ->where('expiry >= :expiry');
         $bind = array(
             ':slotId' => (int)$bannerId,
             ':host' => (string)$host,
@@ -46,7 +46,7 @@ class Citrus_Integration_Model_Resource_Banner extends Mage_Core_Model_Resource_
             ->from(self::getMainTable(), 'id')
             ->where('pageType = :pageType')
             ->where('host = :host')
-            ->where('expiry >= :expiry' );
+            ->where('expiry >= :expiry');
         if($limit) $select = $select->limit((int)$limit);
         $bind = array(
             ':pageType' => (string)$pageType,
@@ -58,7 +58,8 @@ class Citrus_Integration_Model_Resource_Banner extends Mage_Core_Model_Resource_
     /**
      * @return Mage_Core_Helper_Abstract|Citrus_Integration_Helper_Data
      */
-    protected function getHelper(){
+    protected function getHelper()
+    {
         return Mage::helper('citrusintegration/data');
     }
 }

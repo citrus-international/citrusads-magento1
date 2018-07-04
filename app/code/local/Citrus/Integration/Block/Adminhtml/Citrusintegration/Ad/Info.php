@@ -1,6 +1,5 @@
 <?php
 class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Info extends Mage_Adminhtml_Block_Template
-
 {
     public function __construct()
     {
@@ -8,29 +7,32 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Info extends Mage_
         $this->setTemplate('citrus/integration/info.phtml');
     }
 
-    public function getAdData(){
-        $adData = [];
+    public function getAdData()
+    {
+        $adData = array();
         $model = Mage::registry('citrus_ad');
 
         $adId = $model->getId();
         $adData['ads'] = $model;
         $discountData = $this->getDiscountModel()->load($model->getId());
-        $adData['ads']->addData(['discount' => $discountData]);
+        $adData['ads']->addData(array('discount' => $discountData));
         $bannerIds = $this->getBannerModel()->getIdByAdId($adId);
         $relevantIds = $this->getRelevantModel()->getIdByAdId($adId);
-        $bannerData = [];
+        $bannerData = array();
         if(is_array($bannerIds)){
             foreach ($bannerIds as $bannerId){
                 $bannerData[] = $this->getBannerModel()->load($bannerId['id']);
             }
         }
+
         $adData['banners'] = $bannerData;
-        $relevantData = [];
+        $relevantData = array();
         if(is_array($relevantIds)){
             foreach ($relevantIds as $relevantId){
                 $relevantData[] = $this->getBannerModel()->load($relevantId['id']);
             }
         }
+
         $adData['products'] = $relevantData;
         $object = new Varien_Object();
         return $object->addData($adData);
@@ -38,21 +40,24 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Info extends Mage_
     /**
      * @return Citrus_Integration_Model_Banner|false
      */
-    protected function getBannerModel(){
+    protected function getBannerModel()
+    {
         return Mage::getModel('citrusintegration/banner');
     }
 
     /**
      * @return false|Citrus_Integration_Model_Discount
      */
-    protected function getDiscountModel(){
+    protected function getDiscountModel()
+    {
         return Mage::getModel('citrusintegration/discount');
     }
 
     /**
      * @return false|Citrus_Integration_Model_Relevant
      */
-    protected function getRelevantModel(){
+    protected function getRelevantModel()
+    {
         return Mage::getModel('citrusintegration/relevant');
     }
 
