@@ -26,7 +26,8 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Slotid_Grid extends M
     protected function _prepareColumns()
     {
         try {
-            $this->addColumn('id',
+            $this->addColumn(
+                'id',
                 array(
                     'header' => $this->__('ID'),
                     'align' => 'left',
@@ -34,7 +35,8 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Slotid_Grid extends M
                     'index' => 'id'
                 )
             );
-            $this->addColumn('page_type',
+            $this->addColumn(
+                'page_type',
                 array(
                     'header' => $this->__('Page Type'),
                     'align' => 'left',
@@ -42,7 +44,8 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Slotid_Grid extends M
                     'renderer' => 'Citrus_Integration_Block_Adminhtml_Template_Grid_Renderer_PageType'
                 )
             );
-            $this->addColumn('page_id',
+            $this->addColumn(
+                'page_id',
                 array(
                     'header' => $this->__('Page Id'),
                     'align' => 'left',
@@ -51,14 +54,14 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Slotid_Grid extends M
                 )
             );
 
-            $this->addColumn('slot_id',
+            $this->addColumn(
+                'slot_id',
                 array(
                     'header' => $this->__('Slot Id'),
                     'index' => 'slot_id'
                 )
             );
         }catch (Exception $e){
-
         }
 
         return parent::_prepareColumns();

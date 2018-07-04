@@ -20,8 +20,10 @@ class Citrus_Integration_Adminhtml_Citrusintegration_SlotidController extends Ma
             $this->loadLayout();
             $this->getLayout()->getBlock('head')
                 ->setCanLoadExtJs(true);
-            $this->_addContent($this->getLayout()
-                ->createBlock('citrusintegration/adminhtml_citrusintegration_slotid_edit'));
+            $this->_addContent(
+                $this->getLayout()
+                ->createBlock('citrusintegration/adminhtml_citrusintegration_slotid_edit')
+            );
             $this->renderLayout();
         }
         else
@@ -44,10 +46,9 @@ class Citrus_Integration_Adminhtml_Citrusintegration_SlotidController extends Ma
                 $postData = $this->getRequest()->getPost();
                 $slotIdModel = Mage::getModel('citrusintegration/slotid');
 
-                if( $this->getRequest()->getParam('id') <= 0 ) {
-
+                if($this->getRequest()->getParam('id') <= 0) {
                     if($postData['page_type'] == '3')
-                        $postData['page_id'] = ['search'];
+                        $postData['page_id'] = array('search');
                     $postData['page_id'] = json_encode($postData['page_id']);
                     unset($postData['form_key']);
                     $slotIdModel
@@ -65,7 +66,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_SlotidController extends Ma
                     $slotIdModel->load($this->getRequest()->getParam('id'));
 
                     if($postData['page_type'] == '3')
-                        $postData['page_id'] = ['search'];
+                        $postData['page_id'] = array('search');
                     $postData['page_id'] = json_encode($postData['page_id']);
                     unset($postData['form_key']);
                     $slotIdModel
@@ -74,14 +75,13 @@ class Citrus_Integration_Adminhtml_Citrusintegration_SlotidController extends Ma
                         $slotIdModel->save();
                     }catch (Exception $exception){
                     }
+
                     Mage::getSingleton('adminhtml/session')->addSuccess('Successfully saved');
                     Mage::getSingleton('adminhtml/session')->setfilmsData(false);
                     $this->_redirect('*/*/');
                     return;
                 }
-
             } catch (Exception $e) {
-
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
                 Mage::getSingleton('adminhtml/session')->setfilmsData($this->getRequest()->getPost());
                 $this->_redirect('*/*/edit', array('id' => $this->getRequest()->getParam('id')));
@@ -107,61 +107,71 @@ class Citrus_Integration_Adminhtml_Citrusintegration_SlotidController extends Ma
                 $this->_redirect('*/*/edit', array('id' => $this->getRequest()->getParam('id')));
             }
         }
+
         $this->_redirect('*/*/');
     }
 
     /**
      * @return false|Citrus_Integration_Model_Discount
      */
-    protected function getDiscountModel(){
+    protected function getDiscountModel()
+    {
         return Mage::getModel('citrusintegration/discount');
     }
     /**
      * @return false|Citrus_Integration_Model_Ad
      */
-    protected function getAdModel(){
+    protected function getAdModel()
+    {
         return Mage::getModel('citrusintegration/ad');
     }
     /**
      * @return false|Citrus_Integration_Model_Banner
      */
-    protected function getBannerModel(){
+    protected function getBannerModel()
+    {
         return Mage::getModel('citrusintegration/banner');
     }
     /**
      * @return false|Citrus_Integration_Model_Service_Request
      */
-    protected function getRequestModel(){
+    protected function getRequestModel()
+    {
         return Mage::getModel('citrusintegration/service_request');
     }
     /**
      * @return false|Mage_Catalog_Model_Product
      */
-    protected function getProductModel(){
+    protected function getProductModel()
+    {
         return Mage::getModel('catalog/product');
     }
     /**
      * @return false|Mage_Customer_Model_Customer
      */
-    protected function getCustomerModel(){
+    protected function getCustomerModel()
+    {
         return Mage::getModel("customer/customer");
     }
     /**
      * @return false|Mage_Sales_Model_Order
      */
-    protected function getOrderModel(){
+    protected function getOrderModel()
+    {
         return Mage::getModel('sales/order');
     }
     /**
      * @return false|Citrus_Integration_Helper_Data
      */
-    protected function getHelper(){
+    protected function getHelper()
+    {
         return Mage::helper('citrusintegration/data');
     }
     /**
      * @return false|Citrus_Integration_Model_Queue
      */
-    protected function getQueueModel(){
+    protected function getQueueModel()
+    {
         return Mage::getModel('citrusintegration/queue');
     }
     /**

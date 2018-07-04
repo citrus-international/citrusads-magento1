@@ -15,6 +15,7 @@ class Citrus_Integration_Block_Adminhtml_Template_Grid_Renderer_Host extends Mag
                 $out = 'Staging';
                 break;
         }
+
         return $out;
     }
 }

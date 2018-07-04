@@ -1,7 +1,8 @@
 <?php
 $installer = $this;
 $installer->startSetup();
-$installer->run("
+$installer->run(
+    "
 DROP TABLE IF EXISTS {$this->getTable('citrusintegration/slotid')};
 CREATE TABLE {$this->getTable('citrusintegration/slotid')} (
   `id` int(11) unsigned NOT NULL auto_increment,
@@ -10,6 +11,7 @@ CREATE TABLE {$this->getTable('citrusintegration/slotid')} (
   `slot_id` VARCHAR(255) NULL,
   PRIMARY KEY (`id`)    
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-");
+"
+);
 
 $installer->endSetup();

@@ -20,58 +20,74 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Slotid_Edit_Form exte
     protected function _prepareForm()
     {
         $model = Mage::registry('slotid_model');
-        $form = new Varien_Data_Form(array(
+        $form = new Varien_Data_Form(
+            array(
             'id'        => 'edit_form',
             'action'    => $this->getUrl('*/*/save', array('id' => $this->getRequest()->getParam('id'))),
             'method'    => 'post'
-        ));
+            )
+        );
 
-        $fieldset = $form->addFieldset('slotid_fieldset', array(
+        $fieldset = $form->addFieldset(
+            'slotid_fieldset', array(
             'legend'    => Mage::helper('checkout')->__('SlotId Information'),
-        ));
+            )
+        );
 
         if ($model->getId()) {
-            $fieldset->addField('id', 'hidden', array(
+            $fieldset->addField(
+                'id', 'hidden', array(
                 'name' => 'id',
-            ));
+                )
+            );
         }
-        $page_type = $fieldset->addField('page_type', 'select', array(
+
+        $page_type = $fieldset->addField(
+            'page_type', 'select', array(
             'name'      => 'page_type',
             'label'     => Mage::helper('checkout')->__('Page Type'),
             'title'     => Mage::helper('checkout')->__('Page Type'),
-            'values' => [
+            'values' => array(
                 '0' => 'All Pages',
                 '1' => 'Category Pages',
                 '2' => 'CMS Pages',
                 '3' => 'Search Pages',
-            ],
+            ),
             'require' => true
-        ));
-        $category_page = $fieldset->addField('page_category_id', 'multiselect', array(
+            )
+        );
+        $category_page = $fieldset->addField(
+            'page_category_id', 'multiselect', array(
             'name'      => 'page_id',
             'label'     => Mage::helper('checkout')->__('Page Id'),
             'title'     => Mage::helper('checkout')->__('Page Id'),
             'values' => Mage::helper('citrusintegration')->getAllCategoriesArray(true),
             'require' => true
-        ));
-        $cms_page = $fieldset->addField('page_cms_id', 'multiselect', array(
+            )
+        );
+        $cms_page = $fieldset->addField(
+            'page_cms_id', 'multiselect', array(
             'name'      => 'page_id',
             'label'     => Mage::helper('checkout')->__('Page Id'),
             'title'     => Mage::helper('checkout')->__('Page Id'),
             'values' => Mage::getModel('cms/page')->getCollection()->toOptionArray(),
             'require' => true
-        ));
-        $fieldset->addField('slot_id', 'text', array(
+            )
+        );
+        $fieldset->addField(
+            'slot_id', 'text', array(
             'name'      => 'slot_id',
             'label'     => Mage::helper('checkout')->__('Slot Id'),
             'title'     => Mage::helper('checkout')->__('Slot Id'),
             'require' => true
-        ));
+            )
+        );
 
         $form->setValues($model->getData());
 
         $this->setForm($form);
-        $this->setChild('form_after', $this->getLayout()->createBlock('adminhtml/widget_form_element_dependence')
+        $this->setChild(
+            'form_after', $this->getLayout()->createBlock('adminhtml/widget_form_element_dependence')
             ->addFieldMap($page_type->getHtmlId(), $page_type->getName())
             ->addFieldMap($category_page->getHtmlId(), $category_page->getHtmlId())
             ->addFieldMap($cms_page->getHtmlId(), $cms_page->getHtmlId())

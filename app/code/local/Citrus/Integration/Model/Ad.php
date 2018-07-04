@@ -21,10 +21,12 @@ class Citrus_Integration_Model_Ad extends Mage_Core_Model_Abstract
         parent::_construct();
         $this->_init('citrusintegration/ad');
     }
-    public function getIdByCitrusId($citrusId){
+    public function getIdByCitrusId($citrusId)
+    {
         return $this->_getResource()->getIdByCitrusId($citrusId);
     }
-    public function getCitrusIdByGtin($gtin){
+    public function getCitrusIdByGtin($gtin)
+    {
         return $this->_getResource()->getCitrusIdByGtin($gtin);
     }
     protected function _getResource()

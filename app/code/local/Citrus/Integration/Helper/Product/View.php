@@ -72,13 +72,14 @@ class Citrus_Integration_Helper_Product_View extends Mage_Catalog_Helper_Product
         if (!empty($parentIds)) {
             $parentProduct = Mage::getModel('catalog/product')->load($parentIds[0]);
             $attributes = $parentProduct->getTypeInstance()->getConfigurableAttributes($parentProduct);
-            $attribute_values = [];
+            $attribute_values = array();
             foreach ($attributes->getItems() as $attribute) {
                 /** @var Mage_Catalog_Model_Product_Type_Configurable_Attribute $attribute_code */
                 $_attr = $attribute->getProductAttribute();
                 $attribute_code = (string)$_attr->getAttributeCode();
                 $attribute_values[$attribute_code] = $product->getData($attribute_code);
             }
+
             Mage::register('redirect_op', $attribute_values);
             return $parentProduct->getId();
         } else {

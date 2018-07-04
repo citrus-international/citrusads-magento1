@@ -10,25 +10,30 @@ class Citrus_Integration_Block_Widget_Ads extends Mage_Catalog_Block_Product_New
         parent::_construct();
         $this->addPriceBlockType('bundle', 'bundle/catalog_product_price', 'bundle/catalog/product/price.phtml');
     }
-    public function getMaxNumberAds(){
+    public function getMaxNumberAds()
+    {
         return (int)$this->getData('max_number_ads') > 0 ? (int)$this->getData('max_number_ads') : $this->_defaultMaxNumberAds;
     }
-    public function getColumnCount(){
+    public function getColumnCount()
+    {
         return (int)$this->getData('column_count') > 0 ? (int)$this->getData('column_count') : $this->_defaultColumnCount;
     }
-    public function getPageType(){
+    public function getPageType()
+    {
         return $this->getData('page_type');
     }
-    public function _getProductCollection(){
+    public function _getProductCollection()
+    {
         $limit = $this->getMaxNumberAds();
         $pageType = $this->getPageType();
         $adCollections = Mage::getResourceModel('citrusintegration/ad')->getAds($limit, $pageType);
         /** @var $collection Mage_Catalog_Model_Resource_Product_Collection */
 
-        $productIds = [];
+        $productIds = array();
         foreach ($adCollections as $adCollection){
             $productIds[] = $adCollection['gtin'];
         }
+
         $collection = Mage::getResourceModel('catalog/product_collection');
         $collection = $this->_addProductAttributesAndPrices($collection)
             ->addAttributeToFilter('entity_id', array('in' => $productIds))

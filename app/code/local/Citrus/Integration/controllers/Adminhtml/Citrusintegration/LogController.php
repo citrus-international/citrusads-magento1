@@ -13,37 +13,43 @@ class Citrus_Integration_Adminhtml_Citrusintegration_LogController extends Mage_
     /**
      * @return false|Citrus_Integration_Model_Service_Request
      */
-    protected function getRequestModel(){
+    protected function getRequestModel()
+    {
         return Mage::getModel('citrusintegration/service_request');
     }
     /**
      * @return false|Mage_Catalog_Model_Product
      */
-    protected function getProductModel(){
+    protected function getProductModel()
+    {
         return Mage::getModel('catalog/product');
     }
     /**
      * @return false|Mage_Customer_Model_Customer
      */
-    protected function getCustomerModel(){
+    protected function getCustomerModel()
+    {
         return Mage::getModel("customer/customer");
     }
     /**
      * @return false|Mage_Sales_Model_Order
      */
-    protected function getOrderModel(){
+    protected function getOrderModel()
+    {
         return Mage::getModel('sales/order');
     }
     /**
      * @return false|Citrus_Integration_Helper_Data
      */
-    protected function getHelper(){
+    protected function getHelper()
+    {
         return Mage::helper('citrusintegration/data');
     }
     /**
      * @return false|Citrus_Integration_Model_Queue
      */
-    protected function getQueueModel(){
+    protected function getQueueModel()
+    {
         return Mage::getModel('citrusintegration/queue');
     }
     /**

@@ -12,7 +12,7 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Queue extends Mage_Ad
     }
     protected function _prepareLayout()
     {
-        $this->setChild('grid',$this->getLayout()->createBlock( $this->_blockGroup.'/' . $this->_controller . '_grid', $this->_controller . '.grid')->setSaveParametersInSession(true) );
+        $this->setChild('grid', $this->getLayout()->createBlock($this->_blockGroup.'/' . $this->_controller . '_grid', $this->_controller . '.grid')->setSaveParametersInSession(true));
         return parent::_prepareLayout();
     }
 }

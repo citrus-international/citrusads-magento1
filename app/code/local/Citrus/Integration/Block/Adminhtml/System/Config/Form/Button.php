@@ -25,11 +25,11 @@ class Citrus_Integration_Block_Adminhtml_System_Config_Form_Button extends Mage_
         $buttonLabel = !empty($originalData['label']) ? $originalData['label'] : $this->_buttonLabel;
         $router = !empty($originalData['button_url']) ? $originalData['button_url'] : '*/dashboard/index';
         $this->addData(
-            [
+            array(
                 'label' => $this->helper('adminhtml')->__($buttonLabel),
                 'id' => $element->getHtmlId(),
                 'button_url' => Mage::helper('adminhtml')->getUrl($router, array('_secure' => true))//$this->getUrl($router)
-            ]
+            )
         );
         $element->setComment('<strong style="color:red">Warning</strong>: Please save the configuration before syncing data');
         return $this->_toHtml();

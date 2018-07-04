@@ -19,10 +19,12 @@ class Citrus_Integration_Model_Banner extends Mage_Core_Model_Abstract
      * @param   string $citrusId
      * @return  string
      */
-    public function getIdByCitrusId($citrusId){
+    public function getIdByCitrusId($citrusId)
+    {
         return $this->_getResource()->getIdByCitrusId($citrusId);
     }
-    public function getBannerByPageType($pageType){
+    public function getBannerByPageType($pageType)
+    {
         return $this->_getResource()->getBannerByPageType($pageType);
     }
 
