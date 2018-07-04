@@ -26,7 +26,8 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Grid extends Mage_
     protected function _prepareColumns()
     {
         try {
-            $this->addColumn('id',
+            $this->addColumn(
+                'id',
                 array(
                     'header' => $this->__('ID'),
                     'align' => 'left',
@@ -34,21 +35,24 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Grid extends Mage_
                     'index' => 'id'
                 )
             );
-            $this->addColumn('citrus_id',
+            $this->addColumn(
+                'citrus_id',
                 array(
                     'header' => $this->__('Citrus Id'),
                     'align' => 'left',
                     'index' => 'citrus_id'
                 )
             );
-            $this->addColumn('gtin',
+            $this->addColumn(
+                'gtin',
                 array(
                     'header' => $this->__('GTIN'),
                     'align' => 'left',
                     'index' => 'gtin'
                 )
             );
-            $this->addColumn('discount_id',
+            $this->addColumn(
+                'discount_id',
                 array(
                     'header' => $this->__('Discount Id'),
                     'align' => 'left',
@@ -56,14 +60,14 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Grid extends Mage_
                 )
             );
 
-            $this->addColumn('expiry',
+            $this->addColumn(
+                'expiry',
                 array(
                     'header' => $this->__('Expiry'),
                     'index' => 'expiry'
                 )
             );
         }catch (Exception $e){
-
         }
 
         return parent::_prepareColumns();

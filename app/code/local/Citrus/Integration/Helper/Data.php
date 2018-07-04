@@ -19,38 +19,45 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     const CITRUS_PAGE_TYPE_CATEGORY = 1;
     const CITRUS_PAGE_TYPE_CMS = 2;
 
-    public function getTeamId(){
+    public function getTeamId()
+    {
         return Mage::getStoreConfig('citrus/citrus_group/team_id', Mage::app()->getStore());
     }
 
     /** @return false|Citrus_Integration_Model_Sync */
-    public function getSyncModel(){
+    public function getSyncModel()
+    {
         return Mage::getModel('citrusintegration/sync');
     }
 
-    public function getApiKey(){
+    public function getApiKey()
+    {
         return Mage::getStoreConfig('citrus/citrus_group/api_key', Mage::app()->getStore());
     }
     /**
      * @return false|Citrus_Integration_Model_Banner
      */
-    public function getBannerModel(){
+    public function getBannerModel()
+    {
         return Mage::getModel('citrusintegration/banner');
     }
 
     /**
      * @return false|Citrus_Integration_Model_Discount
      */
-    protected function getDiscountModel(){
+    protected function getDiscountModel()
+    {
         return Mage::getModel('citrusintegration/discount');
     }
     /**
      * @return false|Citrus_Integration_Model_Ad
      */
-    protected function getAdModel(){
+    protected function getAdModel()
+    {
         return Mage::getModel('citrusintegration/ad');
     }
-    public function getHost(){
+    public function getHost()
+    {
         $host = Mage::getStoreConfig('citrus/citrus_group/host', Mage::app()->getStore());
         switch ($host){
             case 1:
@@ -67,35 +74,41 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     /**
      * @return false|string
      */
-    public function getCitrusCatalogId(){
+    public function getCitrusCatalogId()
+    {
         /** @var Citrus_Integration_Model_Catalog $model */
         $model = Mage::getModel('citrusintegration/catalog');
 //        $name = $this->getCitrusCatalogName();
         return $model->getCatalogId();
     }
-    public function getCitrusCatalogName(){
+    public function getCitrusCatalogName()
+    {
         return Mage::getStoreConfig('citrus/citrus_group/catalog_name', Mage::app()->getStore());
     }
     /**
      * @return false|Citrus_Integration_Model_Service_Request
      */
-    public function getRequestModel(){
+    public function getRequestModel()
+    {
         return Mage::getModel('citrusintegration/service_request');
     }
     /**
      * @return false|Citrus_Integration_Model_Service_Response
      */
-    public function getResponseModel(){
+    public function getResponseModel()
+    {
         return Mage::getModel('citrusintegration/service_response');
     }
-    public function log($messages, $file = '', $line = 0){
+    public function log($messages, $file = '', $line = 0)
+    {
             Mage::log($messages . ' on '.$file .':'.$line, null, 'citrus.log', true);
     }
     /**
      * @param $entity Mage_Sales_Model_Order
      * @return mixed
      */
-    public function getOrderData($entity){
+    public function getOrderData($entity)
+    {
         $teamId = $this->getTeamId();
         $data['teamId'] = $teamId;
         if($entity->getCustomerId()) {
@@ -103,59 +116,65 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             if($citrusId)
                 $data['customerId'] = $citrusId;
         }
+
         $datetime = DateTime::createFromFormat("Y-m-d H:i:s", $entity->getCreatedAt());
         $data['orderDate'] = $datetime->format(\DateTime::RFC3339);
         $orderItems = $entity->getAllItems();
         foreach ($orderItems as $orderItem){
             $data['orderItems'][] = $this->getOrderItemData($orderItem);
         }
+
         return $data;
     }
-    public function getContextData($context = null){
-        $data = [
+    public function getContextData($context = null)
+    {
+        $data = array(
             'catalogId' => $this->getCitrusCatalogId(),
             'pageType' => isset($context['pageType']) ? $context['pageType'] : 'Home',
             'maxNumberOfAds' => self::MAX_NUMBER_OF_ADS
-        ];
+        );
         if(isset($context['searchTerm']))
             $data['searchTerm'] = $context['searchTerm'];
         if(isset($context['bannerSlotIds'])){
-            $arrays = explode(',',$context['bannerSlotIds']);
+            $arrays = explode(',', $context['bannerSlotIds']);
             $data['bannerSlotIds'] = $arrays;
         }
+
         if(isset($context['productFilters'])){
-            $arrays = explode(',',trim($context['productFilters'], ','));
-                $data['productFilters'] = [$arrays];
+            $arrays = explode(',', trim($context['productFilters'], ','));
+                $data['productFilters'] = array($arrays);
         }
+
         if(isset($context['customerId']))
             $data['customerId'] = $context['customerId'];
         return $data;
     }
 
-    public function handleAdsResponse($response, $pageType = null, $adsEnable = true, $bannerEnable = true){
+    public function handleAdsResponse($response, $pageType = null, $adsEnable = true, $bannerEnable = true)
+    {
         if($response['success']){
             $data = json_decode($response['message'], true);
             $adModel = $this->getAdModel();
             $bannerModel = $this->getBannerModel();
             $discountModel = $this->getDiscountModel();
             $host = $this->getHost();
-            $adsRegistry = [];
-            $bannerRegistry = [];
+            $adsRegistry = array();
+            $bannerRegistry = array();
             if($data['ads'] && $adsEnable){
                 foreach ($data['ads'] as $ad){
                     $id = $adModel->getIdByCitrusId($ad['id']);
                     if($id){
                         $adModel->load($id);
                         $discountModel->load($adModel->getDiscountId());
-                        $adData = [
+                        $adData = array(
                             'gtin' => $ad['gtin'],
                             'expiry' => $ad['expiry']
-                        ];
-                        $discountData = [
+                        );
+                        $discountData = array(
                             'amount' => $ad['discount']['amount'],
                             'minPrice' => $ad['discount']['minPrice'],
                             'maxPerCustomer' => $ad['discount']['maxPerCustomer'],
-                        ];
+                        );
                         $adModel->addData($adData);
                         $discountModel->addData($discountData);
 
@@ -170,11 +189,11 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     }
                     else{
                         $discountModel->unsetData();
-                        $discountData = [
+                        $discountData = array(
                             'amount' => $ad['discount']['amount'],
                             'minPrice' => $ad['discount']['minPrice'],
                             'maxPerCustomer' => $ad['discount']['maxPerCustomer'],
-                        ];
+                        );
                         $discountModel->addData($discountData);
                         try{
                             $discountModel->save();
@@ -182,15 +201,16 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                             $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                             return false;
                         }
+
                         $adModel->unsetData();
-                        $adData = [
+                        $adData = array(
                             'citrus_id' => $ad['id'],
                             'discount_id' => $discountModel->getId(),
                             'pageType' => $pageType,
                             'gtin' => $ad['gtin'],
                             'expiry' => $ad['expiry'],
                             'host' => $host
-                        ];
+                        );
                         $adModel->addData($adData);
                         try{
                             $adModel->save();
@@ -202,19 +222,20 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     }
                 }
             }
+
             if($data['banners'] && $bannerEnable){
                 foreach ($data['banners'] as $banner){
                     $id = $bannerModel->getIdByCitrusId($banner['id']);
                     if($id){
                         $bannerModel->load($id);
-                        $bannerData = [
+                        $bannerData = array(
                             'slotId' => $banner['slotId'],
                             'imageUrl' => $banner['imageUrl'],
                             'altText' => $banner['altText'],
                             'linkUrl' => $banner['linkUrl'],
                             'expiry' => $banner['expiry'],
                             'pageType' => $pageType
-                        ];
+                        );
                         $bannerModel->addData($bannerData);
                         try{
                             $bannerModel->save();
@@ -226,7 +247,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     }
                     else{
                         $bannerModel->unsetData();
-                        $bannerData = [
+                        $bannerData = array(
                             'citrus_id' => $banner['id'],
                             'slotId' => $banner['slotId'],
                             'imageUrl' => $banner['imageUrl'],
@@ -235,7 +256,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                             'expiry' => $banner['expiry'],
                             'host' => $host,
                             'pageType' => $pageType
-                        ];
+                        );
                         $bannerModel->addData($bannerData);
                         try{
                             $bannerModel->save();
@@ -247,14 +268,16 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     }
                 }
             }
-            return ['ads'=>$adsRegistry,'banners'=>$bannerRegistry];
+
+            return array('ads'=>$adsRegistry,'banners'=>$bannerRegistry);
         }
         else{
             $this->log('Get ads response error: '.$response['message'], __FILE__, __LINE__);
             return false;
         }
     }
-    public function handleBanner($banners, $adId){
+    public function handleBanner($banners, $adId)
+    {
         /** @var Citrus_Integration_Model_Banner $model */
         $model = Mage::getModel('citrusintegration/banner');
         $host = $this->getHelper()->getHost();
@@ -283,7 +306,8 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                             $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                         }
                     }
-                    $bannerData = [
+
+                    $bannerData = array(
                         "id" => $banner['id'],
                         "slotId" => $banner['slotId'],
                         "imageUrl" => $banner['imageUrl'],
@@ -292,7 +316,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         "expiry" => $banner['expiry'],
                         "ad_id" => $adId,
                         "host" => $host
-                    ];
+                    );
                     $model->addData($bannerData);
                     try{
                         $model->save();
@@ -301,7 +325,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     }
                 }
                 else{
-                    $bannerData = [
+                    $bannerData = array(
                         "id" => $banner['id'],
                         "slotId" => $banner['slotId'],
                         "imageUrl" => $banner['imageUrl'],
@@ -310,7 +334,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         "expiry" => $banner['expiry'],
                         "ad_id" => $adId,
                         "host" => $host
-                    ];
+                    );
                     $model->addData($bannerData);
                     try{
                         $model->save();
@@ -322,7 +346,8 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         }
     }
 
-    public function handleResponse($response,$type = null, $name = null){
+    public function handleResponse($response,$type = null, $name = null)
+    {
         if ($response['success']) {
             if($type == 'catalog'){
                 $host = $this->getHost();
@@ -357,7 +382,6 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                         $this->log('Handle customer response error: '.$e->getMessage(), __FILE__, __LINE__);
                     }
                 }
-
             }
             elseif($type == 'order'){
                 $data = json_decode($response['message'], true);
@@ -381,7 +405,8 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      * @param $item Mage_Sales_Model_Order_Item
      * @return array
      */
-    public function getOrderItemData($item){
+    public function getOrderItemData($item)
+    {
         $data['gtin'] = $item->getSku();
         $data['quantity'] = (int)$item->getQtyOrdered();
         $data['regularUnitPrice'] = (int)$item->getBasePrice();
@@ -396,13 +421,15 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                 $data['citrusDiscountAmount'] = (int)$discount;
             }
         }
+
         return $data;
     }
     /**
      * @param $entity Mage_Customer_Model_Customer
      * @return mixed
      */
-    public function getCustomerData($entity){
+    public function getCustomerData($entity)
+    {
         $teamId = $this->getTeamId();
         $data['teamId'] = $teamId;
         $citrus_id = $this->getCitrusIdById(Citrus_Integration_Model_Customer::ENTITY, $entity->getId());
@@ -422,11 +449,13 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $year = $datetime->format('Y');
             $data['yearOfBirth'] = (int)$year;
         }
+
         $address = $entity->getDefaultBillingAddress();
         $data['postcode'] = isset($address)&& $address ? $address->getPostcode() : '';
         return $data;
     }
-    public function getCitrusIdById($type, $id){
+    public function getCitrusIdById($type, $id)
+    {
         $model = Mage::getModel('citrusintegration/'.$type);
         $citrus_id = $model->getCitrusIdById($id);
         return $citrus_id;
@@ -435,11 +464,12 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      * @param $entity Mage_Catalog_Model_Product
      * @return mixed
      */
-    public function getProductData($entity){
+    public function getProductData($entity)
+    {
         $data['gtin'] = $entity->getSku();
         $data['name'] = $entity->getName();
         if ($entity->getImage() != 'no_selection')
-            $data['images'] = [Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage())];
+            $data['images'] = array(Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage()));
         if($entity->getSize())
             $data['size'] = $entity->getSize();
         $categoryIds = $entity->getResource()->getCategoryIds($entity);
@@ -450,13 +480,15 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                 $data['categoryHierarchies'][] = $this->getCategoryHierarchies($category);
             }
         }
+
         return $data;
     }
     /**
      * @param $entity Mage_Catalog_Model_Product
      * @return array
      */
-    public function getCatalogProductData($entity){
+    public function getCatalogProductData($entity)
+    {
         $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($entity);
         $catalogId = $this->getCitrusCatalogId();
         $teamId = $this->getTeamId();
@@ -498,37 +530,42 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      * @param array $array
      * @return mixed
      */
-    public function getCategoryHierarchies($category, $array = []){
-        $parents = explode('/', $category->getpath() );
+    public function getCategoryHierarchies($category, $array = array())
+    {
+        $parents = explode('/', $category->getpath());
         foreach ($parents as $parentId){
             $parent = Mage::getModel(Mage_Catalog_Model_Category::class)->load($parentId);
             if($parent->getLevel() != 0 && $parent->getLevel() != 1){
                 $array[] = $parent->getName();
             }
         }
+
         return $array;
     }
     /**
      * @param $product Mage_Catalog_Model_Product
      * @return array
      */
-    public function getProductFilter($product){
+    public function getProductFilter($product)
+    {
         $attributes = Mage::getStoreConfig('citrus_sync/product_attribute_filter/attribute', Mage::app()->getStore());
-        $attribute_value = [];
+        $attribute_value = array();
         if($attributes) {
             $attributes = explode(',', $attributes);
-            foreach ( $attributes as $attribute) {
+            foreach ($attributes as $attribute) {
                 $attributeValue = $product->getData($attribute);
                 if($attributeValue)
                     $attribute_value[] = $attribute.'_'.$attributeValue;
             }
         }
+
         $categoryIds = $product->getResource()->getCategoryIds($product);
         $websites = $product->getWebsiteIds();
         if($attribute_value){
             $websites = array_merge($websites, $attribute_value);
         }
-        $cats = [];
+
+        $cats = array();
         if(is_array($categoryIds)) {
             foreach ($categoryIds as $category_id) {
                 /** @var Mage_Catalog_Model_Category $category */
@@ -536,13 +573,16 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                 $cats[] = $this->getCategoryHierarchies($category);
             }
         }
+
         foreach ($cats as $cat){
-            $result = array_merge(isset($result) ? $result : [],$cat);
+            $result = array_merge(isset($result) ? $result : array(), $cat);
         }
-        return array_values(array_unique(array_merge($websites,isset($result) ? $result : [])));
+
+        return array_values(array_unique(array_merge($websites, isset($result) ? $result : array())));
     }
-    public function getProductTags($id){
-        $results = [];
+    public function getProductTags($id)
+    {
+        $results = array();
         $model=Mage::getModel('tag/tag');
         $tags= $model->getResourceCollection()
             ->addPopularity()
@@ -553,6 +593,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         foreach ($tags as $tag){
             $results[] = $tag->getName();
         }
+
         return $results;
     }
 //    public function handleData($itemId, $type){
@@ -582,7 +623,8 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
 //        }
 //        $this->handleResponse($response);
 //    }
-    public function handlePostResponse($response){
+    public function handlePostResponse($response)
+    {
         if($response['success']){
             $data = json_decode($response['message'], true);
             $adModel = $this->getAdModel();
@@ -594,15 +636,15 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     if($id){
                         $adModel->load($id);
                         $discountModel->load($adModel->getDiscountId());
-                        $adData = [
+                        $adData = array(
                             'gtin' => $ad['gtin'],
                             'expiry' => $ad['expiry']
-                        ];
-                        $discountData = [
+                        );
+                        $discountData = array(
                             'amount' => $ad['discount']['amount'],
                             'minPrice' => $ad['discount']['minPrice'],
                             'maxPerCustomer' => $ad['discount']['maxPerCustomer'],
-                        ];
+                        );
                         $adModel->addData($adData);
                         $discountModel->addData($discountData);
 
@@ -616,11 +658,11 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     }
                     else{
                         $discountModel->unsetData();
-                        $discountData = [
+                        $discountData = array(
                             'amount' => $ad['discount']['amount'],
                             'minPrice' => $ad['discount']['minPrice'],
                             'maxPerCustomer' => $ad['discount']['maxPerCustomer'],
-                        ];
+                        );
                         $discountModel->addData($discountData);
                         try{
                             $discountModel->save();
@@ -628,14 +670,15 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                             $this->log('Handle ads response error: '.$e->getMessage(), __FILE__, __LINE__);
                             return false;
                         }
+
                         $adModel->unsetData();
-                        $adData = [
+                        $adData = array(
                             'citrus_id' => $ad['id'],
                             'discount_id' => $discountModel->getId(),
                             'gtin' => $ad['gtin'],
                             'expiry' => $ad['expiry'],
                             'host' => $host
-                        ];
+                        );
                         $adModel->addData($adData);
                         try{
                             $adModel->save();
@@ -646,6 +689,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     }
                 }
             }
+
             return true;
         }
         else{
@@ -673,14 +717,17 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             if (!isset($category['name'])) {
                 continue;
             }
+
             $categoryIds = explode('/', $category['path']);
             $nameParts = array();
             foreach($categoryIds as $catId) {
                 if($catId == 1) {
                     continue;
                 }
+
                 $nameParts[] = $allCategoriesArray[$catId]['name'];
             }
+
             $categories[$categoryId] = array(
                 'value' => $categoryId,
                 'label' => implode(' / ', $nameParts)

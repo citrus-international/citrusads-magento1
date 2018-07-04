@@ -26,7 +26,8 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Banner_Grid extends M
     protected function _prepareColumns()
     {
         try{
-            $this->addColumn('id',
+            $this->addColumn(
+                'id',
                 array(
                     'header'=> $this->__('ID'),
                     'align' =>'left',
@@ -34,21 +35,24 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Banner_Grid extends M
                     'index' => 'id'
                 )
             );
-            $this->addColumn('citrus_id',
+            $this->addColumn(
+                'citrus_id',
                 array(
                     'header'=> $this->__('Banner Id'),
                     'align' =>'left',
                     'index' => 'citrus_id'
                 )
             );
-            $this->addColumn('slotId',
+            $this->addColumn(
+                'slotId',
                 array(
                     'header'=> $this->__('Slot Id'),
                     'align' =>'left',
                     'index' => 'slotId'
                 )
             );
-            $this->addColumn('pageType',
+            $this->addColumn(
+                'pageType',
                 array(
                     'header'=> $this->__('Page Type'),
                     'align' =>'left',
@@ -56,32 +60,37 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Banner_Grid extends M
                 )
             );
 
-            $this->addColumn('imageUrl',
+            $this->addColumn(
+                'imageUrl',
                 array(
                     'header'=> $this->__('Image Url'),
                     'index' => 'imageUrl',
                     'renderer' => 'Citrus_Integration_Block_Adminhtml_Template_Grid_Renderer_Image'
                 )
             );
-            $this->addColumn('linkUrl',
+            $this->addColumn(
+                'linkUrl',
                 array(
                     'header'=> $this->__('Link Url'),
                     'index' => 'linkUrl'
                 )
             );
-            $this->addColumn('altText',
+            $this->addColumn(
+                'altText',
                 array(
                     'header'=> $this->__('Alt Text'),
                     'index' => 'altText'
                 )
             );
-            $this->addColumn('expiry',
+            $this->addColumn(
+                'expiry',
                 array(
                     'header'=> $this->__('Expiry'),
                     'index' => 'expiry'
                 )
             );
-            $this->addColumn('host',
+            $this->addColumn(
+                'host',
                 array(
                     'header'=> $this->__('Host'),
                     'index' => 'host',
@@ -89,8 +98,8 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Banner_Grid extends M
                 )
             );
         }catch (Exception $e){
-
         }
+
         return parent::_prepareColumns();
     }
 

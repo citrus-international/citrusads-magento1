@@ -9,7 +9,8 @@ class Citrus_Integration_Model_Resource_Log extends Mage_Core_Model_Resource_Db_
     /**
      * @return Mage_Core_Helper_Abstract|Citrus_Integration_Helper_Data
      */
-    protected function getHelper(){
+    protected function getHelper()
+    {
         return Mage::helper('citrusintegration/data');
     }
 }

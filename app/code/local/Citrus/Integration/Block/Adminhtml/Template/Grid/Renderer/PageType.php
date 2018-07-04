@@ -18,6 +18,7 @@ class Citrus_Integration_Block_Adminhtml_Template_Grid_Renderer_PageType extends
                 $out = 'All Pages';
                 break;
         }
+
         return $out;
     }
 }

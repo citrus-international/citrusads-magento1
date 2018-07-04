@@ -11,41 +11,48 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     /**
      * @return false|Citrus_Integration_Model_Service_Request
      */
-    protected function getRequestModel(){
+    protected function getRequestModel()
+    {
         return Mage::getModel('citrusintegration/service_request');
     }
     /**
      * @return false|Mage_Catalog_Model_Product
      */
-    protected function getProductModel(){
+    protected function getProductModel()
+    {
         return Mage::getModel('catalog/product');
     }
     /**
      * @return false|Mage_Customer_Model_Customer
      */
-    protected function getCustomerModel(){
+    protected function getCustomerModel()
+    {
         return Mage::getModel("customer/customer");
     }
     /**
      * @return false|Mage_Sales_Model_Order
      */
-    protected function getOrderModel(){
+    protected function getOrderModel()
+    {
         return Mage::getModel('sales/order');
     }
 
     /**
      * @return false|Citrus_Integration_Helper_Data
      */
-    protected function getHelper(){
+    protected function getHelper()
+    {
         return Mage::helper('citrusintegration/data');
     }
     /**
      * @return false|Citrus_Integration_Model_Queue
      */
-    protected function getQueueModel(){
+    protected function getQueueModel()
+    {
         return Mage::getModel('citrusintegration/queue');
     }
-    public function productAction(){
+    public function productAction()
+    {
         $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
         if($moduleEnable) {
             $enable = Mage::getStoreConfig('citrus_sync/citrus_product/enable', Mage::app()->getStore());
@@ -60,12 +67,13 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     /** @var Mage_Catalog_Model_Resource_Product_Collection $allCollections */
                     $allCollections = $productModel->getCollection()
                         ->addAttributeToSelect('*')
-                        ->addAttributeToFilter('type_id', ['in' => ['simple', 'virtual']])
+                        ->addAttributeToFilter('type_id', array('in' => array('simple', 'virtual')))
                         ->addAttributeToFilter('status', 1);
                     $allCollections->getItems();
                     foreach ($allCollections as $collection) {
                         $this->pushItemToQueue($collection);
                     }
+
                     $message = Mage::helper('adminhtml')->__('All Products have been added to queue, click <a href="' . Mage::helper("adminhtml")->getUrl("adminhtml/citrusintegration_queue/index") . '">here</a> to go to check out sync queue');
                 } else {
                     $message = Mage::helper('adminhtml')->__('Please enable sync product!');
@@ -75,15 +83,17 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         else{
             $message = Mage::helper('adminhtml')->__('Please enable module!');
         }
+
         $params = $this->getRequest()->getParams();
         if(!$params['redirect']){
-            $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(['message'=>$message]));
+            $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array('message'=>$message)));
         }
         else
 
             $this->_redirect('*/citrusintegration_queue/index');
     }
-    public function orderAction(){
+    public function orderAction()
+    {
         $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
         if($moduleEnable) {
             $enable = Mage::getStoreConfig('citrus_sync/citrus_order/enable', Mage::app()->getStore());
@@ -106,6 +116,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     foreach ($allCollections as $collection) {
                         $this->pushItemToQueue($collection);
                     }
+
                     $message = Mage::helper('adminhtml')->__('All Orders have been added to queue, click <a href="' . Mage::helper("adminhtml")->getUrl("adminhtml/citrusintegration_queue/index") . '">here</a> to go to check out sync queue');
                 } else {
                     $message = Mage::helper('adminhtml')->__('Please enable sync order!');
@@ -115,9 +126,11 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         else{
             $message = Mage::helper('adminhtml')->__('Please enable module!');
         }
-        $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(['message'=>$message]));
+
+        $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array('message'=>$message)));
     }
-    public function customerAction(){
+    public function customerAction()
+    {
         $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
         if($moduleEnable) {
             $enable = Mage::getStoreConfig('citrus_sync/citrus_order/enable', Mage::app()->getStore());
@@ -135,6 +148,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     foreach ($allCollections as $collection) {
                         $this->pushItemToQueue($collection);
                     }
+
                     $message = Mage::helper('adminhtml')->__('All Customers have been added to queue, click <a href="' . Mage::helper("adminhtml")->getUrl("adminhtml/citrusintegration_queue/index") . '">here</a> to go to check out sync queue');
                 } else {
                     $message = Mage::helper('adminhtml')->__('Please enable sync customer!');
@@ -144,13 +158,15 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         else{
             $message = Mage::helper('adminhtml')->__('Please enable module!');
         }
-        $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(['message'=>$message]));
+
+        $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array('message'=>$message)));
     }
-    public function pushItemToQueue($item){
+    public function pushItemToQueue($item)
+    {
         $queueModel = $this->getQueueModel();
         $queueCollection = $queueModel->getCollection()->addFieldToSelect('id')
-            ->addFieldToFilter('entity_id', ['in' => [$item->getId(), $item->getIncrementId()]])
-            ->addFieldToFilter('type', ['eq' => $item->getResourceName()])
+            ->addFieldToFilter('entity_id', array('in' => array($item->getId(), $item->getIncrementId())))
+            ->addFieldToFilter('type', array('eq' => $item->getResourceName()))
             ->getFirstItem();
         if($queueCollection->getData()){
             $queueModel->load($queueCollection->getId());
@@ -181,9 +197,10 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
 
                     $oldItem = $queueModel->getCount();
                     $for = count($requestIds)/100;
-                    for($i = 0; $i <= $for; $i ++ ){
+                    for($i = 0; $i <= $for; $i ++){
                         $tmp_array[] = array_slice($requestIds, $i*100, 100);
                     }
+
                     array_walk($tmp_array, array($this, 'catalogProductCallback'), $oldItem);
                     $newtem = $queueModel->getCount();
                     $session = Mage::getSingleton('adminhtml/session');
@@ -208,7 +225,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     }if($oldItem >= $newtem){
                         Mage::getSingleton('adminhtml/session')->addSuccess(
                             Mage::helper('adminhtml')->__(
-                                'Total of %d record(s) were successfully synced',$oldItem - $newtem
+                                'Total of %d record(s) were successfully synced', $oldItem - $newtem
                             )
                         );
                     }
@@ -227,25 +244,26 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
 
         $this->_redirect('*/*/');
     }
-    public function catalogProductCallback($args, $count, $oldItem){
+    public function catalogProductCallback($args, $count, $oldItem)
+    {
         if($args) {
             $queueModel = Mage::getModel('citrusintegration/queue');
             $session = Mage::getSingleton('adminhtml/session');
             $syncItems = new Varien_Object;
             $catalog_product = $queueModel->getCollection()->addFieldToSelect('entity_id')
-                ->addFieldToFilter('id', ['in' => $args])
+                ->addFieldToFilter('id', array('in' => $args))
                 ->addFieldToFilter('type', 'catalog/product');
             $sales_order = $queueModel->getCollection()->addFieldToSelect('entity_id')
-                ->addFieldToFilter('id', ['in' => $args])
+                ->addFieldToFilter('id', array('in' => $args))
                 ->addFieldToFilter('type', 'sales/order');
             $customer_customer = $queueModel->getCollection()->addFieldToSelect('entity_id')
-                ->addFieldToFilter('id', ['in' => $args])
+                ->addFieldToFilter('id', array('in' => $args))
                 ->addFieldToFilter('type', 'customer/customer');
 
 
-            $syncItems->addData(['catalog_product' => $catalog_product]);
-            $syncItems->addData(['sales_order' => $sales_order]);
-            $syncItems->addData(['customer_customer' => $customer_customer]);
+            $syncItems->addData(array('catalog_product' => $catalog_product));
+            $syncItems->addData(array('sales_order' => $sales_order));
+            $syncItems->addData(array('customer_customer' => $customer_customer));
             $orderMessage = $session->getData('orderMessage');
             $customerMessage = $session->getData('customerMessage');
             $productMessage = $session->getData('productMessage');
@@ -260,13 +278,15 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                 elseif (!$return['customerMessage'])
                     $queueModel->makeDelete($args, 'customer/customer');
             }
+
             $return['orderMessage'] = $orderMessage ? $orderMessage : $return['orderMessage'];
             $return['customerMessage'] = $customerMessage ? $customerMessage : $return['customerMessage'];
             $return['productMessage'] = $productMessage ? $productMessage : $return['productMessage'];
             $session->setData($return);
         }
     }
-    protected function pushSyncItem($syncItems){
+    protected function pushSyncItem($syncItems)
+    {
         $catalog_product = $syncItems->getCatalogProduct();
         $sales_order = $syncItems->getSalesOrder();
         $customer_customer = $syncItems->getCustomerCustomer();
@@ -275,26 +295,30 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         $orderSuccess = true;
         $customerMessage = $productMessage = $orderMessage = 0;
         if($catalog_product){
-            $bodyCatalogProducts = [];
-            $bodyProducts = [];
+            $bodyCatalogProducts = array();
+            $bodyProducts = array();
             /** @var Mage_Catalog_Model_Product $productModel */
             $productModel = Mage::getModel(Mage_Catalog_Model_Product::class);
-            $productIds = [];
+            $productIds = array();
             foreach ($catalog_product as $productItem){
                 $productIds[] = $productItem->getEntityId();
             }
+
             if($productIds){
                 $productCollection = $productModel->getCollection()->addAttributeToSelect('*')
-                    ->addAttributeToFilter('entity_id', ['in' => $productIds]);
+                    ->addAttributeToFilter('entity_id', array('in' => $productIds));
                 foreach ($productCollection as $product){
                     $catalogProductData = $this->getHelper()->getCatalogProductData($product);
                     foreach ($catalogProductData as $key => $oneData){
-                        $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = [], [$oneData]);
+                        $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = array(), array($oneData));
                     }
+
                     $bodyProducts[] = $this->getHelper()->getProductData($product);
                 }
+
                 unset($productCollection);
             }
+
             foreach ($bodyCatalogProducts as $bodyCatalogProduct){
                 $pageCatalogProduct = count($bodyCatalogProduct)/100;
                 for ($i = 0;$i <= $pageCatalogProduct; $i++){
@@ -313,6 +337,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     }
                 }
             }
+
             $pageProduct = count($bodyProducts)/100;
             for ($i = 0;$i <= $pageProduct; $i++) {
                 $bodyProductsPage = array_slice($bodyProducts, $i * 100, 100);
@@ -323,22 +348,24 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                 }
             }
         }
-        if($sales_order){
 
-            $body = [];
+        if($sales_order){
+            $body = array();
             /** @var Mage_Sales_Model_Order $orderModel */
             $orderModel = Mage::getModel(Mage_Sales_Model_Order::class);
-            $orderIncrementId = [];
+            $orderIncrementId = array();
             foreach ($sales_order as $orderItem){
                 $orderIncrementId[] = $orderItem->getEntityId();
             }
+
             if($orderIncrementId){
                 $orderCollection = $orderModel->getCollection()->addAttributeToSelect('*')
-                    ->addAttributeToFilter('increment_id', ['in' => $orderIncrementId]);
+                    ->addAttributeToFilter('increment_id', array('in' => $orderIncrementId));
                 foreach ($orderCollection as $order){
                     $data = $this->getHelper()->getOrderData($order);
                     $body[] = $data;
                 }
+
                 unset($orderCollection);
             }
 
@@ -356,24 +383,29 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         $orderMessage = $response['message'];
                     }
                 }
+
 //            }
         }
+
         if($customer_customer){
-            $body = [];
+            $body = array();
             $customerModel = Mage::getModel(Mage_Customer_Model_Customer::class);
-            $customerIds = [];
+            $customerIds = array();
             foreach ($customer_customer as $customerItem){
                 $customerIds[] = $customerItem->getEntityId();
             }
+
             if($customerIds){
                 $customerCollection = $customerModel->getCollection()->addAttributeToSelect('*')
-                    ->addAttributeToFilter('entity_id', ['in' => $customerIds]);
+                    ->addAttributeToFilter('entity_id', array('in' => $customerIds));
                 foreach ($customerCollection as $customer){
                     $data = $this->getHelper()->getOrderData($customer);
                     $body[] = $data;
                 }
+
                 unset($customerCollection);
             }
+
 //            $customerPage = count($body)/100;
 //            for($i = 0; $i <= $customerPage; $i++){
 //                $bodyCustomersPage = array_slice($body, $i*100, 100);
@@ -388,8 +420,10 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         $customerMessage = $response['message'];
                     }
                 }
+
 //            }
         }
+
         $return['success'] = $productSuccess && $orderSuccess && $customerSuccess;
         $return['customerMessage'] = $customerMessage;
         $return['productMessage'] = $productMessage;
@@ -398,7 +432,8 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     }
 
 
-    public function pushProducts(){
+    public function pushProducts()
+    {
 
         $enable = Mage::getStoreConfig('citrus_sync/citrus_group/push_current_product', Mage::app()->getStore());
         $catalogId = $this->getHelper()->getCitrusCatalogId();
@@ -413,7 +448,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                 $productModel = Mage::getModel('catalog/product');
                 $allCollections = $productModel->getCollection()
                     ->addAttributeToSelect('*')
-                    ->addAttributeToFilter('type_id', ['in' => ['simple', 'virtual']])
+                    ->addAttributeToFilter('type_id', array('in' => array('simple', 'virtual')))
                     ->addAttributeToFilter('status', 1)
                     ->joinField(
                         'qty',
@@ -427,7 +462,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                 $numberOfPages = $allCollections->getLastPageNumber();
                 for ($i = 1; $i <= $numberOfPages; $i++) {
                     $collections = $allCollections->setCurPage($i);
-                    $body = [];
+                    $body = array();
                     foreach ($collections as $collection) {
                         $tags = $this->getProductTags($collection->getId());
                         $data['catalogId'] = $catalogId;
@@ -435,7 +470,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         $data['gtin'] = $collection->getId();
                         $data['name'] = $collection->getName();
                         if ($collection->getImage() != 'no_selection')
-                            $data['images'] = [Mage::getModel('catalog/product_media_config')->getMediaUrl($collection->getImage())];
+                            $data['images'] = array(Mage::getModel('catalog/product_media_config')->getMediaUrl($collection->getImage()));
                         $data['inventory'] = (int)$collection->getQty();
                         $data['price'] = (int)$collection->getPrice();
                         $data['tags'] = $tags;
@@ -446,16 +481,19 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                                 $category = $catModel->load($categoryId);
                                 $data['categoryHierarchy'][] = $category->getName();
                             }
+
                         $body[] = $data;
                     }
-                    $response = $this->getRequestModel()->pushCatalogProductsRequest([$body]);
+
+                    $response = $this->getRequestModel()->pushCatalogProductsRequest(array($body));
                     $this->getHelper()->log('sync catalog product 1: '.$response['message'], __FILE__, __LINE__);
                     $this->handleResponse($response);
                 }
             }
         }
     }
-    public function massDeleteAction() {
+    public function massDeleteAction() 
+    {
         $requestIds = $this->getRequest()->getParam('id');
         if(!is_array($requestIds)) {
             Mage::getSingleton('adminhtml/session')->addError(Mage::helper('adminhtml')->__('Please select request(s)'));
@@ -465,6 +503,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     $RequestData = Mage::getModel('citrusintegration/queue')->load($requestId);
                     $RequestData->delete();
                 }
+
                 Mage::getSingleton('adminhtml/session')->addSuccess(
                     Mage::helper('adminhtml')->__(
                         'Total of %d record(s) were successfully deleted', count($requestIds)
@@ -474,6 +513,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                 Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
             }
         }
+
         $this->_redirect('*/*/');
     }
 

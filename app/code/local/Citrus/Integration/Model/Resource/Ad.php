@@ -6,7 +6,8 @@ class Citrus_Integration_Model_Resource_Ad extends Mage_Core_Model_Resource_Db_A
     {
         $this->_init('citrusintegration/ad', 'id');
     }
-    public function getIdByCitrusId($citrusId){
+    public function getIdByCitrusId($citrusId)
+    {
         $host = $this->getHelper()->getHost();
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
@@ -19,7 +20,8 @@ class Citrus_Integration_Model_Resource_Ad extends Mage_Core_Model_Resource_Db_A
         );
         return $adapter->fetchOne($select, $bind);
     }
-    public function getCitrusIdByGtin($gtin){
+    public function getCitrusIdByGtin($gtin)
+    {
         $host = $this->getHelper()->getHost();
         $adapter = $this->_getReadAdapter();
         $select = $adapter->select()
@@ -47,7 +49,7 @@ class Citrus_Integration_Model_Resource_Ad extends Mage_Core_Model_Resource_Db_A
             ->from(self::getMainTable(), '*')
             ->where('host = :host')
             ->where('pageType = :pageType')
-            ->where('expiry >= :expiry' )->order(['id DESC'] )
+            ->where('expiry >= :expiry')->order(array('id DESC'))
             ->limit($limit);
         $bind = array(
             ':host' => (string)$host,
@@ -59,7 +61,8 @@ class Citrus_Integration_Model_Resource_Ad extends Mage_Core_Model_Resource_Db_A
     /**
      * @return Mage_Core_Helper_Abstract|Citrus_Integration_Helper_Data
      */
-    protected function getHelper(){
+    protected function getHelper()
+    {
         return Mage::helper('citrusintegration/data');
     }
 }
