@@ -13,13 +13,15 @@ use PHPUnit\Framework\TestCase;
 class Citrus_Integration_Helper_DataTest extends TestCase
 {
     private $model;
-    private $queueModel;
+    private $resource;
+    private $readConnection;
 
     public function setUp()
     {
         $app = Mage::app('default');
         $this->model = new Citrus_Integration_Helper_Data;
-        $this->queueModel = new Citrus_Integration_Adminhtml_Citrusintegration_QueueController;
+        $this->resource = Mage::getSingleton('core/resource');
+        $this->readConnection = $this->resource->getConnection('core_read');
     }
 
     public function testGetCatalogProductData() {
@@ -68,5 +70,99 @@ class Citrus_Integration_Helper_DataTest extends TestCase
 //            $this->assertInstanceOf('Array', $bodyProduct['categoryHierarchies']);
             $this->assertTrue(count($bodyProduct['categoryHierarchies']) >= 0);
         }
+    }
+
+    public function testGetOrderData() {
+
+        $order = Mage::getModel(Mage_Sales_Model_Order::class)->getCollection()
+            ->addAttributeToSelect('*')
+            ->getFirstItem();
+
+        $data = $this->model->getOrderData($order);
+        $this->assertNotNull($data);
+        $this->assertNotNull($data['orderItems']);
+        $this->assertTrue(count($data['orderItems']) >= 0);
+        $this->assertNotNull($data['orderDate']);
+    }
+
+    public function testHandleAdsResponse() {
+        $context = $this->getContext();
+        $response = Mage::getModel('citrusintegration/service_request')->requestingAnAd($context);
+        $return = $this->model->handleAdsResponse($response, $context['pageType']);
+        $type = gettype($return);
+        $this->assertNotNull($return);
+        switch ($type) {
+            case "boolean":
+                $this->assertTrue($return);
+                break;
+            case "array" :
+                $this->assertNotEmpty($return);
+                $this->assertTrue(count($return) == 2);
+                $this->assertTrue(count($return['ads']) > 0);
+                $this->assertTrue(count($return['banners']) > 0);
+                break;
+            default:
+                break;
+        }
+
+        $context = $this->getContext("magento");
+        $response = Mage::getModel('citrusintegration/service_request')->requestingAnAd($context);
+        $return = $this->model->handleAdsResponse($response, $context['pageType']);
+        $type = gettype($return);
+        $this->assertNotNull($return);
+        switch ($type) {
+            case "boolean":
+                $this->assertTrue($return);
+                break;
+            case "array" :
+                $this->assertNotEmpty($return);
+                $this->assertTrue(count($return['ads']) > 0);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public function testHandleResponse() {
+        $order = Mage::getModel(Mage_Sales_Model_Order::class)->getCollection()
+            ->addAttributeToSelect('*')
+            ->getFirstItem();
+
+        $data = $this->model->getOrderData($order);
+        $body[] = $data;
+        $response = Mage::getModel('citrusintegration/service_request')->pushOrderRequest($body);
+        $this->assertTrue($response['success']);
+        $this->model->handleResponse($response, 'order');
+        $data = json_decode($response['message'], true);
+        foreach ($data['orders'] as $key => $orderItem){
+            $orderTable = $this->resource->getTableName('citrusintegration/order');
+            $orderId = $orderItem['id'];
+            $query = 'SELECT * FROM ' . $orderTable. ' WHERE citrus_id = ":order_id"';
+            $binds = array(
+                "order_id" => $orderId
+            );
+            $orders = $this->readConnection->query($query, $binds);
+
+//            $orderCollection = Mage::getModel('citrusintegration/order')->getCollection()->addAttributeToFilter('citrus_id', $orderItem['id']);
+            $this->assertTrue(count($orders) == 1); // Only put this one to the DB
+        }
+    }
+
+    private function getContext($search = null) {
+        $context = array(
+            'catalogId' => $this->model->getCitrusCatalogId(),
+            'maxNumberOfAds' => 3
+        );
+
+        if (isset($search)) {
+            $context['searchTerm'] = $search;
+            $context['pageType'] = "Category";
+        } else {
+            $context['bannerSlotIds'] = ["HOMEPAGE-1","HOMEPAGE-1"];
+            $context['productFilters'] = [["1","Men","Shirts"]];
+            $context['pageType'] = "Search";
+        }
+
+        return $context;
     }
 }
