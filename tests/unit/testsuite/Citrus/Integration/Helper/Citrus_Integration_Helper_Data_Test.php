@@ -151,7 +151,7 @@ class Citrus_Integration_Helper_DataTest extends TestCase
     public function testGetCategoryHierarchies() {
         $oneProductCollection = Mage::getModel(Mage_Catalog_Model_Product::class)->getCollection()
             ->addAttributeToSelect('*')
-            ->addAttributeToFilter('entity_id', "231")
+            ->addAttributeToFilter('entity_id', "237")
             ->getFirstItem();
         $categoryIds = $oneProductCollection->getResource()->getCategoryIds($oneProductCollection);
         $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
@@ -163,25 +163,41 @@ class Citrus_Integration_Helper_DataTest extends TestCase
         }
 
         // Do assertions here
+//        var_dump($data['categoryHierarchies']);
         $this->assertNotNull($data['categoryHierarchies']);
         $this->assertNotEmpty($data['categoryHierarchies']);
+        $this->assertEquals(2, count($data['categoryHierarchies']));
         foreach ($data['categoryHierarchies'] as $item) {
             $this->assertTrue(in_array("Men", $item));
-            $this->assertTrue(in_array("Shirts", $item));
+            $this->assertTrue(in_array("Shirts", $item) || in_array("Sale", $item));
         }
     }
 
     public function testGetProductFilter() {
         $oneProductCollection = Mage::getModel(Mage_Catalog_Model_Product::class)->getCollection()
             ->addAttributeToSelect('*')
-            ->addAttributeToFilter('entity_id', "231")
+            ->addAttributeToFilter('entity_id', "237")
             ->getFirstItem();
         $filter = $this->model->getProductFilter($oneProductCollection);
         $this->assertNotNull($filter);
         $this->assertNotEmpty($filter);
         $this->assertTrue(in_array("1", $filter));
+        $this->assertTrue(in_array("2", $filter));
         $this->assertTrue(in_array("Men", $filter));
         $this->assertTrue(in_array("Shirts", $filter));
+        $this->assertTrue(in_array("Sale", $filter));
+
+        $anotherProductCollection = Mage::getModel(Mage_Catalog_Model_Product::class)->getCollection()
+            ->addAttributeToSelect('*')
+            ->addAttributeToFilter('entity_id', "249")
+            ->getFirstItem();
+        $filter = $this->model->getProductFilter($anotherProductCollection);
+        $this->assertNotNull($filter);
+        $this->assertNotEmpty($filter);
+        $this->assertTrue(in_array("1", $filter));
+        $this->assertTrue(in_array("2", $filter));
+        $this->assertTrue(in_array("Men", $filter));
+        $this->assertTrue(in_array("Tees, Knits and Polos", $filter));
     }
 
     private function getContext($search = null) {
