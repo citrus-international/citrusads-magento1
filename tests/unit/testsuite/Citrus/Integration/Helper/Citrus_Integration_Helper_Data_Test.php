@@ -148,6 +148,42 @@ class Citrus_Integration_Helper_DataTest extends TestCase
         }
     }
 
+    public function testGetCategoryHierarchies() {
+        $oneProductCollection = Mage::getModel(Mage_Catalog_Model_Product::class)->getCollection()
+            ->addAttributeToSelect('*')
+            ->addAttributeToFilter('entity_id', "231")
+            ->getFirstItem();
+        $categoryIds = $oneProductCollection->getResource()->getCategoryIds($oneProductCollection);
+        $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
+        if (is_array($categoryIds)) {
+            foreach ($categoryIds as $categoryId) {
+                $category = $catModel->load($categoryId);
+                $data['categoryHierarchies'][] = $this->model->getCategoryHierarchies($category);
+            }
+        }
+
+        // Do assertions here
+        $this->assertNotNull($data['categoryHierarchies']);
+        $this->assertNotEmpty($data['categoryHierarchies']);
+        foreach ($data['categoryHierarchies'] as $item) {
+            $this->assertTrue(in_array("Men", $item));
+            $this->assertTrue(in_array("Shirts", $item));
+        }
+    }
+
+    public function testGetProductFilter() {
+        $oneProductCollection = Mage::getModel(Mage_Catalog_Model_Product::class)->getCollection()
+            ->addAttributeToSelect('*')
+            ->addAttributeToFilter('entity_id', "231")
+            ->getFirstItem();
+        $filter = $this->model->getProductFilter($oneProductCollection);
+        $this->assertNotNull($filter);
+        $this->assertNotEmpty($filter);
+        $this->assertTrue(in_array("1", $filter));
+        $this->assertTrue(in_array("Men", $filter));
+        $this->assertTrue(in_array("Shirts", $filter));
+    }
+
     private function getContext($search = null) {
         $context = array(
             'catalogId' => $this->model->getCitrusCatalogId(),
