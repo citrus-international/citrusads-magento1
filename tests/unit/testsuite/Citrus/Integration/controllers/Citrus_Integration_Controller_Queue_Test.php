@@ -112,6 +112,8 @@ class Citrus_Integration_Controller_Queue_Test extends TestCase
 
         // Call CatalogProductCallback()
         $oldItem = Mage::getModel('citrusintegration/queue')->getCount();
+        $this->assertEquals($oldItem, count($requestIds));
+
         $for = count($requestIds)/100;
         for($i = 0; $i <= $for; $i ++){
             $tmp_array[] = array_slice($requestIds, $i*100, 100);

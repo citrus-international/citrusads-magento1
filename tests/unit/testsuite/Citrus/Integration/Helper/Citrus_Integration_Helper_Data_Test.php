@@ -178,11 +178,32 @@ class Citrus_Integration_Helper_DataTest extends TestCase
             ->addAttributeToSelect('*')
             ->addAttributeToFilter('entity_id', "237")
             ->getFirstItem();
+
+        // Set website
+        $website = Mage::getModel('core/website');
+//        var_dump(Mage::getModel('core/website')->getCollection()->count());
+
+        if (Mage::getModel('core/website')->getCollection()->count() < 2) {
+            $website->setCode('unit_test')
+                ->setName('unit_test')
+                ->save();
+        }
+
+        if (Mage::getModel('core/website')->getCollection()->count() < 3) {
+            $website->setCode('unit_test1')
+                ->setName('unit_test1')
+                ->save();
+        }
+
+        $product = Mage::getModel('catalog/product')->load(237);
+        $product->setWebsiteIDs(array(1,2,3))->save();
+
         $filter = $this->model->getProductFilter($oneProductCollection);
         $this->assertNotNull($filter);
         $this->assertNotEmpty($filter);
         $this->assertTrue(in_array("1", $filter));
         $this->assertTrue(in_array("2", $filter));
+        $this->assertTrue(in_array("3", $filter));
         $this->assertTrue(in_array("Men", $filter));
         $this->assertTrue(in_array("Shirts", $filter));
         $this->assertTrue(in_array("Sale", $filter));
@@ -191,11 +212,14 @@ class Citrus_Integration_Helper_DataTest extends TestCase
             ->addAttributeToSelect('*')
             ->addAttributeToFilter('entity_id', "249")
             ->getFirstItem();
+        $anotherProduct = Mage::getModel('catalog/product')->load(249);
+        $anotherProduct->setWebsiteIDs(array(1,2,3))->save();
         $filter = $this->model->getProductFilter($anotherProductCollection);
         $this->assertNotNull($filter);
         $this->assertNotEmpty($filter);
         $this->assertTrue(in_array("1", $filter));
         $this->assertTrue(in_array("2", $filter));
+        $this->assertTrue(in_array("3", $filter));
         $this->assertTrue(in_array("Men", $filter));
         $this->assertTrue(in_array("Tees, Knits and Polos", $filter));
     }
