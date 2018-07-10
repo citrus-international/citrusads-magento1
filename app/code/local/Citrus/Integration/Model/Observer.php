@@ -146,7 +146,7 @@ class Citrus_Integration_Model_Observer
     public function getSlotIdByPageType($entity_id, $page_type)
     {
         /** @var Citrus_Integration_Model_Slotid $slotModel */
-        $slotModel = Mage::getModel(Citrus_Integration_Model_Slotid::class);
+        $slotModel = Mage::getModel('citrusintegration/slotid');
         $banners = $slotModel->getSlotIdById($entity_id, $page_type);
         $result = null;
         if($banners) {

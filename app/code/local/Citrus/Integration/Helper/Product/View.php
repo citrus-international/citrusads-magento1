@@ -63,7 +63,7 @@ class Citrus_Integration_Helper_Product_View extends Mage_Catalog_Helper_Product
 
     public function checkProduct($product_id)
     {
-        $productModel = Mage::getModel(Mage_Catalog_Model_Product::class);
+        $productModel = Mage::getModel('catalog/product');
         /** @var Mage_Catalog_Model_Product $product */
         $product = $productModel->load($product_id);
         /** @var Mage_Catalog_Model_Product_Type_Configurable $configurationModel */

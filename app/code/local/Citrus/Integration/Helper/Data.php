@@ -112,7 +112,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $teamId = $this->getTeamId();
         $data['teamId'] = $teamId;
         if($entity->getCustomerId()) {
-            $citrusId = Mage::getModel(Citrus_Integration_Model_Customer::class)->getCitrusIdByEntityId($entity->getCustomerId());
+            $citrusId = Mage::getModel('citrusintegration/customer')->getCitrusIdByEntityId($entity->getCustomerId());
             if($citrusId)
                 $data['customerId'] = $citrusId;
         }
