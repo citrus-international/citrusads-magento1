@@ -69,7 +69,7 @@ class Citrus_Integration_Model_Sync
             $bodyCatalogProducts = array();
             $bodyProducts = array();
             /** @var Mage_Catalog_Model_Product $productModel */
-            $productModel = Mage::getModel(Mage_Catalog_Model_Product::class);
+            $productModel = Mage::getModel('catalog/product');
             $productCollection = $productModel->getCollection()->addAttributeToSelect('*')
                 ->addAttributeToFilter('entity_id', array('in' => $catalog_product));
             foreach ($productCollection as $product){

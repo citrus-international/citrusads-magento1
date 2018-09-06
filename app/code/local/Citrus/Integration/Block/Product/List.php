@@ -20,7 +20,7 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
     {
         $adProductIds = array();
         foreach ($responses as $response){
-            $adModel = Mage::getModel(Citrus_Integration_Model_Ad::class)->load($response);
+            $adModel = Mage::getModel('citrusintegration/ad')->load($response);
             $sku = $adModel->getGtin();
             /** @var Mage_Catalog_Model_Product $productModel */
             $productModel = Mage::getModel(Mage_Catalog_Model_Product::class);

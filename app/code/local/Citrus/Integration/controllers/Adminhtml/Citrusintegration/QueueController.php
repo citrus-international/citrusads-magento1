@@ -193,7 +193,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             } else {
                 try {
                     /** @var Citrus_Integration_Model_Queue $queueModel */
-                    $queueModel = Mage::getModel(Citrus_Integration_Model_Queue::class);
+                    $queueModel = Mage::getModel('citrusintegration/queue');
 
                     $oldItem = $queueModel->getCount();
                     $for = count($requestIds)/100;

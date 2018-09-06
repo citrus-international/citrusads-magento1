@@ -16,7 +16,7 @@ class Citrus_Integration_Block_Adminhtml_Template_Grid_Renderer_PageId extends M
         elseif($page_type == 1){
             $result = array();
             foreach ($page_ids as $page_id){
-                $result[] = Mage::getModel(Mage_Catalog_Model_Category::class)->load($page_id)->getName();
+                $result[] = Mage::getModel('catalog/category')->load($page_id)->getName();
             }
 
             $out = json_encode($result);
