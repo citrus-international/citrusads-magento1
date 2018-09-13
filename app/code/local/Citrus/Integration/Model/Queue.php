@@ -32,6 +32,7 @@ class Citrus_Integration_Model_Queue extends Mage_Core_Model_Abstract
         try{
             $this->save();
         }catch(Exception $e){
+            error_log("Exception while enqueuing: " . $e->getMessage());
         }
 
     }

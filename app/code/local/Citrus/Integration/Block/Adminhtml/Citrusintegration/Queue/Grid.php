@@ -60,6 +60,7 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Queue_Grid extends Ma
                 )
             );
         }catch (Exception $e){
+            error_log("Exception while preparing columns: " . $e->getMessage());
         }
 
         return parent::_prepareColumns();

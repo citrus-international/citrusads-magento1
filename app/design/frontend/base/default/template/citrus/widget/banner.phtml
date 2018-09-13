@@ -2,7 +2,7 @@
 $bannerEnable = Mage::getStoreConfig('citrus_sync/citrus_banner/enable', Mage::app()->getStore());
 if($bannerEnable):
     $categoryAdResponse = Mage::registry('categoryAdResponse');
-    $searchAdResponse = Mage::registry('searchAdResponse');
+    $searchAdResponse = Mage::registry('searchAdResponseHeb');
     if($categoryAdResponse)
         $banners = $categoryAdResponse['banners'];
     elseif($searchAdResponse)

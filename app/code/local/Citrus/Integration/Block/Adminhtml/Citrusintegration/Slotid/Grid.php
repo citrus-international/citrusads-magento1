@@ -62,6 +62,7 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Slotid_Grid extends M
                 )
             );
         }catch (Exception $e){
+            error_log("Exception while preparing columns: " . $e->getMessage());
         }
 
         return parent::_prepareColumns();

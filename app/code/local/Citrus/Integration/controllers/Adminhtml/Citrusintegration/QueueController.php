@@ -68,11 +68,22 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     $allCollections = $productModel->getCollection()
                         ->addAttributeToSelect('*')
                         ->addAttributeToFilter('type_id', array('in' => array('simple', 'virtual')))
-                        ->addAttributeToFilter('status', 1);
-                    $allCollections->getItems();
-                    foreach ($allCollections as $collection) {
-                        $this->pushItemToQueue($collection);
-                    }
+                        ->addAttributeToFilter('status', 1)
+                        ->setPageSize(100);
+//                    $allCollections->getItems();
+
+                    $currentPage = 1;
+                    $pages = $allCollections->getLastPageNumber();
+                    do {
+                        $allCollections->setCurPage($currentPage);
+                        $allCollections->load();
+                        foreach ($allCollections as $collection) {
+                            $this->pushItemToQueue($collection);
+                        }
+                        $currentPage++;
+                        //make the collection unload the data in memory so it will pick up the next page when load() is called.
+                        $allCollections->clear();
+                    } while ($currentPage <= $pages);
 
                     $message = Mage::helper('adminhtml')->__('All Products have been added to queue, click <a href="' . Mage::helper("adminhtml")->getUrl("adminhtml/citrusintegration_queue/index") . '">here</a> to go to check out sync queue');
                 } else {
@@ -108,14 +119,28 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     $orderModel = $this->getOrderModel();
                     if ($status != '') {
                         $allCollections = $orderModel->getCollection()
-                            ->addAttributeToFilter('status', array('eq' => $status));
+                            ->addAttributeToFilter('status', array('eq' => $status))
+                            ->setPageSize(100);
                     } else {
-                        $allCollections = $orderModel->getCollection();
+                        $allCollections = $orderModel->getCollection()->setPageSize(100);
                     }
 
-                    foreach ($allCollections as $collection) {
-                        $this->pushItemToQueue($collection);
-                    }
+                    $currentPage = 1;
+                    $pages = $allCollections->getLastPageNumber();
+                    do {
+                        $allCollections->setCurPage($currentPage);
+                        $allCollections->load();
+                        foreach ($allCollections as $collection) {
+                            $this->pushItemToQueue($collection);
+                        }
+                        $currentPage++;
+                        //make the collection unload the data in memory so it will pick up the next page when load() is called.
+                        $allCollections->clear();
+                    } while ($currentPage <= $pages);
+
+//                    foreach ($allCollections as $collection) {
+//                        $this->pushItemToQueue($collection);
+//                    }
 
                     $message = Mage::helper('adminhtml')->__('All Orders have been added to queue, click <a href="' . Mage::helper("adminhtml")->getUrl("adminhtml/citrusintegration_queue/index") . '">here</a> to go to check out sync queue');
                 } else {
@@ -143,11 +168,25 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     /** @var Mage_Catalog_Model_Product $productModel */
                     $customerModel = $this->getCustomerModel();
                     $allCollections = $customerModel->getCollection()
-                        ->addAttributeToSelect('*');
+                        ->addAttributeToSelect('*')
+                        ->setPageSize(100);
 
-                    foreach ($allCollections as $collection) {
-                        $this->pushItemToQueue($collection);
-                    }
+                    $currentPage = 1;
+                    $pages = $allCollections->getLastPageNumber();
+                    do {
+                        $allCollections->setCurPage($currentPage);
+                        $allCollections->load();
+                        foreach ($allCollections as $collection) {
+                            $this->pushItemToQueue($collection);
+                        }
+                        $currentPage++;
+                        //make the collection unload the data in memory so it will pick up the next page when load() is called.
+                        $allCollections->clear();
+                    } while ($currentPage <= $pages);
+
+//                    foreach ($allCollections as $collection) {
+//                        $this->pushItemToQueue($collection);
+//                    }
 
                     $message = Mage::helper('adminhtml')->__('All Customers have been added to queue, click <a href="' . Mage::helper("adminhtml")->getUrl("adminhtml/citrusintegration_queue/index") . '">here</a> to go to check out sync queue');
                 } else {

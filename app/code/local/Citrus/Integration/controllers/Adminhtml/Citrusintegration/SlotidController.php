@@ -56,6 +56,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_SlotidController extends Ma
                     try {
                         $slotIdModel->save();
                     }catch (Exception $exception){
+                        error_log('saveAction: ' . $exception->getMessage());
                     }
 
                     Mage::getSingleton('adminhtml/session')->addSuccess('Successfully saved');
@@ -74,6 +75,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_SlotidController extends Ma
                     try {
                         $slotIdModel->save();
                     }catch (Exception $exception){
+                        error_log('saveAction: ' . $exception->getMessage());
                     }
 
                     Mage::getSingleton('adminhtml/session')->addSuccess('Successfully saved');
