@@ -48,6 +48,7 @@ class Citrus_Integration_Model_Observer
 
             $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Home', false, $bannerEnable);
             try {
+                Mage::unregister('categoryAdResponse');
                 Mage::register('categoryAdResponse', $return);
             }catch (Exception $exception){
                 $this->getCitrusHelper()->log('categoryAdResponse: '. Mage::registry('categoryAdResponse'), __FILE__, __LINE__);
@@ -105,6 +106,7 @@ class Citrus_Integration_Model_Observer
 
                 $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Category', $adsEnable, $bannerEnable);
                 try {
+                    Mage::unregister('categoryAdResponse');
                     Mage::register('categoryAdResponse', $return);
                 }catch (Exception $exception){
                     $this->getCitrusHelper()->log('categoryAdResponse: '. Mage::registry('categoryAdResponse'), __FILE__, __LINE__);
@@ -139,7 +141,9 @@ class Citrus_Integration_Model_Observer
             $context = $this->getCitrusHelper()->getContextData($context);
             $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
             $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Search', $adsEnable, $bannerEnable);
-            Mage::register('searchAdResponseHeb', $return);
+
+            Mage::unregister('searchAdResponse');
+            Mage::register('searchAdResponse', $return);
             $this->getCitrusHelper()->log('ads request search :'.$response['message'], __FILE__, __LINE__);
         }
     }

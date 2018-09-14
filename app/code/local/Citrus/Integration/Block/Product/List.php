@@ -47,7 +47,7 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
         try{
             $collections->setPageSize((int)$toolbar->getLimit());
             $categoryAdResponse = Mage::registry('categoryAdResponse');
-            $searchAdResponse = Mage::registry('searchAdResponseHeb');
+            $searchAdResponse = Mage::registry('searchAdResponse');
             $collections->getItems();
             $adProductIds = array();
             if($categoryAdResponse){
