@@ -16,6 +16,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_SlotidController extends Ma
 
         if ($slotModel->getId() || $id == 0)
         {
+            Mage::unregister('slotid_model');
             Mage::register('slotid_model', $slotModel);
             $this->loadLayout();
             $this->getLayout()->getBlock('head')
