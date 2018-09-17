@@ -51,7 +51,8 @@ class Citrus_Integration_Controller_Queue_Test extends TestCase
         $count = count($productCollections);
 //        var_dump($count);
 
-        $collections = Mage::getModel('citrusintegration/queue')->getCollection();
+        $queueModel = Mage::getModel('citrusintegration/queue');
+        $collections = $queueModel->getCollection();
         foreach ($collections as $item) {
             $item->delete();
         }
@@ -59,9 +60,10 @@ class Citrus_Integration_Controller_Queue_Test extends TestCase
 //        var_dump($collections->load()->getSize());
 
         foreach ($productCollections->getItems() as $collection) {
-            $this->model->pushItemToQueue($collection);
+            $this->model->pushItemToQueue($queueModel, $collection);
         }
-
+        $this->assertEquals(0, Mage::getModel('citrusintegration/queue')->getCollection()->count());
+        $queueModel->commit();
         $this->assertEquals($count, Mage::getModel('citrusintegration/queue')->getCollection()->count());
     }
 
@@ -69,7 +71,8 @@ class Citrus_Integration_Controller_Queue_Test extends TestCase
         $requestIds = array();
 
         // Clear queue
-        $collections = Mage::getModel('citrusintegration/queue')->getCollection();
+        $queueModel = Mage::getModel('citrusintegration/queue');
+        $collections = $queueModel->getCollection();
         foreach ($collections as $item) {
             $item->delete();
         }
@@ -82,8 +85,9 @@ class Citrus_Integration_Controller_Queue_Test extends TestCase
             ->setPageSize(100)
             ->setCurPage(1);
         foreach ($productCollections->getItems() as $collection) {
-            $this->model->pushItemToQueue($collection);
+            $this->model->pushItemToQueue($queueModel, $collection);
         }
+        $queueModel->commit();
 
         // Push 100 customers to queue
         $customerCollections = Mage::getModel(Mage_Customer_Model_Customer::class)->getCollection()
@@ -93,6 +97,7 @@ class Citrus_Integration_Controller_Queue_Test extends TestCase
         foreach ($customerCollections->getItems() as $collection) {
             $this->model->pushItemToQueue($collection);
         }
+        $queueModel->commit();
 
         // Push 100 orders to queue
         $orderCollection = Mage::getModel(Mage_Sales_Model_Order::class)->getCollection()

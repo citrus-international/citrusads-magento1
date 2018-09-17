@@ -69,17 +69,19 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         ->addAttributeToSelect('*')
                         ->addAttributeToFilter('type_id', array('in' => array('simple', 'virtual')))
                         ->addAttributeToFilter('status', 1)
-                        ->setPageSize(100);
+                        ->setPageSize(400);
 //                    $allCollections->getItems();
 
                     $currentPage = 1;
                     $pages = $allCollections->getLastPageNumber();
+                    $queueModel = $this->getQueueModel();
                     do {
                         $allCollections->setCurPage($currentPage);
                         $allCollections->load();
                         foreach ($allCollections as $collection) {
-                            $this->pushItemToQueue($collection);
+                            $this->pushItemToQueue($queueModel, $collection);
                         }
+                        $queueModel->commit();
                         $currentPage++;
                         //make the collection unload the data in memory so it will pick up the next page when load() is called.
                         $allCollections->clear();
@@ -120,19 +122,21 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     if ($status != '') {
                         $allCollections = $orderModel->getCollection()
                             ->addAttributeToFilter('status', array('eq' => $status))
-                            ->setPageSize(100);
+                            ->setPageSize(400);
                     } else {
                         $allCollections = $orderModel->getCollection()->setPageSize(100);
                     }
 
                     $currentPage = 1;
                     $pages = $allCollections->getLastPageNumber();
+                    $queueModel = $this->getQueueModel();
                     do {
                         $allCollections->setCurPage($currentPage);
                         $allCollections->load();
                         foreach ($allCollections as $collection) {
-                            $this->pushItemToQueue($collection);
+                            $this->pushItemToQueue($queueModel, $collection);
                         }
+                        $queueModel->commit();
                         $currentPage++;
                         //make the collection unload the data in memory so it will pick up the next page when load() is called.
                         $allCollections->clear();
@@ -169,17 +173,19 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     $customerModel = $this->getCustomerModel();
                     $allCollections = $customerModel->getCollection()
                         ->addAttributeToSelect('*')
-                        ->setPageSize(100);
+                        ->setPageSize(400);
 
                     $currentPage = 1;
                     $pages = $allCollections->getLastPageNumber();
+                    $queueModel = $this->getQueueModel();
                     do {
                         $allCollections->setCurPage($currentPage);
                         $allCollections->load();
                         foreach ($allCollections as $collection) {
-                            $this->pushItemToQueue($collection);
+                            $this->pushItemToQueue($queueModel, $collection);
                         }
                         $currentPage++;
+                        $queueModel->commit();
                         //make the collection unload the data in memory so it will pick up the next page when load() is called.
                         $allCollections->clear();
                     } while ($currentPage <= $pages);
@@ -200,9 +206,9 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
 
         $this->getResponse()->setBody(Mage::helper('core')->jsonEncode(array('message'=>$message)));
     }
-    public function pushItemToQueue($item)
+    public function pushItemToQueue($queueModel, $item)
     {
-        $queueModel = $this->getQueueModel();
+//        $queueModel = $this->getQueueModel();
         $queueCollection = $queueModel->getCollection()->addFieldToSelect('id')
             ->addFieldToFilter('entity_id', array('in' => array($item->getId(), $item->getIncrementId())))
             ->addFieldToFilter('type', array('eq' => $item->getResourceName()))

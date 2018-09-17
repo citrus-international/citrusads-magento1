@@ -29,13 +29,17 @@ class Citrus_Integration_Model_Queue extends Mage_Core_Model_Abstract
             'enqueue_time' => time()
         );
         $this->addData($data);
-        try{
+    }
+
+    public function commit()
+    {
+        try {
             $this->save();
-        }catch(Exception $e){
+        } catch (Exception $e) {
             error_log("Exception while enqueuing: " . $e->getMessage());
         }
-
     }
+
     public function makeDelete($ids, $type = null)
     {
         return $this->_getResource()->makeDelete($ids, $type);
