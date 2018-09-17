@@ -75,6 +75,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                     $currentPage = 1;
                     $pages = $allCollections->getLastPageNumber();
                     $queueModel = $this->getQueueModel();
+                    $time_start = microtime(true);
                     do {
                         $allCollections->setCurPage($currentPage);
                         $allCollections->load();
@@ -86,6 +87,9 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         //make the collection unload the data in memory so it will pick up the next page when load() is called.
                         $allCollections->clear();
                     } while ($currentPage <= $pages);
+                    $time_end = microtime(true);
+                    $performance_time = ($time_end - $time_start);
+                    error_log("Total Performance Time: " . $performance_time . ' seconds' .PHP_EOL);
 
                     $message = Mage::helper('adminhtml')->__('All Products have been added to queue, click <a href="' . Mage::helper("adminhtml")->getUrl("adminhtml/citrusintegration_queue/index") . '">here</a> to go to check out sync queue');
                 } else {
