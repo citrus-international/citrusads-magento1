@@ -20,7 +20,7 @@ class Citrus_Integration_Controller_Queue_Test extends TestCase
 
     public function testSyncMode() {
         $realTime = Mage::getStoreConfig('citrus_sync/citrus_product/sync_mode', Mage::app()->getStore());
-        var_dump($realTime);
+//        var_dump($realTime);
     }
 
     public function testPushItemToQueue()

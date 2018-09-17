@@ -32,17 +32,19 @@ class Citrus_Integration_Model_Queue extends Mage_Core_Model_Abstract
         $data = array(
             'type' => $type,
             'entity_id' => $entityId,
-            'enqueue_time' => time()
+            'enqueue_time' => date("Y-m-d H:i:s")
         );
         $this->rows[] = $data;
     }
 
     public function commit() {
-        try {
-            $this->write->insertMultiple($this->table,$this->rows);
-            $this->rows = array();
-        } catch (Exception $exception) {
-            error_log("Exception while committing: " . $exception->getMessage());
+        if (count($this->rows) > 0) {
+            try {
+                $this->write->insertMultiple($this->table,$this->rows);
+                $this->rows = array();
+            } catch (Exception $exception) {
+                error_log("Exception while committing: " . $exception->getMessage());
+            }
         }
     }
 
