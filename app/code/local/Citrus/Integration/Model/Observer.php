@@ -331,11 +331,12 @@ class Citrus_Integration_Model_Observer
             $product = $observer->getProduct();
 
             $enableProduct = $product->getStatus();
+            $queueModel = $this->getQueueModel();
             if ($enableProduct == 1) {
                 $realTime = $enable = Mage::getStoreConfig('citrus_sync/citrus_product/sync_mode', Mage::app()->getStore());
                 if ($realTime) {
                     if ($product->hasDataChanges()) {
-                        $this->pushItemToQueue($product, $product->getId());
+                        $this->pushItemToQueue($queueModel, $product);
                         $this->getCitrusHelper()->log('push to queue product-' . $product->getEntityId() . ':', __FILE__, __LINE__);
                     }
                 } else {
@@ -363,15 +364,17 @@ class Citrus_Integration_Model_Observer
     public function pushOrderToQueue($observer)
     {
         $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        $queueModel = $this->getQueueModel();
         if($moduleEnable) {
             /** @var Mage_Sales_Model_Order $order */
             $order = $observer->getOrder();
             $customer = $order->getCustomer();
             $realTimeOrder = $enable = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
             if ($realTimeOrder) {
-                $this->pushItemToQueue($order, $order->getIncrementId());
-                if ($order->getCustomerId())
-                    $this->pushItemToQueue($customer, $customer->getId());
+                $this->pushItemToQueue($queueModel, $order);
+                if ($order->getCustomerId()) {
+                    $this->pushItemToQueue($queueModel, $customer);
+                }
             } else {
                 $body = $this->getCitrusHelper()->getOrderData($order);
                 $response = $this->getCitrusHelper()->getRequestModel()->pushOrderRequest(array($body));
@@ -382,12 +385,13 @@ class Citrus_Integration_Model_Observer
     public function pushCustomerToQueue($observer)
     {
         $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
+        $queueModel = $this->getQueueModel();
         if($moduleEnable) {
             /** @var Mage_Customer_Model_Customer $customer */
             $customer = $observer->getCustomer();
             $realTimeOrder = $enable = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
             if ($realTimeOrder) {
-                $this->pushItemToQueue($customer, $customer->getId());
+                $this->pushItemToQueue($queueModel, $customer);
             } else {
                 $body = $this->getCitrusHelper()->getCustomerData($customer);
                 $response = $this->getCitrusHelper()->getRequestModel()->pushCustomerRequest(array($body));
@@ -411,23 +415,24 @@ class Citrus_Integration_Model_Observer
             }
         }
     }
+
     /**
+     * @param $queueModel
      * @param $item
-     * @param $entity_id
      */
-    public function pushItemToQueue($item, $entity_id)
+    public function pushItemToQueue($queueModel, $item)
     {
         /** @var Citrus_Integration_Model_Queue $queueModel */
-        $queueModel = $this->getQueueModel();
+//        $queueModel = $this->getQueueModel();
         $queueCollection = $queueModel->getCollection()->addFieldToSelect('id')
             ->addFieldToFilter('type', array('eq'=> $item->getResourceName()))
-            ->addFieldToFilter('entity_id', array('in' => $entity_id))
+            ->addFieldToFilter('entity_id', array('in' => $item->getIncrementId()))
             ->getFirstItem();
         if($queueCollection->getData()){
             $queueModel->load($queueCollection->getId());
-            $queueModel->enqueue($entity_id, $item->getResourceName());
+            $queueModel->enqueue($item->getIncrementId(), $item->getResourceName());
         }else {
-            $queueModel->enqueue($entity_id, $item->getResourceName());
+            $queueModel->enqueue($item->getIncrementId(), $item->getResourceName());
         }
     }
 
