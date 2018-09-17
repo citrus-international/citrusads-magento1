@@ -216,14 +216,14 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
         if($queueCollection->getData()){
             $queueModel->load($queueCollection->getId());
             if($item->getResourceName() == 'sales/order')
-                $queueModel->enqueue($item->getIncrementId(), $item->getResourceName());
+                $queueModel->enqueueTrans($item->getIncrementId(), $item->getResourceName());
             else
-                $queueModel->enqueue($item->getId(), $item->getResourceName());
+                $queueModel->enqueueTrans($item->getId(), $item->getResourceName());
         }else {
             if($item->getResourceName() == 'sales/order')
-                $queueModel->enqueue($item->getIncrementId(), $item->getResourceName());
+                $queueModel->enqueueTrans($item->getIncrementId(), $item->getResourceName());
             else
-                $queueModel->enqueue($item->getId(), $item->getResourceName());
+                $queueModel->enqueueTrans($item->getId(), $item->getResourceName());
         }
     }
     public function massSyncAction()
