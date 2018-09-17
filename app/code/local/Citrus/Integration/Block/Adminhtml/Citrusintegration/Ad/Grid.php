@@ -68,6 +68,7 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Ad_Grid extends Mage_
                 )
             );
         }catch (Exception $e){
+            error_log("Exception while preparing columns: " . $e->getMessage());
         }
 
         return parent::_prepareColumns();

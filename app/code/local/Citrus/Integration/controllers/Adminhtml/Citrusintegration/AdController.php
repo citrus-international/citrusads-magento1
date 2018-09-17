@@ -40,8 +40,10 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
         }
 
         try{
+            Mage::unregister('citrus_ad');
             Mage::register('citrus_ad', $model);
         }catch (Exception $e){
+            error_log('infoAction: '.$e->getMessage());
         }
 
 
@@ -52,6 +54,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
     public function requestAction()
     {
         $this->loadLayout();
+        Mage::unregister('is_banner');
         Mage::register('is_banner', $this->getRequest()->getParam('banner'), true);
         $this->_addContent($this->getLayout()->createBlock('citrusintegration/adminhtml_citrusintegration_ad_request'));
         $this->renderLayout();
@@ -113,7 +116,8 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                     $model->addData($bannerData);
                     try{
                         $model->save();
-                    }catch (Exception $e){
+                    }catch (Exception $e) {
+                        error_log('handleRelevant: ' . $e->getMessage());
                     }
                 }
                 else{
@@ -127,6 +131,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_AdController extends Mage_A
                     try{
                         $model->save();
                     }catch (Exception $e){
+                        error_log('handleRelevant: ' . $e->getMessage());
                     }
                 }
             }

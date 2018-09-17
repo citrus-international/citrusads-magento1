@@ -98,6 +98,7 @@ class Citrus_Integration_Block_Adminhtml_Citrusintegration_Banner_Grid extends M
                 )
             );
         }catch (Exception $e){
+            error_log("Exception while enqueuing: " . $e->getMessage());
         }
 
         return parent::_prepareColumns();

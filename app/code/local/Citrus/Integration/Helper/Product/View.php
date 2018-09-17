@@ -80,6 +80,7 @@ class Citrus_Integration_Helper_Product_View extends Mage_Catalog_Helper_Product
                 $attribute_values[$attribute_code] = $product->getData($attribute_code);
             }
 
+            Mage::unregister('redirect_op');
             Mage::register('redirect_op', $attribute_values);
             return $parentProduct->getId();
         } else {
