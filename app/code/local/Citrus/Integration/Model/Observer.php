@@ -1,6 +1,8 @@
 <?php
 class Citrus_Integration_Model_Observer
 {
+    const DELIM = ";";
+
     /**
      * @return false|Citrus_Integration_Model_Queue
      */
@@ -36,7 +38,7 @@ class Citrus_Integration_Model_Observer
             }
 
             if($websiteIds)
-                $context['productFilters'] = implode(',', array_unique($websiteIds));
+                $context['productFilters'] = implode(self::DELIM, array_unique($websiteIds));
             $context['pageType'] = 'Home';
             $banners = $this->getSlotIdByPageType($cms->getIdentifier(), Citrus_Integration_Helper_Data::CITRUS_PAGE_TYPE_CMS);
             if($banners) {
@@ -85,16 +87,16 @@ class Citrus_Integration_Model_Observer
             $parentCategories = $category->getParentCategories();
             if(is_array($parentCategories)){
                 foreach ($parentCategories as $parentCategory){
-                    $productFilters = $productFilters.','.$parentCategory->getName();
+                    $productFilters = $productFilters. self::DELIM .$parentCategory->getName();
                 }
 
-                $productFilters = trim($productFilters, ',');
+                $productFilters = trim($productFilters, self::DELIM);
             }
 
             if($category->getLevel() != '1'){
                 $context = array(
                     'pageType' => 'Category',
-                    'productFilters' => $websiteIds.','.$productFilters.','.$attributes
+                    'productFilters' => $websiteIds . self::DELIM . $productFilters . self::DELIM . $attributes
                 );
                 $banners = $this->getSlotIdByPageType($category->getEntityId(), Citrus_Integration_Helper_Data::CITRUS_PAGE_TYPE_CATEGORY);
                 if($banners) {

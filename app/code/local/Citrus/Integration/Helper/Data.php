@@ -18,6 +18,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     const CITRUS_PAGE_TYPE_ALL = 0;
     const CITRUS_PAGE_TYPE_CATEGORY = 1;
     const CITRUS_PAGE_TYPE_CMS = 2;
+    const DELIM = ";";
 
     public function getTeamId()
     {
@@ -141,7 +142,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         }
 
         if(isset($context['productFilters'])){
-            $arrays = explode(',', trim($context['productFilters'], ','));
+            $arrays = explode(self::DELIM, trim($context['productFilters'], self::DELIM));
                 $data['productFilters'] = array($arrays);
         }
 
