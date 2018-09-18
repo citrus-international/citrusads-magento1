@@ -726,7 +726,9 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                     continue;
                 }
 
-                $nameParts[] = $allCategoriesArray[$catId]['name'];
+                if (isset($allCategoriesArray[$catId]['name'])) {
+                    $nameParts[] = $allCategoriesArray[$catId]['name'];
+                }
             }
 
             $categories[$categoryId] = array(
