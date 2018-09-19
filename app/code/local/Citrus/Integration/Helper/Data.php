@@ -581,11 +581,18 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                 $cats[] = $this->getCategoryHierarchies($category);
             }
         }
+//        Mage::helper('citrusintegration')->log('Cat[] is : '. print_r($cats, true) ."", __FILE__, __LINE__);
 
         foreach ($cats as $cat){
-            $result = array_merge(isset($result) ? $result : array(), self::CATEGORY . $cat);
+//            Mage::helper('citrusintegration')->log('Cat is: '. $cat, __FILE__, __LINE__);
+            $prefixCat = array();
+            foreach ($cat as $subCat) {
+                $prefixCat[] = self::CATEGORY . $subCat;
+            }
+            $result = array_merge(isset($result) ? $result : array(), $prefixCat);
         }
 
+//        Mage::helper('citrusintegration')->log('Result size is: '. count($result) ."", __FILE__, __LINE__);
         return array_values(array_unique(array_merge($prefixWebsites, isset($result) ? $result : array())));
     }
     public function getProductTags($id)
