@@ -191,10 +191,10 @@ class Citrus_Integration_Model_Observer
         foreach ($adCollections as $adCollection){
             if($adCollection['gtin'] == $product->getSku()){
                 $discount = $discountModel->load($adCollection->getDiscountId());
-                if($product->getFinalPrice() <= $discount->getMinPrice()){
+                if($product->getPrice() <= $discount->getMinPrice()){
                     continue;
                 }else{
-                    $newPrice = ($product->getFinalPrice() - (float)$discount->getAmount()) <= $discount->getMinPrice() ? $discount->getMinPrice() : $product->getFinalPrice() - (float)$discount->getAmount();
+                    $newPrice = ($product->getPrice() - (float)$discount->getAmount()) <= $discount->getMinPrice() ? $discount->getMinPrice() : $product->getPrice() - (float)$discount->getAmount();
                     $product->setFinalPrice($newPrice);
                 }
             }
