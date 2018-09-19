@@ -9,21 +9,14 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
      */
     protected $_defaultToolbarBlock = 'catalog/product_list_toolbar';
 
-    /**
-     * Product Collection
-     *
-     * @var Mage_Eav_Model_Entity_Collection_Abstract
-     */
-    protected $_productCollection;
-
-    public function getAdResponse($responses,$collections)
+    public function getAdResponse($responses,$collections, $classType)
     {
         $adProductIds = array();
         foreach ($responses as $response){
             $adModel = Mage::getModel(Citrus_Integration_Model_Ad::class)->load($response);
             $sku = $adModel->getGtin();
             /** @var Mage_Catalog_Model_Product $productModel */
-            $productModel = Mage::getModel(Mage_Catalog_Model_Product::class);
+            $productModel = Mage::getModel($classType);
             $id = $productModel->getIdBySku($sku);
             if($id) {
                 $product = $productModel->load($id);
@@ -50,28 +43,31 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
             $searchAdResponse = Mage::registry('searchAdResponse');
             $collections->getItems();
             $adProductIds = array();
+            $classType = count($collections) > 0 ? get_class($collections->getFirstItem()) : "Mage_Catalog_Model_Product";
+            Mage::helper('citrusintegration')->log('Type class: '. $classType, __FILE__, __LINE__);
             if($categoryAdResponse){
-                $adProductIds = $this->getAdResponse($categoryAdResponse['ads'], $collections);
+                $adProductIds = $this->getAdResponse($categoryAdResponse['ads'], $collections, $classType);
             }elseif($searchAdResponse){
-                $adProductIds = $this->getAdResponse($searchAdResponse['ads'], $collections);
+                $adProductIds = $this->getAdResponse($searchAdResponse['ads'], $collections, $classType);
             }
 
-            $items = $collections->getItems();
-            foreach ($items as $key => $collection){
+            $productItems = $collections->getItems();
+            foreach ($productItems as $key => $productItem){
                 if(in_array($key, $adProductIds)){
-                    $collection->addData(array('ad_index' => '0'));
-                    $collection->addData(array('citrus_ad_id' => array_search($key, $adProductIds)));
+                    $productItem->addData(array('ad_index' => '0'));
+                    $productItem->addData(array('citrus_ad_id' => array_search($key, $adProductIds)));
                 }else
-                    $collection->addData(array('ad_index' => '1'));
+                    $productItem->addData(array('ad_index' => '1'));
             }
 
-            usort($items, array('Citrus_Integration_Block_Product_List','sortByIndex'));
-            foreach ($items as $key => $item) {
-                $collections->removeItemByKey($item->getEntityId());
-                $collections->addItem($item);
+            usort($productItems, array('Citrus_Integration_Block_Product_List','sortByIndex'));
+            foreach ($productItems as $key => $productItem) {
+                $collections->removeItemByKey($productItem->getEntityId());
+                $collections->addItem($productItem);
             }
         }catch (Exception $e){
             Mage::helper('citrusintegration')->log('Collection product error: '.$e->getMessage(), __FILE__, __LINE__);
+            Mage::helper('citrusintegration')->log('Collection product error - trace: '.$e->getTraceAsString(), __FILE__, __LINE__);
         }
 
         return $collections;
