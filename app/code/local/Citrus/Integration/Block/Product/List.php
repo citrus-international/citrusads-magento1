@@ -43,7 +43,7 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
             $searchAdResponse = Mage::registry('searchAdResponse');
             $collections->getItems();
             $adProductIds = array();
-            $classType = count($collections) > 0 ? get_class($collections->getFirstItem()) : "Mage_Catalog_Model_Product";
+            $classType = $collections->count() > 0 ? get_class($collections->getFirstItem()) : "Mage_Catalog_Model_Product";
             Mage::helper('citrusintegration')->log('Type class: '. $classType, __FILE__, __LINE__);
             if($categoryAdResponse){
                 $adProductIds = $this->getAdResponse($categoryAdResponse['ads'], $collections, $classType);
