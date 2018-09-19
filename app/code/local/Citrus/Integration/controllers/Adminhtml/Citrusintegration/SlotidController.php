@@ -48,9 +48,14 @@ class Citrus_Integration_Adminhtml_Citrusintegration_SlotidController extends Ma
                 $slotIdModel = Mage::getModel('citrusintegration/slotid');
 
                 if($this->getRequest()->getParam('id') <= 0) {
-                    if($postData['page_type'] == '3')
+                    if($postData['page_type'] == '3') {
                         $postData['page_id'] = array('search');
-                    $postData['page_id'] = json_encode($postData['page_id']);
+                    }
+
+                    if (isset($postData['page_id'])) {
+                        $postData['page_id'] = json_encode($postData['page_id']);
+                    }
+
                     unset($postData['form_key']);
                     $slotIdModel
                         ->addData($postData);
