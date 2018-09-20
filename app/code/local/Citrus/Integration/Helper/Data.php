@@ -19,6 +19,9 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     const CITRUS_PAGE_TYPE_CATEGORY = 1;
     const CITRUS_PAGE_TYPE_CMS = 2;
     const DELIM = ";";
+    const WEBSITE = "website:";
+    const CATEGORY = "category:";
+    const ATTRIBUTE = "attribute:";
 
     public function getTeamId()
     {
@@ -556,14 +559,18 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             foreach ($attributes as $attribute) {
                 $attributeValue = $product->getData($attribute);
                 if($attributeValue)
-                    $attribute_value[] = $attribute.'_'.$attributeValue;
+                    $attribute_value[] = self::ATTRIBUTE . $attribute.'_'.$attributeValue;
             }
         }
 
         $categoryIds = $product->getResource()->getCategoryIds($product);
         $websites = $product->getWebsiteIds();
+        $prefixWebsites = array();
+        foreach ($websites as $site) {
+            $prefixWebsites[] = self::WEBSITE . $site;
+        }
         if($attribute_value){
-            $websites = array_merge($websites, $attribute_value);
+            $prefixWebsites = array_merge($prefixWebsites, $attribute_value);
         }
 
         $cats = array();
@@ -574,12 +581,19 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                 $cats[] = $this->getCategoryHierarchies($category);
             }
         }
+//        Mage::helper('citrusintegration')->log('Cat[] is : '. print_r($cats, true) ."", __FILE__, __LINE__);
 
         foreach ($cats as $cat){
-            $result = array_merge(isset($result) ? $result : array(), $cat);
+//            Mage::helper('citrusintegration')->log('Cat is: '. $cat, __FILE__, __LINE__);
+            $prefixCat = array();
+            foreach ($cat as $subCat) {
+                $prefixCat[] = self::CATEGORY . $subCat;
+            }
+            $result = array_merge(isset($result) ? $result : array(), $prefixCat);
         }
 
-        return array_values(array_unique(array_merge($websites, isset($result) ? $result : array())));
+//        Mage::helper('citrusintegration')->log('Result size is: '. count($result) ."", __FILE__, __LINE__);
+        return array_values(array_unique(array_merge($prefixWebsites, isset($result) ? $result : array())));
     }
     public function getProductTags($id)
     {

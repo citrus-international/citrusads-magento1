@@ -2,6 +2,9 @@
 class Citrus_Integration_Model_Observer
 {
     const DELIM = ";";
+    const WEBSITE = "website:";
+    const CATEGORY = "category:";
+    const ATTRIBUTE = "attribute:";
 
     /**
      * @return false|Citrus_Integration_Model_Queue
@@ -34,7 +37,10 @@ class Citrus_Integration_Model_Observer
             $websiteIds = array();
             $storeIds = $cms->getStoreId();
             foreach ($storeIds as $storeId){
-                $websiteIds[] = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
+                $websiteId = Mage::getModel('core/store')->load($storeId)->getWebsiteId();
+                if (isset($websiteId)) {
+                    $websiteIds[] = self::WEBSITE . $websiteId;
+                }
             }
 
             if($websiteIds)
@@ -71,7 +77,7 @@ class Citrus_Integration_Model_Observer
             $tmpAttributes = array();
             foreach (explode(',', $attributes) as $attribute){
                 if(isset($request[$attribute])){
-                    $tmpAttributes[] = $attribute.'_'.$request[$attribute];
+                    $tmpAttributes[] = self::ATTRIBUTE . $attribute.'_'.$request[$attribute];
                 }
             }
 
@@ -82,12 +88,12 @@ class Citrus_Integration_Model_Observer
         if($bannerEnable || $adsEnable){
             /** @var Mage_Catalog_Model_Category $category */
             $category = $observer->getCategory();
-            $websiteIds = Mage::app()->getStore()->getWebsiteId();
+            $websiteIds = self::WEBSITE . Mage::app()->getStore()->getWebsiteId();
             $productFilters = '';
             $parentCategories = $category->getParentCategories();
             if(is_array($parentCategories)){
                 foreach ($parentCategories as $parentCategory){
-                    $productFilters = $productFilters. self::DELIM .$parentCategory->getName();
+                    $productFilters = $productFilters. self::DELIM . (self::CATEGORY . $parentCategory->getName());
                 }
 
                 $productFilters = trim($productFilters, self::DELIM);
