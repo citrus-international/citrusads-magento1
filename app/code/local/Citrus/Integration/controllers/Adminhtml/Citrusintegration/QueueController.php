@@ -366,7 +366,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = array(), array($oneData));
                     }
 
-                    $bodyProducts[] = $this->getHelper()->getProductData($product);
+//                    $bodyProducts[] = $this->getHelper()->getProductData($product);
                 }
 
                 unset($productCollection);
@@ -391,15 +391,15 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                 }
             }
 
-            $pageProduct = count($bodyProducts)/100;
-            for ($i = 0;$i <= $pageProduct; $i++) {
-                $bodyProductsPage = array_slice($bodyProducts, $i * 100, 100);
-                if (!empty($bodyProductsPage)) {
-                    $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProductsPage);
-                    $this->getHelper()->log('sync product: ' . $responseProduct['message'], __FILE__, __LINE__);
-                    $this->getHelper()->log('sync product body: ' . json_encode($bodyProductsPage), __FILE__, __LINE__);
-                }
-            }
+//            $pageProduct = count($bodyProducts)/100;
+//            for ($i = 0;$i <= $pageProduct; $i++) {
+//                $bodyProductsPage = array_slice($bodyProducts, $i * 100, 100);
+//                if (!empty($bodyProductsPage)) {
+//                    $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProductsPage);
+//                    $this->getHelper()->log('sync product: ' . $responseProduct['message'], __FILE__, __LINE__);
+//                    $this->getHelper()->log('sync product body: ' . json_encode($bodyProductsPage), __FILE__, __LINE__);
+//                }
+//            }
         }
 
         if($sales_order){
