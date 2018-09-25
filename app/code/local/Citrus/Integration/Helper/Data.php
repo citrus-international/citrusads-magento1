@@ -500,18 +500,20 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $categoryIds = $entity->getResource()->getCategoryIds($entity);
         $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
         if (is_array($categoryIds) && $categoryIds){
+            $data[0]['catalogId'] = $catalogId;
+            $data[0]['teamId'] = $teamId;
+            $data[0]['gtin'] = $entity->getSku();
+            $data[0]['inventory'] = (int)$stock->getQty();
+            $data[0]['price'] = (int)$entity->getPrice();
+            $data[0]['tags'] = $tags;
+            $data[0]['filters'] = $this->getProductFilter($entity);
+            $data[0]['profit'] = null;
             foreach ($categoryIds as $key => $categoryId) {
                 /** @var Mage_Catalog_Model_Category $category */
                 $category = $catModel->load($categoryId);
-                $data[$key]['catalogId'] = $catalogId;
-                $data[$key]['teamId'] = $teamId;
-                $data[$key]['gtin'] = $entity->getSku();
-                $data[$key]['inventory'] = (int)$stock->getQty();
-                $data[$key]['price'] = (int)$entity->getPrice();
-                $data[$key]['categoryHierarchy'] = $this->getCategoryHierarchies($category);
-                $data[$key]['tags'] = $tags;
-                $data[$key]['filters'] = $this->getProductFilter($entity);
-                $data[$key]['profit'] = null;
+                if ($category->getChildrenCount() == 0) {
+                    $data[0]['categoryHierarchy'] = $this->getCategoryHierarchies($category);
+                }
             }
         }
 

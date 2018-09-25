@@ -363,6 +363,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                 foreach ($productCollection as $product){
                     $catalogProductData = $this->getHelper()->getCatalogProductData($product);
                     foreach ($catalogProductData as $key => $oneData){
+//                        $this->getHelper()->log('key-oneData ' . $key . ":" . json_encode($oneData), __FILE__, __LINE__);
                         $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = array(), array($oneData));
                     }
 
