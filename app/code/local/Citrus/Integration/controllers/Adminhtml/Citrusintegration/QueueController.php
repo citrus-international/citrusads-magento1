@@ -15,6 +15,11 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
     {
         return Mage::getModel('citrusintegration/service_request');
     }
+
+    protected function getRequestSingleton() {
+        return Mage::getSingleton('citrusintegration/service_request');
+
+    }
     /**
      * @return false|Mage_Catalog_Model_Product
      */
@@ -372,7 +377,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                 for ($i = 0;$i <= $pageCatalogProduct; $i++){
                     $bodyCatalogProductsPage = array_slice($bodyCatalogProduct, $i*100, 100);
                     if(!empty($bodyCatalogProductsPage)){
-                        $responseCatalogProduct = $this->getRequestModel()->pushCatalogProductsRequest($bodyCatalogProductsPage);//$bodyCatalogProductsPage
+                        $responseCatalogProduct = $this->getRequestSingleton()->pushCatalogProductsRequest($bodyCatalogProductsPage);//$bodyCatalogProductsPage
                         $this->getHelper()->log('sync catalog product: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
                         $this->getHelper()->log('sync catalog product body: '.json_encode($bodyCatalogProductsPage), __FILE__, __LINE__);
                         if($responseCatalogProduct['success']){

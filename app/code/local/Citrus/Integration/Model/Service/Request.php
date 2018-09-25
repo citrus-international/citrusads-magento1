@@ -1,7 +1,34 @@
 <?php
 
+include_once __DIR__.'/../../vendor/autoload.php';
+
+use GuzzleHttp\Client;
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Exception\RequestException;
+
 class Citrus_Integration_Model_Service_Request extends Varien_Object
 {
+
+    private $guzzleClient;
+    const TIME_OUT = 2;
+
+    public function _construct()
+    {
+        parent::_construct();
+
+        $this->initGuzzle();
+    }
+
+    private function initGuzzle() {
+
+        $this->guzzleClient = new Client([
+//            // Base URI is used with relative requests
+//            'base_uri' => self::BASE_URI,
+            // You can set any number of default request options.
+            'timeout'  => self::TIME_OUT,
+        ]);
+    }
+
     public function requestingAnAd($body)
     {
         $handle = 'ads/generate';
@@ -66,11 +93,12 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     {
         $handle = 'catalog-products';
         $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
-        $body = array(
+        $requestBody = array(
             'catalogProducts' =>
                 $body
         );
-        return self::requestPostApi($handle, $headers, $body);
+//        return self::requestPostApi($handle, $headers, $requestBody);
+        return self::requestPostApiGuzzle($handle, $headers, $requestBody);
     }
     /**
      * @param null $body
@@ -205,6 +233,31 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
 
         return $result;
     }
+
+    public function requestPostApiGuzzle($handle, $headers=array(), $requestBody=array()) {
+
+        $url = $this->getCitrusHelper()->getHost().$handle;
+        $options = array(
+            "headers" => $headers,
+            "body" => json_encode($requestBody),
+            "version" => '1.1'
+        );
+
+        $promise = $this->guzzleClient->requestAsync('POST', $url, $options);
+        $promise->then(
+            function (ResponseInterface $res) {
+                $result = array('success' => true);
+                $result['message'] = $res->getBody()->getContents();
+                return $result;
+            },
+            function (RequestException $e) {
+                $result = array('success' => false);
+                $result['message'] = $e->getMessage();
+                return $result;
+            }
+        );
+    }
+
     public function requestDeleteApi($handle, $headers = array(), $params = '')
     {
         $url = $this->getCitrusHelper()->getHost().$handle;
