@@ -15,4 +15,14 @@ class Citrus_Integration_Model_Service_Authentication extends Varien_Object
         );
         return $headers;
     }
+
+    public function getAuthorizationGuzzle($apiKey)
+    {
+        $headers = array(
+            'Accept' => 'application/json',
+            'content-type' => 'application/json',
+            'Authorization' => 'Basic '.$apiKey
+        );
+        return $headers;
+    }
 }
