@@ -16,6 +16,7 @@ class Citrus_Integration_Model_Sync
     {
         return Mage::getModel('citrusintegration/service_request');
     }
+
     /**
      * @return false|Citrus_Integration_Model_Customer
      */
@@ -35,7 +36,7 @@ class Citrus_Integration_Model_Sync
         Mage::log('run sync data'.$type, null, 'citrus.log', true);
         $queueModel = $this->getQueueModel();
         $collectionDatas = $queueModel->getCollection()->addFieldToSelect('entity_id')
-            ->addFieldToFilter('type', array('eq' => $type))->setPageSize(100)->setCurPage(1);
+            ->addFieldToFilter('type', array('eq' => $type))->setPageSize(1000)->setCurPage(1);
             $syncItems = new Varien_Object;
             $catalog_product = array();
             $sales_order = array();

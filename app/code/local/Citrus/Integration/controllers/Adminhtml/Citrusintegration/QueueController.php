@@ -396,7 +396,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
             for ($i = 0;$i <= $pageProduct; $i++) {
                 $bodyProductsPage = array_slice($bodyProducts, $i * 100, 100);
                 if (!empty($bodyProductsPage)) {
-                    $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProductsPage);
+                    $responseProduct = $this->getRequestSingleton()->pushProductsRequest($bodyProductsPage);
                     $this->getHelper()->log('sync product: ' . $responseProduct['message'], __FILE__, __LINE__);
                     $this->getHelper()->log('sync product body: ' . json_encode($bodyProductsPage), __FILE__, __LINE__);
                 }
@@ -427,7 +427,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
 //            for($i = 0; $i <= $orderPage; $i++){
 //                $bodyOrdersPage = array_slice($body, $i*100, 100);
                 if(!empty($body)) {
-                    $response = $this->getRequestModel()->pushOrderRequest($body);
+                    $response = $this->getRequestSingleton()->pushOrderRequest($body);
                     $this->getHelper()->handleResponse($response, 'order', $orderIncrementId);
                     $this->getHelper()->log('sync sales order: ' . $response['message'], __FILE__, __LINE__);
                     if ($response['success']) {
@@ -464,7 +464,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
 //            for($i = 0; $i <= $customerPage; $i++){
 //                $bodyCustomersPage = array_slice($body, $i*100, 100);
                 if(!empty($body)) {
-                    $response = $this->getRequestModel()->pushCustomerRequest($body);
+                    $response = $this->getRequestSingleton()->pushCustomerRequest($body);
                     $this->getHelper()->handleResponse($response, 'customer', $customerIds);
                     $this->getHelper()->log('sync sales order: ' . $response['message'], __FILE__, __LINE__);
                     if ($response['success']) {
@@ -539,7 +539,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                         $body[] = $data;
                     }
 
-                    $response = $this->getRequestModel()->pushCatalogProductsRequest(array($body));
+                    $response = $this->getRequestSingleton()->pushCatalogProductsRequest(array($body));
                     $this->getHelper()->log('sync catalog product 1: '.$response['message'], __FILE__, __LINE__);
                     $this->handleResponse($response);
                 }
