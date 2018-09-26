@@ -32,7 +32,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     public function requestingAnAd($body)
     {
         $handle = 'ads/generate';
-        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
         return self::requestPostApi($handle, $headers, $body);
     }
     /**
@@ -42,7 +42,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     public function pushOrderRequest($body)
     {
         $handle = 'orders';
-        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
         $body = array(
             'orders' =>
                 $body
@@ -67,7 +67,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     public function pushCustomerRequest($body)
     {
         $handle = 'customers';
-        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
         $body = array(
             'customers' =>
                 $body
@@ -92,13 +92,13 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     public function pushCatalogProductsRequest($body = null)
     {
         $handle = 'catalog-products';
-        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
         $requestBody = array(
             'catalogProducts' =>
                 $body
         );
 //        return self::requestPostApi($handle, $headers, $requestBody);
-        return self::requestPostApiGuzzle($handle, $headers, $requestBody);
+        return self::requestPostApi($handle, $headers, $requestBody);
     }
     /**
      * @param null $body
@@ -107,7 +107,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     public function pushProductsRequest($body = null)
     {
         $handle = 'products';
-        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
         $body = array(
             'products' =>
                 $body
@@ -122,7 +122,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     public function pushCatalogsRequest($name = null, $id = null)
     {
         $handle = 'catalogs?'.http_build_query(array('teamId'=>$this->getCitrusHelper()->getTeamId()));
-        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
         $params['name'] = $name ? $name : 'Catalog';
         $params['teamId'] = $this->getCitrusHelper()->getTeamId();
         if($id)
@@ -203,7 +203,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
      * @param string $params
      * @return array
      */
-    public function requestPostApi($handle, $headers = array(), $params = '')
+    public function requestPostApiOld($handle, $headers = array(), $params = '')
     {
         $url = $this->getCitrusHelper()->getHost().$handle;
         $result = array('success' => true);
@@ -234,7 +234,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         return $result;
     }
 
-    public function requestPostApiGuzzle($handle, $headers=array(), $requestBody=array()) {
+    public function requestPostApi($handle, $headers=array(), $requestBody=array()) {
 
         $url = $this->getCitrusHelper()->getHost().$handle;
         $options = array(
@@ -243,19 +243,24 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             "version" => '1.1'
         );
 
+        $result = array();
         $promise = $this->guzzleClient->requestAsync('POST', $url, $options);
         $promise->then(
-            function (ResponseInterface $res) {
-                $result = array('success' => true);
+            function (ResponseInterface $res) use (&$result) {
+                $result['success'] = true;
                 $result['message'] = $res->getBody()->getContents();
-                return $result;
+//                return $result;
             },
-            function (RequestException $e) {
-                $result = array('success' => false);
+            function (RequestException $e) use (&$result) {
+                $result['success'] = false;
                 $result['message'] = $e->getMessage();
-                return $result;
+//                return $result;
             }
         );
+        $response = $promise->wait();
+        error_log("finished waiting!");
+//        error_log("result: " . json_encode($result));
+        return $result;
     }
 
     public function requestDeleteApi($handle, $headers = array(), $params = '')
