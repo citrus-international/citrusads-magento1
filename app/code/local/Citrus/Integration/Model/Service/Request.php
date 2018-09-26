@@ -249,17 +249,14 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             function (ResponseInterface $res) use (&$result) {
                 $result['success'] = true;
                 $result['message'] = $res->getBody()->getContents();
-//                return $result;
             },
             function (RequestException $e) use (&$result) {
                 $result['success'] = false;
                 $result['message'] = $e->getMessage();
-//                return $result;
             }
         );
-        $response = $promise->wait();
+        $promise->wait();
         error_log("finished waiting!");
-//        error_log("result: " . json_encode($result));
         return $result;
     }
 
