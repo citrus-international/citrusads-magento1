@@ -57,7 +57,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     public function deleteOrderRequest($orderId)
     {
         $handle = 'orders/'.$orderId;
-        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
         return self::requestDeleteApi($handle, $headers);
     }
     /**
@@ -82,7 +82,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     public function deleteCustomerRequest($customerId)
     {
         $handle = 'customers/'.$customerId;
-        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
         return self::requestDeleteApi($handle, $headers);
     }
     /**
@@ -142,7 +142,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     public function deleteCatalogRequest($catalogId)
     {
         $handle = 'catalogs/'.$catalogId;
-        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
         return self::requestDeleteApi($handle, $headers);
     }
     /**
@@ -157,7 +157,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         }
 
         $handle = 'catalog-products/'.$catalogId.'/'.$gtin;
-        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
         return self::requestDeleteApi($handle, $headers);
     }
     /**
@@ -173,7 +173,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
 
         $teamId = $this->getCitrusHelper()->getTeamId();
         $handle = 'products/'.$gtin.'?teamId='.$teamId;
-        $headers = $this->getAuthenticationModel()->getAuthorization($this->getCitrusHelper()->getApiKey());
+        $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
         return self::requestDeleteApi($handle, $headers);
     }
     /**
@@ -256,11 +256,11 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             }
         );
         $promise->wait();
-        error_log("finished waiting!");
+        error_log("finished waiting POST!");
         return $result;
     }
 
-    public function requestDeleteApi($handle, $headers = array(), $params = '')
+    public function requestDeleteApiOld($handle, $headers = array(), $params = '')
     {
         $url = $this->getCitrusHelper()->getHost().$handle;
         $result = array('success' => true);
@@ -288,6 +288,31 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             $result['message'] = $exception->getMessage();
         }
 
+        return $result;
+    }
+
+    public function requestDeleteApi($handle, $headers=array()) {
+
+        $url = $this->getCitrusHelper()->getHost().$handle;
+        $options = array(
+            "headers" => $headers,
+            "version" => '1.1'
+        );
+
+        $result = array();
+        $promise = $this->guzzleClient->requestAsync('DELETE', $url, $options);
+        $promise->then(
+            function (ResponseInterface $res) use (&$result) {
+                $result['success'] = true;
+                $result['message'] = $res->getBody()->getContents();
+            },
+            function (RequestException $e) use (&$result) {
+                $result['success'] = false;
+                $result['message'] = $e->getMessage();
+            }
+        );
+        $promise->wait();
+        error_log("Finished waiting DELETE");
         return $result;
     }
 }
