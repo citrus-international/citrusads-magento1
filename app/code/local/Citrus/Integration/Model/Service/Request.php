@@ -33,7 +33,14 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     {
         $handle = 'ads/generate';
         $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
-        return self::requestPostApi($handle, $headers, $body);
+        try {
+            $response = self::requestPostApi($handle, $headers, $body);
+        } catch (Exception $e) {
+            $response['success'] = false;
+            $response['message'] = $e->getMessage();
+            error_log("Generating ads got timed out!");
+        }
+        return $response;
     }
     /**
      * @param $body array
