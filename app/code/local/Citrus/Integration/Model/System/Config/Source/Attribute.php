@@ -17,7 +17,7 @@ class Citrus_Integration_Model_System_Config_Source_Attribute
             ->setEntityTypeFilter($entityType);
         $options = array();
         foreach ($attributes as $attribute) { /** @var Mage_Eav_Model_Entity_Attribute $attribute */
-            if($attribute->getIsVisibleOnFront()) {
+            if($attribute->getData("is_filterable")) {
                 $options[] = array(
                     'value' => $attribute->getAttributeCode(),
                     'label' => Mage::helper('adminhtml')->__($attribute->getFrontendLabel())
