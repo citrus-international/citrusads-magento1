@@ -11,7 +11,6 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
 
     private $guzzleClient;
     const DEFAULT_TIMEOUT_SECONDS = 60;
-    const GENERATE_AD_TIMEOUT_SECONDS = 2;
 
     public function _construct()
     {
@@ -35,7 +34,12 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         $handle = 'ads/generate';
         $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
         try {
-            $response = self::requestPostApi($handle, $headers, $body, self::GENERATE_AD_TIMEOUT_SECONDS);
+            $timeOut = floatval(Mage::getStoreConfig('citrus_sync/citrus_ads/time_out'));
+            if ($timeOut <= 0) {
+                $timeOut = 1;
+            }
+//            error_log("time out is : " . $timeOut . PHP_EOL);
+            $response = self::requestPostApi($handle, $headers, $body, $timeOut);
         } catch (Exception $e) {
             $response['success'] = false;
             $response['message'] = $e->getMessage();
