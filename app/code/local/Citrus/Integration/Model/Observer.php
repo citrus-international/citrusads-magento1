@@ -386,6 +386,7 @@ class Citrus_Integration_Model_Observer
             } else {
                 $body = $this->getCitrusHelper()->getOrderData($order);
                 $response = $this->getCitrusHelper()->getRequestModel()->pushOrderRequest(array($body));
+                $this->getCitrusHelper()->log('push order-' . $order->getEntityId() . ':' . $response['message'], __FILE__, __LINE__);
                 $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Order::ENTITY, $order->getIncrementId());
             }
         }
