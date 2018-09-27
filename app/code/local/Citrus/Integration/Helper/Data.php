@@ -123,8 +123,9 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
 
         $datetime = DateTime::createFromFormat("Y-m-d H:i:s", $entity->getCreatedAt());
         $data['orderDate'] = $datetime->format(\DateTime::RFC3339);
-        $orderItems = $entity->getAllItems();
+        $orderItems = $entity->getAllVisibleItems();
         foreach ($orderItems as $orderItem){
+//            error_log("order items count: " . count($orderItems) . PHP_EOL);
             $data['orderItems'][] = $this->getOrderItemData($orderItem);
         }
 
@@ -413,8 +414,8 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     {
         $data['gtin'] = $item->getSku();
         $data['quantity'] = (int)$item->getQtyOrdered();
-        $data['regularUnitPrice'] = (int)$item->getBasePrice();
-        $data['totalOrderItemPriceAfterDiscounts'] = (float)$item->getRowTotal();
+        $data['regularUnitPrice'] = (float)$item->getData('row_total_incl_tax');
+        $data['totalOrderItemPriceAfterDiscounts'] = $data['regularUnitPrice'] - (float)$item->getData('discount_amount');
         $info_buyRequest = $item->getProductOptionByCode('info_buyRequest');
         if(isset($info_buyRequest['citrus_ad_id'])){
             $data['adId'] = $info_buyRequest['citrus_ad_id'];
