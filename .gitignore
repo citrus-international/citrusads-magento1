@@ -64,3 +64,4 @@ etc/modules/*
 !etc/modules/Citrus_Integration.xml
 
 locale/*
+.idea/
