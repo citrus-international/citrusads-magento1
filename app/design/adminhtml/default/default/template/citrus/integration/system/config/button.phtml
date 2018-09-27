@@ -36,13 +36,13 @@
     var queueContinue = document.getElementById("queue_continue");
     if(queueContinue !== 'undefined' && queueContinue !== null ) {
         queueContinue.onclick = function () {
-            confirm('are you sure you want to add all items?');
-
-            var height = $('html-body').getHeight();
-            $('message-popup-window-mask').setStyle({'height':height+'px'});
-            toggleSelectsUnderBlock($('message-popup-window-mask'), false);
-            Element.show('message-popup-window-mask');
-            jQuery('#loading-mask').show()
+            if (confirm('are you sure you want to add all items?')) {
+                var height = $('html-body').getHeight();
+                $('message-popup-window-mask').setStyle({'height':height+'px'});
+                toggleSelectsUnderBlock($('message-popup-window-mask'), false);
+                Element.show('message-popup-window-mask');
+                jQuery('#loading-mask').show()
+            }
         }
     }
     buttonDataRole.onclick = function () {
