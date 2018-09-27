@@ -10,7 +10,8 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
 {
 
     private $guzzleClient;
-    const TIME_OUT = 2;
+    const DEFAULT_TIMEOUT_SECONDS = 60;
+    const GENERATE_AD_TIMEOUT_SECONDS = 2;
 
     public function _construct()
     {
@@ -25,7 +26,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
 //            // Base URI is used with relative requests
 //            'base_uri' => self::BASE_URI,
             // You can set any number of default request options.
-            'timeout'  => self::TIME_OUT,
+            'timeout'  => self::DEFAULT_TIMEOUT_SECONDS,
         ]);
     }
 
@@ -34,7 +35,7 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         $handle = 'ads/generate';
         $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
         try {
-            $response = self::requestPostApi($handle, $headers, $body);
+            $response = self::requestPostApi($handle, $headers, $body, self::GENERATE_AD_TIMEOUT_SECONDS);
         } catch (Exception $e) {
             $response['success'] = false;
             $response['message'] = $e->getMessage();
@@ -241,13 +242,14 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         return $result;
     }
 
-    public function requestPostApi($handle, $headers=array(), $requestBody=array()) {
+    public function requestPostApi($handle, $headers=array(), $requestBody=array(), $timeout=self::DEFAULT_TIMEOUT_SECONDS) {
 
         $url = $this->getCitrusHelper()->getHost().$handle;
         $options = array(
             "headers" => $headers,
             "body" => json_encode($requestBody),
-            "version" => '1.1'
+            "version" => '1.1',
+            "timeout" => $timeout
         );
 
         $result = array();
