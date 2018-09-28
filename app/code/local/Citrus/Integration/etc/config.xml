@@ -294,4 +294,11 @@
             </updates>
         </layout>
     </frontend>
+    <default>
+        <citrus_sync>
+            <citrus_ads>
+                <time_out>0.5</time_out>
+            </citrus_ads>
+        </citrus_sync>
+    </default>
 </config>

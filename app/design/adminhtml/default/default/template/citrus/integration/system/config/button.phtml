@@ -40,39 +40,41 @@
             $('message-popup-window-mask').setStyle({'height':height+'px'});
             toggleSelectsUnderBlock($('message-popup-window-mask'), false);
             Element.show('message-popup-window-mask');
-            jQuery('#loading-mask').show()
+            jQuery('#loading-mask').show();
         }
     }
     buttonDataRole.onclick = function () {
-        jQuery.ajax({
-            type: "GET",
-            url: '<?php /* @escapeNotVerified */ echo $this->escapeUrl($this->getButtonUrl()) ?>',
-            data: [],
-            showLoader: true,
-            beforeSend: function(){
-                var height = $('html-body').getHeight();
-                $('message-popup-window-mask').setStyle({'height':height+'px'});
-                toggleSelectsUnderBlock($('message-popup-window-mask'), false);
-                Element.show('message-popup-window-mask');
-                jQuery('#loading-mask').show()
-            },
-            success: function (response) {
-                console.log(response);
-                jQuery('#loading-mask').hide();
-                var data = JSON.parse(response);
-                console.log(data.message);
-                openMessagePopup(
-                    data.message
-                );
-            },
-            error: function (response) {
-                console.log(response);
-                jQuery('#loading-mask').hide();
-                openMessagePopup(
-                    'Something went wrong with Ajax request, please refresh your browser'
-                );
-            }
-        });
+        if (confirm('are you sure you want to add all items?')) {
+            jQuery.ajax({
+                type: "GET",
+                url: '<?php /* @escapeNotVerified */ echo $this->escapeUrl($this->getButtonUrl()) ?>',
+                data: [],
+                showLoader: true,
+                beforeSend: function(){
+                    var height = $('html-body').getHeight();
+                    $('message-popup-window-mask').setStyle({'height':height+'px'});
+                    toggleSelectsUnderBlock($('message-popup-window-mask'), false);
+                    Element.show('message-popup-window-mask');
+                    jQuery('#loading-mask').show()
+                },
+                success: function (response) {
+                    console.log(response);
+                    jQuery('#loading-mask').hide();
+                    var data = JSON.parse(response);
+                    console.log(data.message);
+                    openMessagePopup(
+                        data.message
+                    );
+                },
+                error: function (response) {
+                    console.log(response);
+                    jQuery('#loading-mask').hide();
+                    openMessagePopup(
+                        'Something went wrong with Ajax request, please refresh your browser'
+                    );
+                }
+            });
+        }
     };
 
     var messagePopupClosed = false;
