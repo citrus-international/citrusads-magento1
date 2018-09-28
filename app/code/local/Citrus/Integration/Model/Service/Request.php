@@ -10,12 +10,12 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
 {
 
     private $guzzleClient;
-    const DEFAULT_TIMEOUT_SECONDS = 60;
+    const DEFAULT_TIMEOUT_SECONDS = 5;
+    const DEFAULT_GENERATE_AD_TIMEOUT_SECONDS = 1;
 
     public function _construct()
     {
         parent::_construct();
-
         $this->initGuzzle();
     }
 
@@ -33,19 +33,12 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
     {
         $handle = 'ads/generate';
         $headers = $this->getAuthenticationModel()->getAuthorizationGuzzle($this->getCitrusHelper()->getApiKey());
-        try {
-            $timeOut = floatval(Mage::getStoreConfig('citrus_sync/citrus_ads/time_out'));
-            if ($timeOut <= 0) {
-                $timeOut = 1;
-            }
-//            error_log("time out is : " . $timeOut . PHP_EOL);
-            $response = self::requestPostApi($handle, $headers, $body, $timeOut);
-        } catch (Exception $e) {
-            $response['success'] = false;
-            $response['message'] = $e->getMessage();
-            error_log("Generating ads got timed out!");
+        $timeOut = floatval(Mage::getStoreConfig('citrus_sync/citrus_ads/time_out'));
+        if ($timeOut <= 0) {
+            $timeOut = self::DEFAULT_GENERATE_AD_TIMEOUT_SECONDS;
         }
-        return $response;
+        // error_log("time out is : " . $timeOut . PHP_EOL);
+        return self::requestPostApi($handle, $headers, $body, $timeOut);
     }
     /**
      * @param $body array
@@ -257,19 +250,25 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         );
 
         $result = array();
-        $promise = $this->guzzleClient->requestAsync('POST', $url, $options);
-        $promise->then(
-            function (ResponseInterface $res) use (&$result) {
-                $result['success'] = true;
-                $result['message'] = $res->getBody()->getContents();
-            },
-            function (RequestException $e) use (&$result) {
-                $result['success'] = false;
-                $result['message'] = $e->getMessage();
-            }
-        );
-        $promise->wait();
-        error_log("finished waiting POST!");
+        try {
+            $promise = $this->guzzleClient->requestAsync('POST', $url, $options);
+            $promise->then(
+                function (ResponseInterface $res) use (&$result) {
+                    $result['success'] = true;
+                    $result['message'] = $res->getBody()->getContents();
+                },
+                function (RequestException $e) use (&$result) {
+                    $result['success'] = false;
+                    $result['message'] = $e->getMessage();
+                }
+            );
+            $promise->wait();
+            // error_log("finished waiting POST!");
+        } catch (Exception $e) {
+            $result['success'] = false;
+            $result['message'] = $e->getMessage();
+            error_log("Exception while doing POST to " . $url . ". Error Message: " . $e->getMessage());
+        }
         return $result;
     }
 
@@ -313,19 +312,25 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
         );
 
         $result = array();
-        $promise = $this->guzzleClient->requestAsync('DELETE', $url, $options);
-        $promise->then(
-            function (ResponseInterface $res) use (&$result) {
-                $result['success'] = true;
-                $result['message'] = $res->getBody()->getContents();
-            },
-            function (RequestException $e) use (&$result) {
-                $result['success'] = false;
-                $result['message'] = $e->getMessage();
-            }
-        );
-        $promise->wait();
-        error_log("Finished waiting DELETE");
+        try {
+            $promise = $this->guzzleClient->requestAsync('DELETE', $url, $options);
+            $promise->then(
+                function (ResponseInterface $res) use (&$result) {
+                    $result['success'] = true;
+                    $result['message'] = $res->getBody()->getContents();
+                },
+                function (RequestException $e) use (&$result) {
+                    $result['success'] = false;
+                    $result['message'] = $e->getMessage();
+                }
+            );
+            $promise->wait();
+            // error_log("Finished waiting DELETE");
+        } catch (Exception $e) {
+            $result['success'] = false;
+            $result['message'] = $e->getMessage();
+            error_log("Exception while doing DELETE to " . $url . ". Error Message: " . $e->getMessage());
+        }
         return $result;
     }
 }
