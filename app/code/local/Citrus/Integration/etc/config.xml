@@ -300,5 +300,15 @@
                 <time_out>0.5</time_out>
             </citrus_ads>
         </citrus_sync>
+        <citrus_sync>
+            <citrus_order>
+                <time_out>2.5</time_out>
+            </citrus_order>
+        </citrus_sync>
+        <citrus_sync>
+            <citrus_product>
+                <time_out>2.5</time_out>
+            </citrus_product>
+        </citrus_sync>
     </default>
 </config>
