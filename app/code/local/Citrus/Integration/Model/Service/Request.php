@@ -11,7 +11,9 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
 
     private $guzzleClient;
     const DEFAULT_TIMEOUT_SECONDS = 5;
-    const DEFAULT_GENERATE_AD_TIMEOUT_SECONDS = 1;
+    const DEFAULT_CUSTOMER_ORDER_TIMEOUT_SECONDS = 2.5;
+    const DEFAULT_PRODUCT_TIMEOUT_SECONDS = 2.5;
+    const DEFAULT_GENERATE_AD_TIMEOUT_SECONDS = 0.5;
 
     public function _construct()
     {
@@ -52,7 +54,12 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             'orders' =>
                 $body
         );
-        return self::requestPostApi($handle, $headers, $body);
+
+        $timeOut = floatval(Mage::getStoreConfig('citrus_sync/citrus_order/time_out'));
+        if ($timeOut <= 0) {
+            $timeOut = self::DEFAULT_CUSTOMER_ORDER_TIMEOUT_SECONDS;
+        }
+        return self::requestPostApi($handle, $headers, $body, $timeOut);
     }
 
     /**
@@ -77,7 +84,12 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             'customers' =>
                 $body
         );
-        return self::requestPostApi($handle, $headers, $body);
+
+        $timeOut = floatval(Mage::getStoreConfig('citrus_sync/citrus_order/time_out'));
+        if ($timeOut <= 0) {
+            $timeOut = self::DEFAULT_CUSTOMER_ORDER_TIMEOUT_SECONDS;
+        }
+        return self::requestPostApi($handle, $headers, $body, $timeOut);
     }
 
     /**
@@ -102,8 +114,12 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             'catalogProducts' =>
                 $body
         );
-//        return self::requestPostApi($handle, $headers, $requestBody);
-        return self::requestPostApi($handle, $headers, $requestBody);
+
+        $timeOut = floatval(Mage::getStoreConfig('citrus_sync/citrus_product/time_out'));
+        if ($timeOut <= 0) {
+            $timeOut = self::DEFAULT_PRODUCT_TIMEOUT_SECONDS;
+        }
+        return self::requestPostApi($handle, $headers, $requestBody, $timeOut);
     }
     /**
      * @param null $body
@@ -117,7 +133,12 @@ class Citrus_Integration_Model_Service_Request extends Varien_Object
             'products' =>
                 $body
         );
-        return self::requestPostApi($handle, $headers, $body);
+
+        $timeOut = floatval(Mage::getStoreConfig('citrus_sync/citrus_product/time_out'));
+        if ($timeOut <= 0) {
+            $timeOut = self::DEFAULT_PRODUCT_TIMEOUT_SECONDS;
+        }
+        return self::requestPostApi($handle, $headers, $body, $timeOut);
     }
     /**
      * @param null $name
