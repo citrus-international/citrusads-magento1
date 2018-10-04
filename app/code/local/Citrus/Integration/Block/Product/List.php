@@ -51,14 +51,25 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
                 $adProductIds = $this->getAdResponse($searchAdResponse['ads'], $collections, $classType);
             }
 
+            $session = Mage::getSingleton( 'customer/session' );
+            $persistentCitrusAdIdArray = $session->getData('citrusAdIds');
+            if (!isset($persistentCitrusAdIdArray)) {
+                $persistentCitrusAdIdArray = array();
+            }
+            Mage::helper('citrusintegration')->log('persistent array: '. json_encode($persistentCitrusAdIdArray), __FILE__, __LINE__);
             $productItems = $collections->getItems();
             foreach ($productItems as $key => $productItem){
                 if(in_array($key, $adProductIds)){
                     $productItem->addData(array('ad_index' => '0'));
-                    $productItem->addData(array('citrus_ad_id' => array_search($key, $adProductIds)));
+                    $citrusAdId = array_search($key, $adProductIds);
+                    $productItem->addData(array('citrus_ad_id' => $citrusAdId));
+                    $persistentCitrusAdIdArray[$productItem->getSku()] = $citrusAdId;
                 }else
                     $productItem->addData(array('ad_index' => '1'));
             }
+
+            $session->setData( 'citrusAdIds', $persistentCitrusAdIdArray);
+            Mage::helper('citrusintegration')->log('citrus_ad_id_array: '. json_encode($persistentCitrusAdIdArray), __FILE__, __LINE__);
 
             usort($productItems, array('Citrus_Integration_Block_Product_List','sortByIndex'));
             foreach ($productItems as $key => $productItem) {
