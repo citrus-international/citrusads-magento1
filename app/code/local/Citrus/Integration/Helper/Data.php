@@ -426,7 +426,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
                 $data['citrusDiscountAmount'] = (int)$discount;
             }
         } else {
-            $citrusAdIdArray = Mage::getSingleton( 'customer/session' )->getData('citrusAdId');
+            $citrusAdIdArray = Mage::getSingleton( 'customer/session' )->getData('citrusAdIds');
             $data['adId'] = isset($citrusAdIdArray[$data['gtin']]) ? $citrusAdIdArray[$data['gtin']] : "";
         }
 
