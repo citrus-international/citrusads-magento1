@@ -9,73 +9,70 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
      */
     protected $_defaultToolbarBlock = 'catalog/product_list_toolbar';
 
-    public function getAdResponse($responses,$collections, $classType)
+    public function getAdId2SkuMap($responses)
     {
-        $adProductIds = array();
+        $map = array();
         foreach ($responses as $response){
             $adModel = Mage::getModel(Citrus_Integration_Model_Ad::class)->load($response);
             $sku = $adModel->getGtin();
-            /** @var Mage_Catalog_Model_Product $productModel */
-            $productModel = Mage::getModel($classType);
-            $id = $productModel->getIdBySku($sku);
-            if($id) {
-                $product = $productModel->load($id);
-                $citrus_ad_id = $adModel->getCitrusId();
-                $collections->removeItemByKey($id);
-                $collections->addItem($product);
-                $adProductIds[$citrus_ad_id] = $id;
+            if($sku) {
+                $citrusAdId = $adModel->getData('citrus_id');
+                $map[$citrusAdId] = $sku;
             }
         }
-
-        return $adProductIds;
+        return $map;
     }
+
+    public function getOrderbyExprForAdSkus($skus) {
+        $expr = '';
+        foreach ($skus as $sku){
+            if($sku) {
+                $expr = $expr . ($expr?',':'') . 'sku=\'' . $sku . '\' DESC';
+            }
+        }
+        return $expr;
+    }
+
     protected function _getProductCollection()
     {
 
         $collections = parent::_getProductCollection();
         /** @var Mage_Catalog_Block_Product_List_Toolbar $toolbar */
         $toolbar = Mage::getBlockSingleton(Mage_Catalog_Block_Product_List_Toolbar::class);
-        /** @var Mage_Catalog_Model_Layer $layer */
-        $layer = Mage::getModel(Mage_Catalog_Model_Layer::class);
         try{
-            $collections->setPageSize((int)$toolbar->getLimit());
+            $collections->setPage((int)$toolbar->getCurrentPage(), (int)$toolbar->getLimit());
             $categoryAdResponse = Mage::registry('categoryAdResponse');
             $searchAdResponse = Mage::registry('searchAdResponse');
-            $collections->getItems();
-            $adProductIds = array();
-            $classType = $collections->count() > 0 ? get_class($collections->getFirstItem()) : "Mage_Catalog_Model_Product";
-//            Mage::helper('citrusintegration')->log('Type class: '. $classType, __FILE__, __LINE__);
+            $collections->addAttributeToSelect('sku');
+
+
+            $adId2SkuMap = array();
             if($categoryAdResponse){
-                $adProductIds = $this->getAdResponse($categoryAdResponse['ads'], $collections, $classType);
+                $adId2SkuMap = $this->getAdId2SkuMap($categoryAdResponse['ads']);
             }elseif($searchAdResponse){
-                $adProductIds = $this->getAdResponse($searchAdResponse['ads'], $collections, $classType);
+                $adId2SkuMap = $this->getAdId2SkuMap($searchAdResponse['ads']);
             }
+
+            $collections->getSelect()->order(new Zend_Db_Expr($this->getOrderByExprForAdSkus($adId2SkuMap)));
+//            Mage::helper('citrusintegration')->log('==== SQL: '. $collections->getse, __FILE__, __LINE__);
+            $productItems = $collections->getItems();
 
             $session = Mage::getSingleton( 'customer/session' );
             $persistentCitrusAdIdArray = $session->getData('citrusAdIds');
             if (!isset($persistentCitrusAdIdArray)) {
                 $persistentCitrusAdIdArray = array();
             }
-            Mage::helper('citrusintegration')->log('persistent array: '. json_encode($persistentCitrusAdIdArray), __FILE__, __LINE__);
-            $productItems = $collections->getItems();
-            foreach ($productItems as $key => $productItem){
-                if(in_array($key, $adProductIds)){
-                    $productItem->addData(array('ad_index' => '0'));
-                    $citrusAdId = array_search($key, $adProductIds);
+            foreach ($productItems as $productItem){
+                if(in_array($productItem->getSku(), $adId2SkuMap)){
+                    $citrusAdId = array_search($productItem->getSku(), $adId2SkuMap);
                     $productItem->addData(array('citrus_ad_id' => $citrusAdId));
                     $persistentCitrusAdIdArray[$productItem->getSku()] = $citrusAdId;
-                }else
-                    $productItem->addData(array('ad_index' => '1'));
+                }
             }
 
             $session->setData( 'citrusAdIds', $persistentCitrusAdIdArray);
-            Mage::helper('citrusintegration')->log('citrus_ad_id_array: '. json_encode($persistentCitrusAdIdArray), __FILE__, __LINE__);
+//            Mage::helper('citrusintegration')->log('citrus_ad_id_array: '. json_encode($persistentCitrusAdIdArray), __FILE__, __LINE__);
 
-            usort($productItems, array('Citrus_Integration_Block_Product_List','sortByIndex'));
-            foreach ($productItems as $key => $productItem) {
-                $collections->removeItemByKey($productItem->getEntityId());
-                $collections->addItem($productItem);
-            }
         }catch (Exception $e){
             Mage::helper('citrusintegration')->log('Collection product error: '.$e->getMessage(), __FILE__, __LINE__);
             Mage::helper('citrusintegration')->log('Collection product error - trace: '.$e->getTraceAsString(), __FILE__, __LINE__);
@@ -84,12 +81,4 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
         return $collections;
     }
 
-    public static function sortByIndex($a, $b)
-    {
-        if($a->getAdIndex() ==  $b->getAdIndex()){
-            return 0 ;
-        }
-
-        return ($a->getAdIndex() < $b->getAdIndex()) ? -1 : 1;
-    }
 }
