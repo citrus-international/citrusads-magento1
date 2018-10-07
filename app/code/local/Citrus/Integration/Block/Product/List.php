@@ -25,9 +25,10 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
 
     public function getOrderbyExprForAdSkus($skus) {
         $expr = '';
+        $conn = Mage::getSingleton('core/resource')->getConnection('default_read');
         foreach ($skus as $sku){
             if($sku) {
-                $expr = $expr . ($expr?',':'') . 'sku=\'' . $sku . '\' DESC';
+                $expr = $expr . ($expr?',':'') . 'sku=' . $conn->quote($sku) . ' DESC';
             }
         }
         return $expr;
@@ -54,7 +55,7 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
             }
 
             $collections->getSelect()->order(new Zend_Db_Expr($this->getOrderByExprForAdSkus($adId2SkuMap)));
-//            Mage::helper('citrusintegration')->log('==== SQL: '. $collections->getse, __FILE__, __LINE__);
+//            Mage::helper('citrusintegration')->log('==== SQL: '. $collections->getSelect(), __FILE__, __LINE__);
             $productItems = $collections->getItems();
 
             $session = Mage::getSingleton( 'customer/session' );
