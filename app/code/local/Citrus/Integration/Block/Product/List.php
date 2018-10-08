@@ -70,10 +70,8 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
                     if ($adId2SkuMap) {
                         $from = $collections->getSelect()->getPart(Zend_Db_Select::FROM);
                         $from['search_result']['joinType'] = 'left join';
-                        $searchResultJoinConditions = explode(' AND ', $from['search_result']['joinCondition']);
                         $collections->getSelect()
                             ->setPart(Zend_Db_Select::FROM, $from)
-                            ->where($searchResultJoinConditions[1] . $this->getOrSkuInExpr($adId2SkuMap))
                             ->where("search_result.query_id is not null" . $this->getOrSkuInExpr($adId2SkuMap));
                     }
                 }
