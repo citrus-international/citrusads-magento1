@@ -414,8 +414,9 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     {
         $data['gtin'] = $item->getSku();
         $data['quantity'] = (int)$item->getQtyOrdered();
-        $data['regularUnitPrice'] = (float)$item->getData('row_total_incl_tax');
-        $data['totalOrderItemPriceAfterDiscounts'] = $data['regularUnitPrice'] - (float)$item->getData('discount_amount');
+        $total_price = (float)$item->getData('row_total_incl_tax');
+        $data['regularUnitPrice'] = $data['quantity'] ? $total_price / $data['quantity'] : 0;
+        $data['totalOrderItemPriceAfterDiscounts'] = $total_price - (float)$item->getData('discount_amount');
         $info_buyRequest = $item->getProductOptionByCode('info_buyRequest');
         if(isset($info_buyRequest['citrus_ad_id'])){
             $data['adId'] = $info_buyRequest['citrus_ad_id'];
