@@ -132,7 +132,7 @@ class Citrus_Integration_Model_Observer
             return;
         }
         $searchTerm = Mage::app()->getRequest()->getParams()['q'];
-        if (!$searchTerm) {
+        if (!isset($searchTerm) || empty($searchTerm)) {
             return;
         }
 
