@@ -125,14 +125,14 @@ class Citrus_Integration_Model_Observer
             }
         }
     }
-    public function sendContextAfterSearch($observer)
+    public function sendContextAfterSearch()
     {
-        /** @var Mage_CatalogSearch_Model_Query $queryModel */
-        $searchTerm = $observer->getCatalogsearchQuery()->getQueryText();
-        $isProcessed = $observer->getCatalogsearchQuery()->getIsProcessed();
-        // $this->getCitrusHelper()->log('==== search term is: '. $searchTerm . ', isProcessed: ' . $isProcessed, __FILE__, __LINE__);
-
-        if (!$searchTerm || !$isProcessed) {
+        $isAjax = Mage::app()->getRequest()->isXmlHttpRequest();
+        if ($isAjax) {
+            return;
+        }
+        $searchTerm = Mage::app()->getRequest()->getParams()['q'];
+        if (!$searchTerm) {
             return;
         }
 
