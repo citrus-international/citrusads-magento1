@@ -400,16 +400,14 @@ class Citrus_Integration_Model_Observer
             /** @var Mage_Customer_Model_Customer $customer */
             $customer = $observer->getCustomer();
             $citrusCustomerId = $this->getCitrusCustomerModel()->getCitrusIdByEntityId($customer->getEntityId());
-            if (isset($citrusCustomerId)) {
-                $this->getCitrusHelper()->log('Existing customer-' . $customer->getEntityId(), __FILE__, __LINE__);
-                return;
-            }
-
             $realTimeOrder = $enable = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
             if ($realTimeOrder) {
                 $this->pushItemToQueue($queueModel, $customer);
             } else {
                 $body = $this->getCitrusHelper()->getCustomerData($customer);
+                if (isset($citrusCustomerId)) {
+                    $body['id'] = $citrusCustomerId;
+                }
                 $response = $this->getCitrusHelper()->getRequestModel()->pushCustomerRequest(array($body));
                 $this->getCitrusHelper()->log('push customer-' . $customer->getEntityId() . ':' . $response['message'], __FILE__, __LINE__);
                 $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Customer::ENTITY, $customer->getId());
