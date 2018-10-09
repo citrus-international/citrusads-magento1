@@ -125,16 +125,22 @@ class Citrus_Integration_Model_Observer
             }
         }
     }
-    public function sendContextAfterSearch($observer)
+    public function sendContextAfterSearch()
     {
+        $isAjax = Mage::app()->getRequest()->isXmlHttpRequest();
+        if ($isAjax) {
+            return;
+        }
+        $searchTerm = Mage::app()->getRequest()->getParams()['q'];
+        if (!isset($searchTerm) || empty($searchTerm)) {
+            return;
+        }
+
         $bannerEnable = Mage::getStoreConfig('citrus_sync/citrus_banner/enable', Mage::app()->getStore());
         $adsEnable = Mage::getStoreConfig('citrus_sync/citrus_ads/enable', Mage::app()->getStore());
         $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
         if(!$moduleEnable) $bannerEnable = $adsEnable = 0;
         if($bannerEnable || $adsEnable) {
-            /** @var Mage_CatalogSearch_Model_Query $queryModel */
-            $queryModel = $observer->getCatalogsearchQuery();
-            $searchTerm = $queryModel->getQueryText();
 
             $context = array(
                 'pageType' => 'Search',
