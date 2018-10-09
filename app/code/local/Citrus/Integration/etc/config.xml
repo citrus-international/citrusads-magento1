@@ -32,7 +32,7 @@
     <!---->
     <frontend>
         <events>
-            <catalogsearch_query_load_after>
+            <catalogsearch_query_save_after>
                 <observers>
                     <citrusintegration>
                         <type>singleton</type>
@@ -40,7 +40,7 @@
                         <method>sendContextAfterSearch</method>
                     </citrusintegration>
                 </observers>
-            </catalogsearch_query_load_after>
+            </catalogsearch_query_save_after>
             <catalog_controller_category_init_after>
                 <observers>
                     <citrusintegration>
