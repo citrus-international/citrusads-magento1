@@ -376,13 +376,13 @@ class Citrus_Integration_Model_Observer
         if($moduleEnable) {
             /** @var Mage_Sales_Model_Order $order */
             $order = $observer->getOrder();
-            $customer = $order->getCustomer();
+//            $customer = $order->getCustomer();
             $realTimeOrder = $enable = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
             if ($realTimeOrder) {
                 $this->pushItemToQueue($queueModel, $order);
-                if ($order->getCustomerId()) {
-                    $this->pushItemToQueue($queueModel, $customer);
-                }
+//                if ($order->getCustomerId()) {
+//                    $this->pushItemToQueue($queueModel, $customer);
+//                }
             } else {
                 $body = $this->getCitrusHelper()->getOrderData($order);
                 $this->getCitrusHelper()->log('push order request -' . $order->getEntityId() . ':' . json_encode($body), __FILE__, __LINE__);
@@ -399,11 +399,15 @@ class Citrus_Integration_Model_Observer
         if($moduleEnable) {
             /** @var Mage_Customer_Model_Customer $customer */
             $customer = $observer->getCustomer();
+            $citrusCustomerId = $this->getCitrusCustomerModel()->getCitrusIdByEntityId($customer->getEntityId());
             $realTimeOrder = $enable = Mage::getStoreConfig('citrus_sync/citrus_order/sync_mode', Mage::app()->getStore());
             if ($realTimeOrder) {
                 $this->pushItemToQueue($queueModel, $customer);
             } else {
                 $body = $this->getCitrusHelper()->getCustomerData($customer);
+                if (isset($citrusCustomerId)) {
+                    $body['id'] = $citrusCustomerId;
+                }
                 $response = $this->getCitrusHelper()->getRequestModel()->pushCustomerRequest(array($body));
                 $this->getCitrusHelper()->log('push customer-' . $customer->getEntityId() . ':' . $response['message'], __FILE__, __LINE__);
                 $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Customer::ENTITY, $customer->getId());

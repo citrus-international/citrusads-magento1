@@ -466,7 +466,7 @@ class Citrus_Integration_Adminhtml_Citrusintegration_QueueController extends Mag
                 if(!empty($body)) {
                     $response = $this->getRequestSingleton()->pushCustomerRequest($body);
                     $this->getHelper()->handleResponse($response, 'customer', $customerIds);
-                    $this->getHelper()->log('sync sales order: ' . $response['message'], __FILE__, __LINE__);
+                    $this->getHelper()->log('sync customers: ' . $response['message'], __FILE__, __LINE__);
                     if ($response['success']) {
                         $customerSuccess = true;
                     } else {

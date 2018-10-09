@@ -170,7 +170,7 @@ class Citrus_Integration_Model_Sync
                 }
 
                 $this->getHelper()->handleResponse($response, 'customer', $customerIds);
-                $this->getHelper()->log('cron - sync sales order: ' . $response['message'], __FILE__, __LINE__);
+                $this->getHelper()->log('cron - sync customers: ' . $response['message'], __FILE__, __LINE__);
             }
         }
     }
