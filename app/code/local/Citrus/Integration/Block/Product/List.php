@@ -69,7 +69,7 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
                     $adId2SkuMap = $this->getAdId2SkuMap($searchAdResponse['ads']);
                     if ($adId2SkuMap) {
                         $from = $collections->getSelect()->getPart(Zend_Db_Select::FROM);
-                        Mage::helper('citrusintegration')->log('==== From: ' . json_encode($from), __FILE__, __LINE__);
+//                        Mage::helper('citrusintegration')->log('==== From: ' . json_encode($from), __FILE__, __LINE__);
                         if(!isset($from['search_result'])) {
                             $from['search_result']['schema'] = null;
                             $from['search_result']['tableName'] = 'catalogsearch_result';
@@ -83,7 +83,7 @@ class Citrus_Integration_Block_Product_List extends Mage_Catalog_Block_Product_L
                 }
 
                 $collections->getSelect()->order(new Zend_Db_Expr($this->getOrderbyExpr($adId2SkuMap)));
-                Mage::helper('citrusintegration')->log('==== SQL: ' . $collections->getSelect(), __FILE__, __LINE__);
+//                Mage::helper('citrusintegration')->log('==== SQL: ' . $collections->getSelect(), __FILE__, __LINE__);
                 $productItems = $collections->getItems();
 
                 $session = Mage::getSingleton('customer/session');
