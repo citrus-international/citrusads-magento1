@@ -51,15 +51,30 @@ class Citrus_Integration_Model_Observer
                 $context['bannerSlotIds'] = $banners;
             }
 
-            $context = $this->getCitrusHelper()->getContextData($context);
-            $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
+            $uuid = uniqid('ad_gen_uuid_home_');
+            $this->getCitrusHelper()->log('[ad-gen] making uuid (home): '.$uuid, __FILE__, __LINE__);
 
-            $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Home', false, $bannerEnable);
+            try {
+                $context = $this->getCitrusHelper()->getContextData($context);
+                $this->getCitrusHelper()->log('[ad-gen] uuid=' . $uuid . ' context (home): ' . json_encode($context), __FILE__, __LINE__);
+                
+                $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
+                $this->getCitrusHelper()->log('[ad-gen] uuid=' . $uuid . 'response (home): ' . $response['message'], __FILE__, __LINE__);
+                
+                $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Home', false, $bannerEnable);
+            }catch (Exception $exception){
+                $this->getCitrusHelper()->log('Exception happens when generating ads (home): '. $exception->getMessage(), __FILE__, __LINE__, Zend_Log::ERR);
+            }
+
             try {
                 Mage::unregister('categoryAdResponse');
                 Mage::register('categoryAdResponse', $return);
+
+                Mage::unregister('ad_gen_uuid');
+                Mage::register('ad_gen_uuid', $uuid);
+
             }catch (Exception $exception){
-                $this->getCitrusHelper()->log('categoryAdResponse: '. Mage::registry('categoryAdResponse'), __FILE__, __LINE__);
+                $this->getCitrusHelper()->log('categoryAdResponse: '. Mage::registry('categoryAdResponse'), __FILE__, __LINE__, Zend_Log::ERR);
             }
 
             $this->getCitrusHelper()->log('ads request homepage context '.' : '.json_encode($context), __FILE__, __LINE__);
@@ -109,15 +124,30 @@ class Citrus_Integration_Model_Observer
                     $context['bannerSlotIds'] = $banners;
                 }
 
-                $context = $this->getCitrusHelper()->getContextData($context);
-                $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
+                $uuid = uniqid('ad_gen_uuid_category_');
+                $this->getCitrusHelper()->log('[ad-gen] making uuid (category): '.$uuid, __FILE__, __LINE__);
 
-                $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Category', $adsEnable, $bannerEnable);
+                try {
+                    $context = $this->getCitrusHelper()->getContextData($context);
+                    $this->getCitrusHelper()->log('[ad-gen] uuid='.$uuid.' context (category): ' . json_encode($context), __FILE__, __LINE__);
+                    
+                    $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
+                    $this->getCitrusHelper()->log('[ad-gen] uuid='.$uuid.' response (category): ' . $response['message'], __FILE__, __LINE__);
+                     
+                    $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Category', $adsEnable, $bannerEnable);
+                } catch (Exception $exception) {
+                    $this->getCitrusHelper()->log('Exception happens when generating ads (category): ' . $exception->getMessage(), __FILE__, __LINE__, Zend_Log::ERR);
+                }
+
                 try {
                     Mage::unregister('categoryAdResponse');
                     Mage::register('categoryAdResponse', $return);
+
+                    Mage::unregister('ad_gen_uuid');
+                    Mage::register('ad_gen_uuid', $uuid);
+
                 }catch (Exception $exception){
-                    $this->getCitrusHelper()->log('categoryAdResponse: '. Mage::registry('categoryAdResponse'), __FILE__, __LINE__);
+                    $this->getCitrusHelper()->log('categoryAdResponse: '. Mage::registry('categoryAdResponse'), __FILE__, __LINE__, Zend_Log::ERR);
                 }
 
                 $this->getCitrusHelper()->log('ads request category context -'.$productFilters.' : '.json_encode($context), __FILE__, __LINE__);
@@ -145,20 +175,33 @@ class Citrus_Integration_Model_Observer
             $context = array(
                 'pageType' => 'Search',
                 'searchTerm' => $searchTerm,
-                'maxNumberOfAds' => Citrus_Integration_Helper_Data::MAX_NUMBER_OF_ADS
+                'maxNumberOfAds' => intval(Mage::getStoreConfig('citrus_sync/citrus_ads/max_number_of_ads'))
             );
             $banners = $this->getSlotIdByPageType('search', Citrus_Integration_Helper_Data::CITRUS_PAGE_TYPE_SEARCH);
             if ($banners) {
                 $context['bannerSlotIds'] = $banners;
             }
 
-            $context = $this->getCitrusHelper()->getContextData($context);
-            $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
-            $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Search', $adsEnable, $bannerEnable);
+            $uuid = uniqid('ad_gen_uuid_search_');
+            $this->getCitrusHelper()->log('[ad-gen] making uuid (search): '.$uuid, __FILE__, __LINE__);
 
+            try {
+                $context = $this->getCitrusHelper()->getContextData($context);
+                $this->getCitrusHelper()->log('[ad-gen] uuid=' . $uuid . ' context (search): ' . json_encode($context), __FILE__, __LINE__);
+
+                $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
+                $this->getCitrusHelper()->log('[ad-gen] uuid=' . $uuid . 'response (search) :'.$response['message'], __FILE__, __LINE__);
+                
+                $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Search', $adsEnable, $bannerEnable);
+            } catch (Exception $exception) {
+                $this->getCitrusHelper()->log('Exception happens when generating ads (category): ' . $exception->getMessage(), __FILE__, __LINE__, Zend_Log::ERR);
+            }
+                
             Mage::unregister('searchAdResponse');
             Mage::register('searchAdResponse', $return);
-            $this->getCitrusHelper()->log('ads request search :'.$response['message'], __FILE__, __LINE__);
+
+            Mage::unregister('ad_gen_uuid');
+            Mage::register('ad_gen_uuid', $uuid);
         }
     }
     public function getSlotIdByPageType($entity_id, $page_type)
@@ -411,12 +454,14 @@ class Citrus_Integration_Model_Observer
                 $this->pushItemToQueue($queueModel, $customer);
             } else {
                 $body = $this->getCitrusHelper()->getCustomerData($customer);
-                if (isset($citrusCustomerId)) {
+                if ($citrusCustomerId) {
                     $body['id'] = $citrusCustomerId;
                 }
                 $response = $this->getCitrusHelper()->getRequestModel()->pushCustomerRequest(array($body));
                 $this->getCitrusHelper()->log('push customer-' . $customer->getEntityId() . ':' . $response['message'], __FILE__, __LINE__);
-                $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Customer::ENTITY, $customer->getId());
+                if (!$citrusCustomerId) {
+                    $this->getCitrusHelper()->handleResponse($response, Citrus_Integration_Model_Customer::ENTITY, $customer->getId());
+                }
             }
         }
     }
