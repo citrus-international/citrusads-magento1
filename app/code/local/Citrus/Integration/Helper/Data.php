@@ -13,7 +13,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     const CITRUS_STAGING_SERVER = "https://staging-integration.citrusad.com/v1/";
     const CITRUS_AU_SERVER = "https://au-integration.citrusad.com/v1/";
     const CITRUS_US_SERVER = "https://us-west-2-integration.citrusad.com/v1/";
-    const MAX_NUMBER_OF_ADS = 3;
+//    const MAX_NUMBER_OF_ADS = 3;
     const CITRUS_PAGE_TYPE_SEARCH = 3;
     const CITRUS_PAGE_TYPE_ALL = 0;
     const CITRUS_PAGE_TYPE_CATEGORY = 1;
@@ -103,9 +103,11 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     {
         return Mage::getModel('citrusintegration/service_response');
     }
-    public function log($messages, $file = '', $line = 0)
+    public function log($messages, $file = '', $line = 0, $level= Zend_Log::DEBUG)
     {
-            Mage::log($messages . ' on '.$file .':'.$line, null, 'citrus.log', true);
+        if ($level != Zend_Log::DEBUG || Mage::getStoreConfig('citrus/citrus_group/debug_log_enabled')) {
+            Mage::log($messages . ' (' . $file . ':' . $line . ')', $level, 'citrus.log', true);
+        }
     }
     /**
      * @param $entity Mage_Sales_Model_Order
@@ -136,13 +138,16 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $data = array(
             'catalogId' => $this->getCitrusCatalogId(),
             'pageType' => isset($context['pageType']) ? $context['pageType'] : 'Home',
-            'maxNumberOfAds' => self::MAX_NUMBER_OF_ADS
+            'maxNumberOfAds' => intval(Mage::getStoreConfig('citrus_sync/citrus_ads/max_number_of_ads'))
         );
         if(isset($context['searchTerm']))
             $data['searchTerm'] = $context['searchTerm'];
         if(isset($context['bannerSlotIds'])){
             $arrays = explode(',', $context['bannerSlotIds']);
             $data['bannerSlotIds'] = $arrays;
+        }
+        if(isset($context['contentStandardId'])){
+            $data['contentStandardId'] = $context['contentStandardId'];
         }
 
         if(isset($context['productFilters'])){
@@ -159,128 +164,14 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
     {
         if($response['success']){
             $data = json_decode($response['message'], true);
-            $adModel = $this->getAdModel();
-            $bannerModel = $this->getBannerModel();
-            $discountModel = $this->getDiscountModel();
-            $host = $this->getHost();
-            $adsRegistry = array();
-            $bannerRegistry = array();
-            if($data['ads'] && $adsEnable){
-                foreach ($data['ads'] as $ad){
-                    $id = $adModel->getIdByCitrusId($ad['id']);
-                    if($id){
-                        $adModel->load($id);
-                        $discountModel->load($adModel->getDiscountId());
-                        $adData = array(
-                            'gtin' => $ad['gtin'],
-                            'expiry' => $ad['expiry']
-                        );
-                        $discountData = array(
-                            'amount' => $ad['discount']['amount'],
-                            'minPrice' => $ad['discount']['minPrice'],
-                            'maxPerCustomer' => $ad['discount']['maxPerCustomer'],
-                        );
-                        $adModel->addData($adData);
-                        $discountModel->addData($discountData);
-
-                        try{
-                            $discountModel->save();
-                            $adModel->save();
-                            $adsRegistry[] = $adModel->getId();
-                        }catch (Exception $e){
-                            $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
-                            return false;
-                        }
-                    }
-                    else{
-                        $discountModel->unsetData();
-                        $discountData = array(
-                            'amount' => $ad['discount']['amount'],
-                            'minPrice' => $ad['discount']['minPrice'],
-                            'maxPerCustomer' => $ad['discount']['maxPerCustomer'],
-                        );
-                        $discountModel->addData($discountData);
-                        try{
-                            $discountModel->save();
-                        }catch (Exception $e){
-                            $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
-                            return false;
-                        }
-
-                        $adModel->unsetData();
-                        $adData = array(
-                            'citrus_id' => $ad['id'],
-                            'discount_id' => $discountModel->getId(),
-                            'pageType' => $pageType,
-                            'gtin' => $ad['gtin'],
-                            'expiry' => $ad['expiry'],
-                            'host' => $host
-                        );
-                        $adModel->addData($adData);
-                        try{
-                            $adModel->save();
-                            $adsRegistry[] = $adModel->getId();
-                        }catch (Exception $e){
-                            $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            if($data['banners'] && $bannerEnable){
-                foreach ($data['banners'] as $banner){
-                    $id = $bannerModel->getIdByCitrusId($banner['id']);
-                    if($id){
-                        $bannerModel->load($id);
-                        $bannerData = array(
-                            'slotId' => $banner['slotId'],
-                            'imageUrl' => $banner['imageUrl'],
-                            'altText' => $banner['altText'],
-                            'linkUrl' => $banner['linkUrl'],
-                            'expiry' => $banner['expiry'],
-                            'pageType' => $pageType
-                        );
-                        $bannerModel->addData($bannerData);
-                        try{
-                            $bannerModel->save();
-                            $bannerRegistry[] = $bannerModel->getId();
-                        }catch (Exception $e){
-                            $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
-                            return false;
-                        }
-                    }
-                    else{
-                        $bannerModel->unsetData();
-                        $bannerData = array(
-                            'citrus_id' => $banner['id'],
-                            'slotId' => $banner['slotId'],
-                            'imageUrl' => $banner['imageUrl'],
-                            'altText' => $banner['altText'],
-                            'linkUrl' => $banner['linkUrl'],
-                            'expiry' => $banner['expiry'],
-                            'host' => $host,
-                            'pageType' => $pageType
-                        );
-                        $bannerModel->addData($bannerData);
-                        try{
-                            $bannerModel->save();
-                            $bannerRegistry[] = $bannerModel->getId();
-                        }catch (Exception $e){
-                            $this->log('Get ads response error: '.$e->getMessage(), __FILE__, __LINE__);
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            return array('ads'=>$adsRegistry,'banners'=>$bannerRegistry);
+            return array('ads'=>$data['ads'],'banners'=>$data['banners']);
         }
         else{
-            $this->log('Get ads response error: '.$response['message'], __FILE__, __LINE__);
+            $this->log('[ad-handler] response was unsuccessful: '.$response['message'], __FILE__, __LINE__, Zend_Log::ERR);
             return false;
         }
     }
+
     public function handleBanner($banners, $adId)
     {
         /** @var Citrus_Integration_Model_Banner $model */

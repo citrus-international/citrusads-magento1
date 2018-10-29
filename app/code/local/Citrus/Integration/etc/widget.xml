@@ -25,6 +25,12 @@
                     </search>
                 </values>
             </page_type>
+            <slot_id>
+                <label>SlotId</label>
+                <visible>1</visible>
+                <required>0</required>
+                <type>text</type>
+            </slot_id>
             <height>
                 <label>Height</label>
                 <visible>1</visible>
