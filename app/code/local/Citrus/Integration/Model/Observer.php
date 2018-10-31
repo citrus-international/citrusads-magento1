@@ -215,6 +215,18 @@ class Citrus_Integration_Model_Observer
                 $this->getCitrusHelper()->log('Exception happens when generating ads (category): ' . $exception->getMessage(), __FILE__, __LINE__, Zend_Log::ERR);
             }
 
+            try {
+                $context = $this->getCitrusHelper()->getContextData($context);
+                $this->getCitrusHelper()->log('[ad-gen] uuid=' . $uuid . ' context (search): ' . json_encode($context), __FILE__, __LINE__);
+
+                $response = $this->getCitrusHelper()->getRequestModel()->requestingAnAd($context);
+                $this->getCitrusHelper()->log('[ad-gen] uuid=' . $uuid . 'response (search) :'.$response['message'], __FILE__, __LINE__);
+                
+                $return = $this->getCitrusHelper()->handleAdsResponse($response, 'Search', $adsEnable, $bannerEnable);
+            } catch (Exception $exception) {
+                $this->getCitrusHelper()->log('Exception happens when generating ads (category): ' . $exception->getMessage(), __FILE__, __LINE__, Zend_Log::ERR);
+            }
+                
             Mage::unregister('searchAdResponse');
             Mage::register('searchAdResponse', $return);
 
