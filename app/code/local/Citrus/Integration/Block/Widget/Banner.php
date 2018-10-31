@@ -9,6 +9,10 @@ class Citrus_Integration_Block_Widget_Banner extends Mage_Core_Block_Template im
     {
         return $this->getData('page_type');
     }
+    public function getSlotId()
+    {
+        return $this->getData('slot_id');
+    }
     public function getHeight()
     {
         return $this->getData('height');

@@ -146,6 +146,9 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $arrays = explode(',', $context['bannerSlotIds']);
             $data['bannerSlotIds'] = $arrays;
         }
+        if(isset($context['contentStandardId'])){
+            $data['contentStandardId'] = $context['contentStandardId'];
+        }
 
         if(isset($context['productFilters'])){
             $arrays = explode(self::DELIM, trim($context['productFilters'], self::DELIM));

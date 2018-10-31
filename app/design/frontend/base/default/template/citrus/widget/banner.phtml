@@ -8,15 +8,22 @@ if($bannerEnable):
     elseif($searchAdResponse)
         $banners = $searchAdResponse['banners'];
     else $banners = null;
+
+    $uuid = Mage::registry('ad_gen_uuid');
+    Mage::helper('citrusintegration')->log('[widget] uuid: ' . $uuid . ', slotId: '. $this->getSlotId()
+        .', showing banners (first matching only): ' . json_encode($banners) , __FILE__, __LINE__);
+
     if($banners): ?>
         <div class="citrus-banner">
-            <?php
-            foreach ($banners as $banner):
-                $banner = $this->getCitrusHelper()->getBannerModel()->load($banner)
+            <?php foreach ($banners as $banner):
+                if(!$this->getSlotId() || $banner['slotId'] == $this->getSlotId()) {
                 ?>
-                <a href="<?= $banner->getData('linkUrl') ?>" data-id="<?= $banner->getCitrusId() ?>" class="citrus-ads"><img src="<?= $banner->getData('imageUrl')?>" alt="<?= $banner->getData('altText')?>"
+                <a href="<?= $banner['linkUrl'] ?>" data-id="<?= $banner['id'] ?>" class="citrus-ads"><img src="<?= $banner['imageUrl']?>" alt="<?= $banner['altText']?>"
                     height="<?= $this->getHeight()?>" width="<?= $this->getWidth()?>"></a>
-            <?php endforeach;?>
+                <?php
+                  break;
+                }
+            endforeach;?>
         </div>
 <?php
     endif;

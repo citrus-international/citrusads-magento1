@@ -36,7 +36,7 @@
                             <source_model>adminhtml/system_config_source_yesno</source_model>
                         </enable>
                         <host translate="label">
-                            <label>Host: </label>
+                            <label>Host(*): </label>
                             <comment>Choose your host</comment>
                             <frontend_type>select</frontend_type>
                             <sort_order>20</sort_order>
@@ -46,7 +46,7 @@
                             <source_model>citrusintegration/system_config_source_host</source_model>
                         </host>
                         <team_id translate="label">
-                            <label>Team Id: </label>
+                            <label>Team Id(*): </label>
                             <comment>
                                 1. Navigate to staging.citrusad.com.
                                 2. Log in.
@@ -60,7 +60,7 @@
                             <show_in_store>1</show_in_store>
                         </team_id>
                         <api_key translate="label">
-                            <label>Api Key: </label>
+                            <label>Api Key(*): </label>
                             <comment>
                                 1. Navigate to staging.citrusad.com.
                                 2. Click on Integration Settings in the drop-down menu that appears when you click your name in the upper-right-hand corner of the Citrus User Interface.
@@ -69,7 +69,7 @@
                                 5. Click the green Copy button. This copies the API key to your clipboard.
                             </comment>
                             <frontend_type>text</frontend_type>
-                            <sort_order>40</sort_order>
+                            <sort_order>35</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -85,6 +85,16 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </catalog_name>
+
+                        <content_standard_id>
+                            <label>Content Standard Id: </label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>45</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </content_standard_id>
+
                         <debug_log_enabled translate="label comment">
                             <label>Debug Log: </label>
                             <frontend_type>select</frontend_type>

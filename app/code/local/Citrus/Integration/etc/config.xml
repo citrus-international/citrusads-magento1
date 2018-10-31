@@ -302,7 +302,7 @@
         </citrus_sync>
         <citrus_sync>
             <citrus_ads>
-                <max_number_of_ads>3</max_number_of_ads>
+                <max_number_of_ads>8</max_number_of_ads>
             </citrus_ads>
         </citrus_sync>
         <citrus_sync>
