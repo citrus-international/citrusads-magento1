@@ -510,33 +510,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
 
         return $results;
     }
-//    public function handleData($itemId, $type){
-//        $itemModel = Mage::getModel($type);
-//
-//        switch ($type){
-//            case 'catalog/product':
-//                /** @var  $itemModel Mage_Catalog_Model_Product */
-//                $entity = $itemModel->load($itemId);
-//                $body = $this->getCatalogProductData($entity);
-//                $response = $this->getRequestModel()->pushCatalogProductsRequest($body);
-//                $body = $this->getProductData($entity);
-//                $response = $this->getRequestModel()->pushProductsRequest($body);
-//                break;
-//            case 'customer/customer':
-//                /** @var  $itemModel Mage_Customer_Model_Customer */
-//                $entity = $itemModel->load($itemId);
-//                $body = $this->getCustomerData($entity);
-//                $response = $this->getRequestModel()->pushCustomerRequest([$body]);
-//                break;
-//            case 'sales/order':
-//                /** @var  $itemModel Mage_Sales_Model_Order */
-//                $entity = $itemModel->loadByIncrementId($itemId);
-//                $body = $this->getOrderData($entity);
-//                $response = $this->getRequestModel()->pushOrderRequest([$body]);
-//                break;
-//        }
-//        $this->handleResponse($response);
-//    }
+
     public function handlePostResponse($response)
     {
         if($response['success']){

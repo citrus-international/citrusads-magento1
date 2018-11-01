@@ -434,20 +434,20 @@ class Citrus_Integration_Model_Observer
                         $this->getCitrusHelper()->log('push catalog product-' . $product->getEntityId() . ':' . $response['message'], __FILE__, __LINE__);
                     }
 
-                    $this->pushCatalogProductAfter($product);
+//                    $this->pushCatalogProductAfter($product);
                 }
             } else {
                 $this->productDeleteEventAction($observer);
             }
         }
     }
-    public function pushCatalogProductAfter($entity)
-    {
-        $helper = $this->getCitrusHelper();
-        $body = $helper->getProductData($entity);
-        $response = $this->getCitrusHelper()->getRequestModel()->pushProductsRequest(array($body));
-        $this->getCitrusHelper()->log('push product-'.$entity->getEntityId().':'.$response['message'], __FILE__, __LINE__);
-    }
+//    public function pushCatalogProductAfter($entity)
+//    {
+//        $helper = $this->getCitrusHelper();
+//        $body = $helper->getProductData($entity);
+//        $response = $this->getCitrusHelper()->getRequestModel()->pushProductsRequest(array($body));
+//        $this->getCitrusHelper()->log('push product-'.$entity->getEntityId().':'.$response['message'], __FILE__, __LINE__);
+//    }
     public function pushOrderToQueue($observer)
     {
         $moduleEnable = Mage::getStoreConfig('citrus/citrus_group/enable', Mage::app()->getStore());
