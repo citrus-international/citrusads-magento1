@@ -372,14 +372,6 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $data['images'] = array(Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage()));
         if($entity->getSize())
             $data['size'] = $entity->getSize();
-        /*$categoryIds = $entity->getResource()->getCategoryIds($entity);
-        $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
-        if (is_array($categoryIds)) {
-            foreach ($categoryIds as $categoryId) {
-                $category = $catModel->load($categoryId);
-                $data['categoryHierarchies'][] = $this->getCategoryHierarchies($category);
-            }
-        }*/
 
         return $data;
     }
@@ -403,8 +395,6 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($entity);
         $catalogId = $this->getCitrusCatalogId();
         $teamId = $this->getTeamId();
-//        $tags = $this->getProductTags($entity->getId());
-//        $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
         $data[0]['catalogId'] = $catalogId;
         $data[0]['teamId'] = $teamId;
         $data[0]['gtin'] = $entity->getSku();

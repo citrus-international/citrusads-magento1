@@ -84,8 +84,6 @@ class Citrus_Integration_Model_Sync
                         foreach ($catalogProductData as $key => $oneData){
                             $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = array(), array($oneData));
                         }
-
-//                        $bodyProducts[] = $this->getHelper()->getProductData($product);
                     }
 
                     unset($productCollection);
@@ -101,21 +99,6 @@ class Citrus_Integration_Model_Sync
                     }
                 }
             }
-
-//            $pageProduct = count($bodyProducts)/100;
-//            for ($i = 0;$i <= $pageProduct; $i++) {
-//                $bodyProductsPage = array_slice($bodyProducts, $i * 100, 100);
-//                if (!empty($bodyProductsPage)) {
-//                    $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProductsPage);
-//                    if($responseProduct['success']){
-//                        $queueModel = $this->getQueueModel();
-//                        $queueModel->makeDeleteItems($catalog_product, 'catalog/product');
-//                    }
-//
-//                    $this->getHelper()->log('cron - sync product: ' . $responseProduct['message'], __FILE__, __LINE__);
-//                    $this->getHelper()->log('cron - sync product body: ' . json_encode($bodyProductsPage), __FILE__, __LINE__);
-//                }
-//            }
         }
 
         if($sales_order){
