@@ -395,7 +395,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $entityImageUrl = Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage());
         $tags = array(
             "name" => $entityName,
-            "image_url" => $entityImageUrl
+            "imageURL" => $entityImageUrl
         );
 
         $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($entity);
