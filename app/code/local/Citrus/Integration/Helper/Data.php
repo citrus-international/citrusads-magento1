@@ -386,10 +386,10 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
         if ($entity->getImage() != 'no_selection')
             $entityImageUrl = Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage());
         $tags = array(
-            "name" => $entityName,
-            "image_url" => $entityImageUrl,
-            "size" => $entity->getSize(),
-            "description" => $entity->getDescription()
+            "name:" . $entityName,
+            "image_url:" . $entityImageUrl,
+            "size:" . $entity->getSize(),
+            "description:" . $entity->getDescription()
         );
 
         $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($entity);
