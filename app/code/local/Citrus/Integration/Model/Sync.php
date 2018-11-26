@@ -69,7 +69,6 @@ class Citrus_Integration_Model_Sync
 
         if($catalog_product){
             $bodyCatalogProducts = array();
-            $bodyProducts = array();
             /** @var Mage_Catalog_Model_Product $productModel */
             $productModel = Mage::getModel(Mage_Catalog_Model_Product::class);
             $productCollection = $productModel->getCollection()->addAttributeToSelect('*')
