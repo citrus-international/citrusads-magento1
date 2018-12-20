@@ -66,9 +66,9 @@ class Citrus_Integration_Model_Sync
         $catalog_product = $syncItems->getCatalogProduct();
         $sales_order = $syncItems->getSalesOrder();
         $customer_customer = $syncItems->getCustomerCustomer();
+
         if($catalog_product){
             $bodyCatalogProducts = array();
-            $bodyProducts = array();
             /** @var Mage_Catalog_Model_Product $productModel */
             $productModel = Mage::getModel(Mage_Catalog_Model_Product::class);
             $productCollection = $productModel->getCollection()->addAttributeToSelect('*')
@@ -78,8 +78,6 @@ class Citrus_Integration_Model_Sync
                 foreach ($catalogProductData as $key => $oneData){
                     $bodyCatalogProducts[$key] = array_merge(isset($bodyCatalogProducts[$key]) ? $bodyCatalogProducts[$key] : $bodyCatalogProducts[$key] = array(), array($oneData));
                 }
-
-                $bodyProducts[] = $this->getHelper()->getProductData($product);
             }
 
             unset($productCollection);
@@ -92,21 +90,6 @@ class Citrus_Integration_Model_Sync
                         $this->getHelper()->log('cron - sync catalog product: '.$responseCatalogProduct['message'], __FILE__, __LINE__);
                         $this->getHelper()->log('cron - sync catalog product body: '.json_encode($bodyCatalogProductsPage), __FILE__, __LINE__);
                     }
-                }
-            }
-
-            $pageProduct = count($bodyProducts)/100;
-            for ($i = 0;$i <= $pageProduct; $i++) {
-                $bodyProductsPage = array_slice($bodyProducts, $i * 100, 100);
-                if (!empty($bodyProductsPage)) {
-                    $responseProduct = $this->getRequestModel()->pushProductsRequest($bodyProductsPage);
-                    if($responseProduct['success']){
-                        $queueModel = $this->getQueueModel();
-                        $queueModel->makeDeleteItems($catalog_product, 'catalog/product');
-                    }
-
-                    $this->getHelper()->log('cron - sync product: ' . $responseProduct['message'], __FILE__, __LINE__);
-                    $this->getHelper()->log('cron - sync product body: ' . json_encode($bodyProductsPage), __FILE__, __LINE__);
                 }
             }
         }

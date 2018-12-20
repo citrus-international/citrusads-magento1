@@ -372,14 +372,6 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
             $data['images'] = array(Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage()));
         if($entity->getSize())
             $data['size'] = $entity->getSize();
-        /*$categoryIds = $entity->getResource()->getCategoryIds($entity);
-        $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
-        if (is_array($categoryIds)) {
-            foreach ($categoryIds as $categoryId) {
-                $category = $catModel->load($categoryId);
-                $data['categoryHierarchies'][] = $this->getCategoryHierarchies($category);
-            }
-        }*/
 
         return $data;
     }
@@ -389,41 +381,29 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
      */
     public function getCatalogProductData($entity)
     {
+        $entityName = $entity->getName();
+        $entityImageUrl = null;
+        if ($entity->getImage() != 'no_selection')
+            $entityImageUrl = Mage::getModel('catalog/product_media_config')->getMediaUrl($entity->getImage());
+        $tags = array(
+            "name:" . $entityName,
+            "image_url:" . $entityImageUrl,
+            "size:" . $entity->getSize(),
+            "description:" . $entity->getDescription()
+        );
+
         $stock = Mage::getModel('cataloginventory/stock_item')->loadByProduct($entity);
         $catalogId = $this->getCitrusCatalogId();
         $teamId = $this->getTeamId();
-        $tags = $this->getProductTags($entity->getId());
-//        $categoryIds = $entity->getResource()->getCategoryIds($entity);
-        $catModel = Mage::getModel('catalog/category')->setStoreId(Mage::app()->getStore()->getId());
-        /*if (is_array($categoryIds) && $categoryIds){
-            $data[0]['catalogId'] = $catalogId;
-            $data[0]['teamId'] = $teamId;
-            $data[0]['gtin'] = $entity->getSku();
-            $data[0]['inventory'] = (int)$stock->getQty();
-            $data[0]['price'] = (int)$entity->getPrice();
-            $data[0]['tags'] = $tags;
-            $data[0]['filters'] = $this->getProductFilter($entity);
-            $data[0]['profit'] = null;
-            foreach ($categoryIds as $key => $categoryId) {
-                $category = $catModel->load($categoryId);
-                if ($category->getChildrenCount() == 0) {
-                    $data[0]['categoryHierarchy'] = $this->getCategoryHierarchies($category);
-                    break;
-                }
-            }
-        }*/
-
-//        else{
-            $data[0]['catalogId'] = $catalogId;
-            $data[0]['teamId'] = $teamId;
-            $data[0]['gtin'] = $entity->getSku();
-            $data[0]['inventory'] = (int)$stock->getQty();
-            $data[0]['price'] = (int)$entity->getPrice();
-            $data[0]['tags'] = $tags;
-            $data[0]['filters'] = $this->getProductFilter($entity);
-            $data[0]['categoryHierarchy'] = null;
-            $data[0]['profit'] = null;
-//        }
+        $data[0]['catalogId'] = $catalogId;
+        $data[0]['teamId'] = $teamId;
+        $data[0]['gtin'] = $entity->getSku();
+        $data[0]['inventory'] = (int)$stock->getQty();
+        $data[0]['price'] = (int)$entity->getPrice();
+        $data[0]['tags'] = $tags;
+        $data[0]['filters'] = $this->getProductFilter($entity);
+        $data[0]['categoryHierarchy'] = null;
+        $data[0]['profit'] = null;
 
         return $data;
     }
@@ -510,33 +490,7 @@ class Citrus_Integration_Helper_Data extends Mage_Core_Helper_Data
 
         return $results;
     }
-//    public function handleData($itemId, $type){
-//        $itemModel = Mage::getModel($type);
-//
-//        switch ($type){
-//            case 'catalog/product':
-//                /** @var  $itemModel Mage_Catalog_Model_Product */
-//                $entity = $itemModel->load($itemId);
-//                $body = $this->getCatalogProductData($entity);
-//                $response = $this->getRequestModel()->pushCatalogProductsRequest($body);
-//                $body = $this->getProductData($entity);
-//                $response = $this->getRequestModel()->pushProductsRequest($body);
-//                break;
-//            case 'customer/customer':
-//                /** @var  $itemModel Mage_Customer_Model_Customer */
-//                $entity = $itemModel->load($itemId);
-//                $body = $this->getCustomerData($entity);
-//                $response = $this->getRequestModel()->pushCustomerRequest([$body]);
-//                break;
-//            case 'sales/order':
-//                /** @var  $itemModel Mage_Sales_Model_Order */
-//                $entity = $itemModel->loadByIncrementId($itemId);
-//                $body = $this->getOrderData($entity);
-//                $response = $this->getRequestModel()->pushOrderRequest([$body]);
-//                break;
-//        }
-//        $this->handleResponse($response);
-//    }
+
     public function handlePostResponse($response)
     {
         if($response['success']){
